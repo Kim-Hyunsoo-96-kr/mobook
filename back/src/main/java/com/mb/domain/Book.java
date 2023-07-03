@@ -8,9 +8,9 @@ public class Book {
     @GeneratedValue
     private Long bookId;
 
-    private String name;
+    private String bookName;
 
-    @ManyToOne
-    @JoinColumn(name = "MEMBER_UUID")
-    private Member rentalMember;
+//    @ManyToOne
+//    @JoinColumn(name = "MEMBER_UUID")
+//    private Member rentalMember;
 }
