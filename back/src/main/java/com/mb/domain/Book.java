@@ -10,7 +10,7 @@ public class Book {
 
     private String bookName;
 
-//    @ManyToOne
-//    @JoinColumn(name = "MEMBER_UUID")
-//    private Member rentalMember;
+    @ManyToOne
+    @JoinColumn(name = "MEMBER_ID")
+    private Member rentalMember;
 }

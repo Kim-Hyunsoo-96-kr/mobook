@@ -4,7 +4,6 @@ import com.mb.domain.Member;
 import com.mb.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Service
 @RequiredArgsConstructor
@@ -13,5 +12,10 @@ public class MemberService {
     public Member addMember(Member member) {
         Member saveMember = memberRepository.save(member);
         return saveMember;
+    }
+
+    public Member findByEmail(String email) {
+        Member findMember = memberRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("등록되지 않은 사용자입니다."));
+        return findMember;
     }
 }

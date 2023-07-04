@@ -1,13 +1,21 @@
 package com.mb.controller;
 
 import com.mb.domain.Member;
-import com.mb.dto.MemberJoinDto;
-import com.mb.dto.MemberJoinResponseDto;
+import com.mb.domain.RefreshToken;
+import com.mb.dto.MemberLoginDto;
+import com.mb.dto.MemberLoginResponseDto;
+import com.mb.dto.MemberSignUpDto;
+import com.mb.dto.MemberSignUpResponseDto;
 import com.mb.service.MemberService;
+import com.mb.service.RefreshTokenService;
+import com.mb.util.JwtUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,26 +26,67 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MemberController {
 
     private final MemberService memberService;
+    private final RefreshTokenService refreshTokenService;
 
-    @PostMapping("/joinTest")
-    public ResponseEntity join(@RequestBody MemberJoinDto memberJoinDto){
-        String memberId = memberJoinDto.getId();
-        String password = memberJoinDto.getPassword();
+    @Value("${jwt.secretKey}")
+    public String accessSecretKey;
+    @Value("${jwt.refreshKey}")
+    public String refreshSecretKey;
+
+    @PostMapping("/signUp")
+    public ResponseEntity join(@RequestBody @Valid MemberSignUpDto memberSignUpDto, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+
+        String name = memberSignUpDto.getName();
+        String email = memberSignUpDto.getEmail();
+        String password = memberSignUpDto.getPassword();
 
         Member member = new Member();
-        member.setId(memberId);
-        member.setEmail("test@test.com");
+        member.setEmail(email);
         member.setPassword(password);
         member.setIsAdmin(false);
+        member.setName(name);
 
         Member saveMember = memberService.addMember(member);
 
-        MemberJoinResponseDto memberJoinResponseDto = new MemberJoinResponseDto();
+        MemberSignUpResponseDto memberSignUpResponseDto = new MemberSignUpResponseDto();
 
-        memberJoinResponseDto.setMemberId(saveMember.getId());
-        memberJoinResponseDto.setPassword(saveMember.getPassword());
+        memberSignUpResponseDto.setEmail(saveMember.getEmail());
+        memberSignUpResponseDto.setName(saveMember.getName());
 
-        return new ResponseEntity(memberJoinResponseDto, HttpStatus.CREATED);
+        return new ResponseEntity(memberSignUpResponseDto, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity login(@RequestBody @Valid MemberLoginDto memberLoginDto, BindingResult bindingResult){
+
+        if(bindingResult.hasErrors()){
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+
+        Member findMember = memberService.findByEmail(memberLoginDto.getEmail());
+
+        if (!findMember.getPassword().equals(memberLoginDto.getPassword())) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+
+        String accessToken = JwtUtil.createAccessToken(findMember, accessSecretKey);
+        String refreshToken = JwtUtil.createRefreshToken(findMember, refreshSecretKey);
+
+        RefreshToken saveRefreshToken = new RefreshToken();
+        saveRefreshToken.setMemberId(findMember.getMemberId());
+        saveRefreshToken.setValue(refreshToken);
+
+        refreshTokenService.addToken(saveRefreshToken);
+        MemberLoginResponseDto memberLoginResponseDto = new MemberLoginResponseDto();
+        memberLoginResponseDto.setName(findMember.getName());
+        memberLoginResponseDto.setAccessToken(accessToken);
+        memberLoginResponseDto.setRefreshToken(refreshToken);
+
+        return new ResponseEntity(memberLoginResponseDto, HttpStatus.OK);
     }
 
 
