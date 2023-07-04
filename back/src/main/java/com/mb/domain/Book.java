@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 @Entity
 public class Book {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bookId;
 
     private String bookName;
