@@ -35,4 +35,21 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.HS256, refreshSecretKey)
                 .compact();
     }
+
+    public static boolean isExpired(String token, String secretKey) {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration()
+                .before(new Date());
+    } //만료 기한이 현재 시간보다 이전이면 isExpired : true
+
+    public static Long getMemberId(String token, String secretKey) {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .get("memberId", Long.class);
+    }
 }
