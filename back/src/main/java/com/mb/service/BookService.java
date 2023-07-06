@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class BookService {
@@ -14,5 +16,10 @@ public class BookService {
     public Book addBook(Book newBook) {
         Book saveBook = bookRepository.save(newBook);
         return saveBook;
+    }
+
+    public List<Book> getBooksList() {
+        List<Book> bookList = bookRepository.findAll();
+        return bookList;
     }
 }
