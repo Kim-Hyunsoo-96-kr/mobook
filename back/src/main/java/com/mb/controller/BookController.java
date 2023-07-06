@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,10 +49,8 @@ public class BookController {
     @PostMapping("/{bookId}/rent")
     public ResponseEntity bookRent(@PathVariable Long bookId, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
-        System.out.println(loginMember.getName());
         Book book = bookService.findById(bookId);
         if(book.getIsAble()){
-            System.out.println(book.getBookName());
             book.setRentalMember(loginMember);
             book.setIsAble(false);
             bookService.addBook(book);
@@ -67,6 +66,27 @@ public class BookController {
             return new ResponseEntity(errorDto ,HttpStatus.BAD_REQUEST);
         }
 
+    }
+
+    @PostMapping("/{bookId}/return")
+    public ResponseEntity bookReturn(@PathVariable Long bookId, Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+        Book book = bookService.findById(bookId);
+        if(loginMember == book.getRentalMember()){
+            book.setIsAble(true);
+            bookService.addBook(book);
+            BookReturnResponseDto bookReturnResponseDto = new BookReturnResponseDto();
+            bookReturnResponseDto.setMemberName(loginMember.getName());
+            bookReturnResponseDto.setBookName(book.getBookName());
+            bookReturnResponseDto.setMessage("반납 완료");
+
+            return new ResponseEntity(bookReturnResponseDto, HttpStatus.OK);
+        }
+        else {
+            ErrorDto errorDto = new ErrorDto();
+            errorDto.setErrorMessage("해당 책을 대여하지 않았습니다.");
+            return new ResponseEntity(errorDto ,HttpStatus.BAD_REQUEST);
+        }
     }
 
     private Member getLoginMember(Authentication authentication) {
