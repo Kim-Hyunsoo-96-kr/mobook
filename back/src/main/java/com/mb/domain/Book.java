@@ -14,6 +14,8 @@ public class Book {
 
     private String bookName;
 
+    private Boolean isAble;
+
     @ManyToOne
     @JoinColumn(name = "MEMBER_ID")
     private Member rentalMember;

@@ -18,4 +18,9 @@ public class MemberService {
         Member findMember = memberRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("등록되지 않은 사용자입니다."));
         return findMember;
     }
+
+    public Member findById(long memberId) {
+        Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("등록되지 않은 사용자입니다."));
+        return findMember;
+    }
 }

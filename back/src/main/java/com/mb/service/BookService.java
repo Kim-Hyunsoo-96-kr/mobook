@@ -22,4 +22,9 @@ public class BookService {
         List<Book> bookList = bookRepository.findAll();
         return bookList;
     }
+
+    public Book findById(Long bookId) {
+        Book findBook = bookRepository.findById(bookId).orElseThrow(() -> new IllegalArgumentException("등로되지 않은 책입니다."));
+        return findBook;
+    }
 }
