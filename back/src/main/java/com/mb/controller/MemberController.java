@@ -6,6 +6,8 @@ import com.mb.dto.*;
 import com.mb.service.MemberService;
 import com.mb.service.RefreshTokenService;
 import com.mb.util.JwtUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -102,5 +104,11 @@ public class MemberController {
         return new ResponseEntity(memberLoginResponseDto, HttpStatus.OK);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity logout(@RequestBody RefreshTokenDto refreshTokenDto) {
+        refreshTokenService.deleteRefreshToken(refreshTokenDto.getRefreshToken());
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
 
 }
