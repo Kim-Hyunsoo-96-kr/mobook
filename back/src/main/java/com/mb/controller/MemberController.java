@@ -2,10 +2,7 @@ package com.mb.controller;
 
 import com.mb.domain.Member;
 import com.mb.domain.RefreshToken;
-import com.mb.dto.MemberLoginDto;
-import com.mb.dto.MemberLoginResponseDto;
-import com.mb.dto.MemberSignUpDto;
-import com.mb.dto.MemberSignUpResponseDto;
+import com.mb.dto.*;
 import com.mb.service.MemberService;
 import com.mb.service.RefreshTokenService;
 import com.mb.util.JwtUtil;
@@ -85,6 +82,22 @@ public class MemberController {
         memberLoginResponseDto.setName(findMember.getName());
         memberLoginResponseDto.setAccessToken(accessToken);
         memberLoginResponseDto.setRefreshToken(refreshToken);
+
+        return new ResponseEntity(memberLoginResponseDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/refreshToken")
+    public ResponseEntity refreshToken(@RequestBody RefreshTokenDto refreshTokenDto) {
+        RefreshToken refreshToken = refreshTokenService.findRefreshToken(refreshTokenDto.getRefreshToken());
+        Long memberId = JwtUtil.getMemberId(refreshToken.getValue(), refreshSecretKey);
+        Member member = memberService.findById(memberId);
+
+        String accessToken = JwtUtil.createAccessToken(member, accessSecretKey);
+
+        MemberLoginResponseDto memberLoginResponseDto = new MemberLoginResponseDto();
+        memberLoginResponseDto.setName(member.getName());
+        memberLoginResponseDto.setAccessToken(accessToken);
+        memberLoginResponseDto.setRefreshToken(refreshToken.getValue());
 
         return new ResponseEntity(memberLoginResponseDto, HttpStatus.OK);
     }
