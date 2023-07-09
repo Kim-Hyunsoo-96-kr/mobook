@@ -1,5 +1,6 @@
 package com.mb.controller;
 
+import com.mb.domain.Book;
 import com.mb.domain.Member;
 import com.mb.domain.RefreshToken;
 import com.mb.dto.*;
@@ -13,11 +14,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -109,6 +111,37 @@ public class MemberController {
         refreshTokenService.deleteRefreshToken(refreshTokenDto.getRefreshToken());
 
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @GetMapping("myPage")
+    public ResponseEntity myPage(Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+
+        MyPageResponseDto myPageResponseDto = new MyPageResponseDto();
+
+        List<Book> rentalBookList = loginMember.getRentalBookList();
+        for (Book book : rentalBookList) {
+            System.out.println(book.getBookName());
+            System.out.println(book.getBookId());
+        }
+
+
+        myPageResponseDto.setName(loginMember.getName());
+        myPageResponseDto.setEmail(loginMember.getEmail());
+        myPageResponseDto.setIsAdmin(loginMember.getIsAdmin());
+        myPageResponseDto.setRentalBookList(loginMember.getRentalBookList());
+
+        return new ResponseEntity(myPageResponseDto, HttpStatus.OK);
+    }
+
+    private Member getLoginMember(Authentication authentication) {
+        if(authentication == null){
+            System.out.println("authentication에 아무것도 없음");
+            return memberService.findById(1L);
+        }
+        Long memberId = (Long) authentication.getPrincipal();
+        Member loginMember = memberService.findById(memberId);
+        return loginMember;
     }
 
 }
