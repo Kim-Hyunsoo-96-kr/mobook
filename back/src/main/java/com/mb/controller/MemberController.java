@@ -1,24 +1,25 @@
 package com.mb.controller;
 
+import com.mb.domain.Book;
 import com.mb.domain.Member;
 import com.mb.domain.RefreshToken;
-import com.mb.dto.MemberLoginDto;
-import com.mb.dto.MemberLoginResponseDto;
-import com.mb.dto.MemberSignUpDto;
-import com.mb.dto.MemberSignUpResponseDto;
+import com.mb.dto.*;
 import com.mb.service.MemberService;
 import com.mb.service.RefreshTokenService;
 import com.mb.util.JwtUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -89,5 +90,58 @@ public class MemberController {
         return new ResponseEntity(memberLoginResponseDto, HttpStatus.OK);
     }
 
+    @PostMapping("/refreshToken")
+    public ResponseEntity refreshToken(@RequestBody RefreshTokenDto refreshTokenDto) {
+        RefreshToken refreshToken = refreshTokenService.findRefreshToken(refreshTokenDto.getRefreshToken());
+        Long memberId = JwtUtil.getMemberId(refreshToken.getValue(), refreshSecretKey);
+        Member member = memberService.findById(memberId);
+
+        String accessToken = JwtUtil.createAccessToken(member, accessSecretKey);
+
+        MemberLoginResponseDto memberLoginResponseDto = new MemberLoginResponseDto();
+        memberLoginResponseDto.setName(member.getName());
+        memberLoginResponseDto.setAccessToken(accessToken);
+        memberLoginResponseDto.setRefreshToken(refreshToken.getValue());
+
+        return new ResponseEntity(memberLoginResponseDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity logout(@RequestBody RefreshTokenDto refreshTokenDto) {
+        refreshTokenService.deleteRefreshToken(refreshTokenDto.getRefreshToken());
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @GetMapping("myPage")
+    public ResponseEntity myPage(Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+
+        MyPageResponseDto myPageResponseDto = new MyPageResponseDto();
+
+        List<Book> rentalBookList = loginMember.getRentalBookList();
+        for (Book book : rentalBookList) {
+            System.out.println(book.getBookName());
+            System.out.println(book.getBookId());
+        }
+
+
+        myPageResponseDto.setName(loginMember.getName());
+        myPageResponseDto.setEmail(loginMember.getEmail());
+        myPageResponseDto.setIsAdmin(loginMember.getIsAdmin());
+        myPageResponseDto.setRentalBookList(loginMember.getRentalBookList());
+
+        return new ResponseEntity(myPageResponseDto, HttpStatus.OK);
+    }
+
+    private Member getLoginMember(Authentication authentication) {
+        if(authentication == null){
+            System.out.println("authentication에 아무것도 없음");
+            return memberService.findById(1L);
+        }
+        Long memberId = (Long) authentication.getPrincipal();
+        Member loginMember = memberService.findById(memberId);
+        return loginMember;
+    }
 
 }

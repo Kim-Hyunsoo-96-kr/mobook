@@ -1,11 +1,12 @@
 package com.mb.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Setter
@@ -22,5 +23,9 @@ public class Member {
     private String email;
 
     private Boolean isAdmin;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "rentalMember")
+    private List<Book> rentalBookList = new ArrayList<>();
 
 }
