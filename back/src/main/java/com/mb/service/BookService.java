@@ -3,6 +3,7 @@ package com.mb.service;
 import com.mb.domain.Book;
 import com.mb.repository.BookRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -28,8 +29,8 @@ public class BookService {
         return findBook;
     }
 
-    public List<Book> getBookListByKeyword(String keyword) {
-        List<Book> bookList = bookRepository.findByBookNameContaining(keyword);
+    public List<Book> getBookListByKeyword(String keyword, Pageable pageable) {
+        List<Book> bookList = bookRepository.findByBookNameContaining(keyword, pageable);
         return bookList;
     }
 }

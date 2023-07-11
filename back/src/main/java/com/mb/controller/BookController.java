@@ -6,6 +6,10 @@ import com.mb.dto.*;
 import com.mb.service.BookService;
 import com.mb.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -90,8 +94,9 @@ public class BookController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity bookSearch(@RequestBody BookSearchDto bookSearchDto){
-        List<Book> bookList = bookService.getBookListByKeyword(bookSearchDto.getSearchText());
+    public ResponseEntity bookSearch(@RequestBody BookSearchDto bookSearchDto, Pageable pageable){
+        pageable = PageRequest.of(bookSearchDto.getPage(), bookSearchDto.getPage(), Sort.by("bookId"))
+        List<Book> bookList = bookService.getBookListByKeyword(bookSearchDto.getSearchText(), pageable.withPage(bookSearchDto.getPage()));
 
         BookListResponseDto bookListResponseDto = new BookListResponseDto();
         bookListResponseDto.setBookList(bookList);
