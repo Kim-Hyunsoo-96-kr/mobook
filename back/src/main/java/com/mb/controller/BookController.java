@@ -89,6 +89,15 @@ public class BookController {
         }
     }
 
+    @GetMapping("/search")
+    public ResponseEntity bookSearch(@RequestBody BookSearchDto bookSearchDto){
+        List<Book> bookList = bookService.getBookListByKeyword(bookSearchDto.getSearchText());
+
+        BookListResponseDto bookListResponseDto = new BookListResponseDto();
+        bookListResponseDto.setBookList(bookList);
+        return new ResponseEntity(bookListResponseDto, HttpStatus.OK);
+    }
+
     private Member getLoginMember(Authentication authentication) {
         if(authentication == null){
             System.out.println("authentication에 아무것도 없음");

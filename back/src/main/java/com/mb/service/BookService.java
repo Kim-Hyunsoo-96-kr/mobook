@@ -27,4 +27,9 @@ public class BookService {
         Book findBook = bookRepository.findById(bookId).orElseThrow(() -> new IllegalArgumentException("등로되지 않은 책입니다."));
         return findBook;
     }
+
+    public List<Book> getBookListByKeyword(String keyword) {
+        List<Book> bookList = bookRepository.findByBookNameContaining(keyword);
+        return bookList;
+    }
 }
