@@ -137,6 +137,7 @@ public class MemberController {
     private Member getLoginMember(Authentication authentication) {
         if(authentication == null){
             System.out.println("authentication에 아무것도 없음");
+            //Todo
             return memberService.findById(1L);
         }
         Long memberId = (Long) authentication.getPrincipal();

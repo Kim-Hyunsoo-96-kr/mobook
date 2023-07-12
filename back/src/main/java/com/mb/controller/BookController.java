@@ -95,7 +95,7 @@ public class BookController {
 
     @GetMapping("/search")
     public ResponseEntity bookSearch(@RequestBody BookSearchDto bookSearchDto, Pageable pageable){
-        pageable = PageRequest.of(bookSearchDto.getPage(), bookSearchDto.getPage(), Sort.by("bookId"))
+        pageable = PageRequest.of(bookSearchDto.getPage(), 10, Sort.by("bookId").descending());
         List<Book> bookList = bookService.getBookListByKeyword(bookSearchDto.getSearchText(), pageable.withPage(bookSearchDto.getPage()));
 
         BookListResponseDto bookListResponseDto = new BookListResponseDto();
