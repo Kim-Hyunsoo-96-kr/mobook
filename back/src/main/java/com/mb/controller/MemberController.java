@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final RefreshTokenService refreshTokenService;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${jwt.secretKey}")
     public String accessSecretKey;
@@ -47,7 +49,7 @@ public class MemberController {
 
         Member member = new Member();
         member.setEmail(email);
-        member.setPassword(password);
+        member.setPassword(passwordEncoder.encode(password));
         member.setIsAdmin(false);
         member.setName(name);
 
@@ -70,7 +72,7 @@ public class MemberController {
 
         Member findMember = memberService.findByEmail(memberLoginDto.getEmail());
 
-        if (!findMember.getPassword().equals(memberLoginDto.getPassword())) {
+        if (!passwordEncoder.matches(memberLoginDto.getPassword(), findMember.getPassword())) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
 
