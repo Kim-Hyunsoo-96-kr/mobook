@@ -64,11 +64,7 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid MemberLoginDto memberLoginDto, BindingResult bindingResult){
-
-        if(bindingResult.hasErrors()){
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity login(@RequestBody @Valid MemberLoginDto memberLoginDto){
 
         Member findMember = memberService.findByEmail(memberLoginDto.getEmail());
 
