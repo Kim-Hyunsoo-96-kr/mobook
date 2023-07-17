@@ -7,8 +7,8 @@ import com.mb.dto.*;
 import com.mb.service.MemberService;
 import com.mb.service.RefreshTokenService;
 import com.mb.util.JwtUtil;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,11 +17,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name="MemberController", description = "멤버 컨트롤러")
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api/members")
@@ -36,12 +36,9 @@ public class MemberController {
     @Value("${jwt.refreshKey}")
     public String refreshSecretKey;
 
+    @Operation(summary = "회원 가입", description = "입력값으로 회원가입을 요청합니다.")
     @PostMapping("/signUp")
-    public ResponseEntity join(@RequestBody @Valid MemberSignUpDto memberSignUpDto, BindingResult bindingResult) {
-
-        if (bindingResult.hasErrors()) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity join(@RequestBody @Valid MemberSignUpDto memberSignUpDto) {
 
         String name = memberSignUpDto.getName();
         String email = memberSignUpDto.getEmail();
@@ -62,7 +59,7 @@ public class MemberController {
 
         return new ResponseEntity(memberSignUpResponseDto, HttpStatus.CREATED);
     }
-
+    @Operation(summary = "로그인", description = "입력값으로 로그인을 합니다.")
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid MemberLoginDto memberLoginDto){
 
@@ -87,7 +84,7 @@ public class MemberController {
 
         return new ResponseEntity(memberLoginResponseDto, HttpStatus.OK);
     }
-
+    @Operation(summary = "accessToken 갱신", description = "refreshToken으로 accessToken을 갱신합니다.")
     @PostMapping("/refreshToken")
     public ResponseEntity refreshToken(@RequestBody RefreshTokenDto refreshTokenDto) {
         RefreshToken refreshToken = refreshTokenService.findRefreshToken(refreshTokenDto.getRefreshToken());
@@ -104,6 +101,7 @@ public class MemberController {
         return new ResponseEntity(memberLoginResponseDto, HttpStatus.OK);
     }
 
+    @Operation(summary = "로그아웃", description = "DB에서 refreshToken을 삭제합니다.")
     @PostMapping("/logout")
     public ResponseEntity logout(@RequestBody RefreshTokenDto refreshTokenDto) {
         refreshTokenService.deleteRefreshToken(refreshTokenDto.getRefreshToken());
@@ -111,6 +109,7 @@ public class MemberController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    @Operation(summary = "마이 페이지", description = "로그인한 회원의 정보를 조회합니다.")
     @GetMapping("myPage")
     public ResponseEntity myPage(Authentication authentication){
         Member loginMember = getLoginMember(authentication);
