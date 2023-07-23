@@ -5,6 +5,8 @@ import com.mb.domain.Member;
 import com.mb.dto.*;
 import com.mb.service.BookService;
 import com.mb.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name="BookController", description = "책 컨트롤러")
 @Controller
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class BookController {
     private final BookService bookService;
     private final MemberService memberService;
 
+    @Operation(summary = "책 추가", description = "DB에 책을 추가합니다.")
     @PostMapping("/add")
     public ResponseEntity addBook(@RequestBody BookAddDto bookAddDto){
         Book newBook = new Book();
@@ -42,6 +46,7 @@ public class BookController {
         return new ResponseEntity(bookAddResponseDto, HttpStatus.OK);
     }
 
+    @Operation(summary = "책 전체 리스트", description = "DB에 저장된 전체 책 리스트를 가져옵니다.")
     @GetMapping("/list")
     public ResponseEntity bookList(){
         List<Book> bookList= bookService.getBooksList();
@@ -50,6 +55,7 @@ public class BookController {
         return new ResponseEntity(bookListResponseDto, HttpStatus.OK);
     }
 
+    @Operation(summary = "책 대여", description = "해당 책을 대여불가 상태로 DB에 저장합니다.")
     @PostMapping("/{bookId}/rent")
     public ResponseEntity bookRent(@PathVariable Long bookId, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
@@ -72,6 +78,7 @@ public class BookController {
 
     }
 
+    @Operation(summary = "책 반납", description = "해당 책을 대여가능 상태로 DB에 저장합니다.")
     @PostMapping("/{bookId}/return")
     public ResponseEntity bookReturn(@PathVariable Long bookId, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
@@ -93,6 +100,7 @@ public class BookController {
         }
     }
 
+    @Operation(summary = "책 검색", description = "검색값과 일치하는 제목의 책 리스트를 가져옵니다.")
     @GetMapping("/search")
     public ResponseEntity bookSearch(@RequestBody BookSearchDto bookSearchDto, Pageable pageable){
         pageable = PageRequest.of(bookSearchDto.getPage(), 10, Sort.by("bookId").descending());

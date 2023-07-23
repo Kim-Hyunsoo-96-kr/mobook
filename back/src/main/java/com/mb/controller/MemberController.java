@@ -59,7 +59,7 @@ public class MemberController {
 
         return new ResponseEntity(memberSignUpResponseDto, HttpStatus.CREATED);
     }
-    @Operation(summary = "로그인", description = "입력값으로 로그인을 합니다.")
+    @Operation(summary = "로그인(Token 필요)", description = "입력값으로 로그인을 합니다.")
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid MemberLoginDto memberLoginDto){
 
@@ -84,7 +84,7 @@ public class MemberController {
 
         return new ResponseEntity(memberLoginResponseDto, HttpStatus.OK);
     }
-    @Operation(summary = "accessToken 갱신", description = "refreshToken으로 accessToken을 갱신합니다.")
+    @Operation(summary = "accessToken 갱신(Token 필요)", description = "refreshToken으로 accessToken을 갱신합니다.")
     @PostMapping("/refreshToken")
     public ResponseEntity refreshToken(@RequestBody RefreshTokenDto refreshTokenDto) {
         RefreshToken refreshToken = refreshTokenService.findRefreshToken(refreshTokenDto.getRefreshToken());
@@ -109,7 +109,7 @@ public class MemberController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @Operation(summary = "마이 페이지", description = "로그인한 회원의 정보를 조회합니다.")
+    @Operation(summary = "마이 페이지(Token 필요)", description = "로그인한 회원의 정보를 조회합니다.")
     @GetMapping("myPage")
     public ResponseEntity myPage(Authentication authentication){
         Member loginMember = getLoginMember(authentication);
