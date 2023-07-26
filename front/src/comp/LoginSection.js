@@ -1,5 +1,10 @@
+import axios from "axios";
+
 function LoginSection() {
-    const onSubmit = (event) => {
+    const CONFIG = {};
+    CONFIG.BASE_URL = "http://localhost:8080";
+    CONFIG.API_LOGIN = "http://localhost:8080/api/members/login";
+    const onSubmit = async (event) => {
         event.preventDefault();
 
         const form = event.target;
@@ -21,6 +26,14 @@ function LoginSection() {
 
         const email = form.email.value;
         const password = form.password.value;
+
+        try {
+            const response = await axios.post(CONFIG.API_LOGIN, {email, password});
+            console.log(response);
+        }
+        catch (e) {
+            
+        }
     };
     return (
         <section className="py-5">
