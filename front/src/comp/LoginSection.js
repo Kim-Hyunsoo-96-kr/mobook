@@ -1,6 +1,7 @@
 import axios from "axios";
-import {atom, useRecoilState, useRecoilValue, selector} from "recoil";
+import {atom, useRecoilState} from "recoil";
 import {recoilPersist} from "recoil-persist";
+import {Link, Navigate} from "react-router-dom";
 
 // 리코일 atom, selector 시작
 // 리코일 atom와 selector는 전역변수 정도로 해석하면 됩니다.
@@ -29,6 +30,8 @@ function LoginSection() {
     CONFIG.BASE_URL = "http://localhost:8080";
     CONFIG.API_LOGIN = "http://localhost:8080/api/members/login";
     const [loginedUserInfo, setLoginedUserInfo] = useRecoilState(loginedUserInfoAtom);
+    const isLogined = loginedUserInfo != null
+    if(isLogined) return <Navigate to={"/"}/>;
     const onSubmit = async (event) => {
         event.preventDefault();
 
