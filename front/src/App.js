@@ -4,7 +4,6 @@ import Main from "./pages/Main";
 import NavBar from "./comp/NavBar";
 import Login from "./pages/Login";
 import axios from "axios";
-
 function App() {
     const nav = {
         title: "MOBOOK1.0",
