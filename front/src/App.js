@@ -4,6 +4,7 @@ import Main from "./pages/Main";
 import NavBar from "./comp/NavBar";
 import Login from "./pages/Login";
 import axios from "axios";
+import Logout from "./pages/Logout";
 function App() {
     const nav = {
         title: "MOBOOK1.0",
@@ -13,6 +14,7 @@ function App() {
             {title: "책 대여", router: "contact.html"},
             {title: "책 반납", router: "pricing.html"},
             {title: "책 요청", router: "faq.html"},
+            {title: "로그아웃", router: "/logout"},
             {title: "로그인", router: "/login"},
         ]
     }
@@ -23,6 +25,7 @@ function App() {
           <Routes>
               <Route path="/" element={<Main />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/logout" element={<Logout />} />
           </Routes>
           </div>
       </BrowserRouter>
