@@ -4,6 +4,7 @@ import {recoilPersist} from "recoil-persist";
 export const CONFIG = {};
 CONFIG.BASE_URL = "http://localhost:8080";
 CONFIG.API_LOGIN = "http://localhost:8080/api/members/login";
+CONFIG.TEST = "http://localhost:8080/api/books/list";
 export const { persistAtom } = recoilPersist();
 export const loginedUserInfoAtom = atom({
     key: "app/loginedUserInfoAtom", // 이 키는 나중에 디버깅시에 의미가 있음
@@ -16,6 +17,22 @@ export const isLoginedSelector = selector({
     key: "app/isLoginedSelector",
     get: ({ get }) => get(loginedUserInfoAtom) != null
 });
+
+export const loginedUserInfoSelector = selector({
+    key: "app/loginedUserInfoSelector",
+    get: ({ get }) => {
+        const isLogined = get(isLoginedSelector);
+
+        if (!isLogined) return null; // 로그인 안했다면 null 반환
+
+        const rawLoginedUserInfo = get(loginedUserInfoAtom);
+
+        return {
+            ...rawLoginedUserInfo
+        };
+    }
+});
+
 export function getPayloadFromJWT(token) {
     const base64Payload = token.split(".")[1];
     return JSON.parse(atob(base64Payload));

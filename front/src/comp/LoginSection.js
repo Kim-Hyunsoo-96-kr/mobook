@@ -8,6 +8,7 @@ function LoginSection() {
     const isLogined = useRecoilValue(isLoginedSelector);
     if(isLogined) return <Navigate to={"/"}/>;
     const onSubmit = async (event) => {
+        console.log("onSubmit 들어옴")
         event.preventDefault();
 
         const form = event.target;
