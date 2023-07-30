@@ -21,7 +21,7 @@ function Logout() {
                     Authorization: `Bearer ${loginedUserInfo.accessToken}`
                     }
                 });
-            console.log(response);
+            alert("로그아웃 성공")
         } catch (error) {
             //응답 실패
             console.error(error);

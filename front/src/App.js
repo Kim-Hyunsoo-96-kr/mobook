@@ -10,13 +10,11 @@ function App() {
     const nav = {
         title: "MOBOOK1.0",
         menu: [
-            {title: "홈", router: "index.html"},
-            {title: "책 검색", router: "about.html"},
-            {title: "책 대여", router: "contact.html"},
-            {title: "책 반납", router: "pricing.html"},
-            {title: "책 요청", router: "faq.html"},
-            // {title: "로그아웃", router: "/logout"},
-            // {title: "로그인", router: "/login"},
+            {title: "홈", router: "/"},
+            {title: "책 검색", router: "/search"},
+            {title: "책 대여", router: "/rent"},
+            {title: "책 반납", router: "/return"},
+            {title: "책 요청", router: "/request"},
         ]
     }
   return (
