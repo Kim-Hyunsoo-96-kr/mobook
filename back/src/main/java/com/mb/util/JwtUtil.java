@@ -15,6 +15,8 @@ public class JwtUtil {
     public static String createAccessToken(Member member, String accessSecretKey){
         Claims claims = Jwts.claims();
         claims.put("memberId", member.getMemberId());
+        claims.put("isAdmin", member.getIsAdmin());
+        claims.put("name", member.getName());
 
         return Jwts.builder()
                 .setClaims(claims)
