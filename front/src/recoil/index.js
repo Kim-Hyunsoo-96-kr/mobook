@@ -3,7 +3,8 @@ import {recoilPersist} from "recoil-persist";
 
 export const CONFIG = {};
 CONFIG.BASE_URL = "http://localhost:8080";
-CONFIG.API_LOGIN = "http://localhost:8080/api/members/login";
+CONFIG.API_LOGIN = `${CONFIG.BASE_URL}/api/members/login`;
+CONFIG.API_LOGOUT = "http://localhost:8080/api/members/logout";
 CONFIG.TEST = "http://localhost:8080/api/books/list";
 export const { persistAtom } = recoilPersist();
 export const loginedUserInfoAtom = atom({

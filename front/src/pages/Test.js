@@ -6,7 +6,6 @@ import {Navigate} from "react-router-dom";
 import axios from "axios";
 
 function Test() {
-    console.log("왜 두번 들어오지?")
     const loginedUserInfo = useRecoilValue(loginedUserInfoSelector);
     const isLogined = useRecoilValue(isLoginedSelector);
     if(!isLogined) return <Navigate to={"/"}/>;

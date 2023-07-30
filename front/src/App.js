@@ -15,8 +15,8 @@ function App() {
             {title: "책 대여", router: "contact.html"},
             {title: "책 반납", router: "pricing.html"},
             {title: "책 요청", router: "faq.html"},
-            {title: "로그아웃", router: "/logout"},
-            {title: "로그인", router: "/login"},
+            // {title: "로그아웃", router: "/logout"},
+            // {title: "로그인", router: "/login"},
         ]
     }
   return (
