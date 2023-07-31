@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import axios from "axios";
 import Logout from "./pages/Logout";
 import Test from "./pages/Test";
+import Search from "./pages/Search";
 function App() {
     const nav = {
         title: "MOBOOK1.0",
@@ -25,6 +26,7 @@ function App() {
               <Route path="/" element={<Main />} />
               <Route path="/login" element={<Login />} />
               <Route path="/logout" element={<Logout />} />
+              <Route path="/search" element={<Search />} />
               <Route path="/test" element={<Test />} />
           </Routes>
           </div>

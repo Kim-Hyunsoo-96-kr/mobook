@@ -5,7 +5,9 @@ export const CONFIG = {};
 CONFIG.BASE_URL = "http://localhost:8080";
 CONFIG.API_LOGIN = `${CONFIG.BASE_URL}/api/members/login`;
 CONFIG.API_LOGOUT = "http://localhost:8080/api/members/logout";
+CONFIG.API_BOOK_LIST = "http://localhost:8080/api/books/list";
 CONFIG.TEST = "http://localhost:8080/api/books/list";
+
 export const { persistAtom } = recoilPersist();
 export const loginedUserInfoAtom = atom({
     key: "app/loginedUserInfoAtom", // 이 키는 나중에 디버깅시에 의미가 있음
