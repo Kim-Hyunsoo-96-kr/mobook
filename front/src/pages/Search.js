@@ -23,7 +23,6 @@ function Search() {
                     .then(resp => {
                         setBookData(resp.data)
                     });
-                // setBookData(response.data,[])
             } catch (error) {
                 //응답 실패
                 console.error(error);
@@ -54,7 +53,6 @@ function Search() {
                                     <tr>
                                         <th>글번호</th>
                                         <th>제목</th>
-                                        <th>작성자</th>
                                         <th>조회수</th>
                                         <th>작성일</th>
                                     </tr>

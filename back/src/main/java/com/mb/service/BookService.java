@@ -33,4 +33,9 @@ public class BookService {
         List<Book> bookList = bookRepository.findByBookNameContaining(keyword, pageable);
         return bookList;
     }
+
+    public List<Book> findByRentalMemberId(Long memberId) {
+        List<Book> bookList = bookRepository.findByRentalMemberId(memberId);
+        return bookList;
+    }
 }

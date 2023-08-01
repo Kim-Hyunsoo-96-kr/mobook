@@ -61,7 +61,7 @@ public class BookController {
         Member loginMember = getLoginMember(authentication);
         Book book = bookService.findById(bookId);
         if(book.getIsAble()){
-            book.setRentalMember(loginMember);
+            book.setRentalMemberId(loginMember.getMemberId());
             book.setIsAble(false);
             bookService.addBook(book);
             BookRentResponseDto bookRentResponseDto = new BookRentResponseDto();
@@ -83,7 +83,7 @@ public class BookController {
     public ResponseEntity bookReturn(@PathVariable Long bookId, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
         Book book = bookService.findById(bookId);
-        if(loginMember == book.getRentalMember()){
+        if(loginMember.getMemberId() == book.getRentalMemberId()){
             book.setIsAble(true);
             bookService.addBook(book);
             BookReturnResponseDto bookReturnResponseDto = new BookReturnResponseDto();

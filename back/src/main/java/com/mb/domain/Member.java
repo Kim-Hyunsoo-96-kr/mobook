@@ -24,8 +24,4 @@ public class Member {
 
     private Boolean isAdmin;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "rentalMember")
-    private List<Book> rentalBookList = new ArrayList<>();
-
 }

@@ -14,9 +14,12 @@ public class Book {
 
     private String bookName;
 
+    private Integer stars;
+
+    private String regDate;
+
     private Boolean isAble;
 
-    @ManyToOne
-    @JoinColumn(name = "MEMBER_ID")
-    private Member rentalMember;
+    private Long rentalMemberId;
+
 }

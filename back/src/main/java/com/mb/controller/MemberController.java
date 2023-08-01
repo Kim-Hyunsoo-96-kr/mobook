@@ -4,6 +4,7 @@ import com.mb.domain.Book;
 import com.mb.domain.Member;
 import com.mb.domain.RefreshToken;
 import com.mb.dto.*;
+import com.mb.service.BookService;
 import com.mb.service.MemberService;
 import com.mb.service.RefreshTokenService;
 import com.mb.util.JwtUtil;
@@ -28,6 +29,7 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
+    private final BookService bookService;
     private final RefreshTokenService refreshTokenService;
     private final PasswordEncoder passwordEncoder;
 
@@ -116,7 +118,7 @@ public class MemberController {
 
         MyPageResponseDto myPageResponseDto = new MyPageResponseDto();
 
-        List<Book> rentalBookList = loginMember.getRentalBookList();
+        List<Book> rentalBookList = bookService.findByRentalMemberId(loginMember.getMemberId());
         for (Book book : rentalBookList) {
             System.out.println(book.getBookName());
             System.out.println(book.getBookId());
@@ -126,7 +128,7 @@ public class MemberController {
         myPageResponseDto.setName(loginMember.getName());
         myPageResponseDto.setEmail(loginMember.getEmail());
         myPageResponseDto.setIsAdmin(loginMember.getIsAdmin());
-        myPageResponseDto.setRentalBookList(loginMember.getRentalBookList());
+        myPageResponseDto.setRentalBookList(rentalBookList);
 
         return new ResponseEntity(myPageResponseDto, HttpStatus.OK);
     }
