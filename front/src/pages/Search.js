@@ -15,7 +15,7 @@ function Search() {
             setLoading(true);
             try {
                 //응답 성공
-                const response = await axios.get(CONFIG.TEST, {
+                const response = await axios.get(CONFIG.API_BOOK_LIST, {
                     headers: {
                         Authorization: `Bearer ${loginedUserInfo.accessToken}`
                     }

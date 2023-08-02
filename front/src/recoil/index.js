@@ -6,6 +6,7 @@ CONFIG.BASE_URL = "http://localhost:8080";
 CONFIG.API_LOGIN = `${CONFIG.BASE_URL}/api/members/login`;
 CONFIG.API_LOGOUT = "http://localhost:8080/api/members/logout";
 CONFIG.API_BOOK_LIST = "http://localhost:8080/api/books/list";
+CONFIG.API_UPLOAD_EXCEL = "http://localhost:8080/api/books/test";
 CONFIG.TEST = "http://localhost:8080/api/books/list";
 
 export const { persistAtom } = recoilPersist();

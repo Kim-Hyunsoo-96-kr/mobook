@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -111,6 +112,17 @@ public class BookController {
         return new ResponseEntity(bookListResponseDto, HttpStatus.OK);
     }
 
+    @PostMapping("/test")
+    public String test(@RequestParam("testFile") MultipartFile mf){
+        if(mf.isEmpty()){
+            System.out.println("empty");
+            return "empty";
+        } else {
+            System.out.println("notEmpty");
+            return "asdfasdfaxzcv";
+        }
+    }
+
     private Member getLoginMember(Authentication authentication) {
         if(authentication == null){
             System.out.println("authentication에 아무것도 없음");
@@ -120,4 +132,5 @@ public class BookController {
         Member loginMember = memberService.findById(memberId);
         return loginMember;
     }
+
 }

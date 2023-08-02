@@ -1,4 +1,45 @@
+import {useState} from "react";
+import axios from "axios";
+import {CONFIG, isLoginedSelector, loginedUserInfoSelector} from "../recoil";
+import {useRecoilValue} from "recoil";
+
 function AddComp() {
+    const loginedUserInfo = useRecoilValue(loginedUserInfoSelector);
+    const isLogined = useRecoilValue(isLoginedSelector);
+    const [file,setFile] = useState()
+    const fileChangedHandler = (event)=>{
+        event.preventDefault()
+        const formData = new FormData();
+        if(event.target.files){
+            const uploadFile = event.target.files[0]
+            formData.append('file',uploadFile)
+            setFile(uploadFile)
+            console.log(uploadFile)
+            console.log('===useState===')
+            console.log(file)
+        }
+        console.log(file)
+    }
+
+    console.log(file)
+    const fileUpload = (event) => {
+        event.preventDefault()
+        const formData = new FormData();
+        formData.append('testFile',file)
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${loginedUserInfo.accessToken}`}
+            }
+            //응답 성공
+            axios.post(CONFIG.API_UPLOAD_EXCEL, formData,config)
+        } catch (error) {
+            //응답 실패
+            console.error(error);
+        }
+    }
+
+
     return (
         <section className="bg-light py-5">
             <div className="container px-5 my-5">
@@ -49,8 +90,9 @@ function AddComp() {
                                     <span className="display-4 fw-bold">엑셀 파일</span>
                                 </div>
                                 <div className="margin-top30">
-                                    <div className="d-grid"><a className="btn btn-primary" href="#!">엑셀 파일로 추가하기</a></div>
+                                    <input type="file" onChange={fileChangedHandler}/>
                                 </div>
+                                <button className="btn btn-primary btn-lg" onClick={fileUpload}>등록</button>
                             </div>
                         </div>
                     </div>
