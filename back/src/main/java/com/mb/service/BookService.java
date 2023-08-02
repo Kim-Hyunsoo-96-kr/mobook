@@ -38,4 +38,10 @@ public class BookService {
         List<Book> bookList = bookRepository.findByRentalMemberId(memberId);
         return bookList;
     }
+
+    public void addBookByExcel(List<Book> list) {
+        for (Book book : list) {
+            bookRepository.save(book);
+        }
+    }
 }

@@ -8,18 +8,24 @@ import com.mb.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name="BookController", description = "책 컨트롤러")
@@ -113,14 +119,38 @@ public class BookController {
     }
 
     @PostMapping("/test")
-    public String test(@RequestParam("testFile") MultipartFile mf){
-        if(mf.isEmpty()){
-            System.out.println("empty");
-            return "empty";
-        } else {
-            System.out.println("notEmpty");
-            return "asdfasdfaxzcv";
+    public ResponseEntity test(@RequestParam("testFile") MultipartFile mf) throws Exception {
+        List<Book> list = new ArrayList<>();
+
+        OPCPackage opcPackage = OPCPackage.open(mf.getInputStream());
+        XSSFWorkbook workbook = new XSSFWorkbook(opcPackage);
+
+        XSSFSheet sheet = workbook.getSheetAt(0);
+
+        for (int i=0; i<sheet.getLastRowNum() + 1; i++) {
+
+            Book newBook = new Book();
+
+            XSSFRow row = sheet.getRow(i);
+
+            // 행이 존재하지 않으면 패스한다.
+            if (null == row) {
+                continue;
+            }
+
+            // 행의 첫 번째 열(이름)
+            XSSFCell cell = row.getCell(0);
+            if (null != cell) {
+                newBook.setBookName(cell.getStringCellValue());
+            }
+
+            // 리스트에 담는다.
+            list.add(newBook);
+
         }
+
+        bookService.addBookByExcel(list);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     private Member getLoginMember(Authentication authentication) {
