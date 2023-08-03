@@ -1,27 +1,96 @@
 import {atom, selector} from "recoil";
 import {recoilPersist} from "recoil-persist";
+import {QueryClient} from "@tanstack/react-query";
+import axios from "axios";
 
+// 리액트 쿼리(useEffect 없이 API 통신 가능하도록, API 통신 쉽게 해줌)
+export const queryClient = new QueryClient();
+// 액시오스(통신 API, fetch 를 써도 되지만, access_key, refresh_key 관련 인터셉터 기능을 사용하기 위해)
+export const axiosInstance = axios.create()
+// 리액트 리코일 퍼시스트(전역변수 중 일부를 영속적으로 로컬 스토리지에 저장, 로그인 유지에 쓰임)
+export const { persistAtom } = recoilPersist();
+
+// 일반 lib 시작
+// 숫장에 콤마(,) 붙이기
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+// 어떠한 시각이 현재로 부터 몇초 남았는지
+function secondsDiffFromNow(exp) {
+    const diffMillis = parseInt(exp + "000") - new Date().getTime();
+    return parseInt(diffMillis / 1000);
+}
+// jwt lib 시작
+const base64UrlDecode = (input) => {
+    const padding = '='.repeat((4 - (input.length % 4)) % 4);
+    const base64 = (input + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const decoded = atob(base64);
+
+    // 디코드된 문자열을 UTF-8 형식으로 변환
+    const utf8Array = new Uint8Array(decoded.length);
+    for (let i = 0; i < decoded.length; i++) {
+        utf8Array[i] = decoded.charCodeAt(i);
+    }
+
+    // UTF-8 형식의 문자열을 JavaScript 문자열로 변환
+    const utf8decoder = new TextDecoder();
+    return utf8decoder.decode(utf8Array);
+};
+// 토큰에서 페이로드(데이터) 부분 가져오기
+function getPayloadFromJWT(token) {
+    const base64Payload = token.split(".")[1];
+    const decodedPayload = base64UrlDecode(base64Payload);
+    return JSON.parse(decodedPayload);
+}
+
+// 토큰의 페이로드 부분에서 만료시간 가져오기
+function getPayloadFromJWTExp(token) {
+    const base64Payload = atob(token.split(".")[1]);
+    return base64Payload.split('"exp":')[1].split(',"')[0];
+}
+
+function needToRefreshAccessToken(token) {
+    const exp = getPayloadFromJWTExp(token);
+    return secondsDiffFromNow(exp) < 60 * 0;
+}
+
+// 리프레시 토큰을 재발급(리프레시) 해야하는지 체크
+function needToRefreshRefreshToken(token) {
+    const exp = getPayloadFromJWTExp(token);
+    return secondsDiffFromNow(exp) < 60 * 60 * 24 * 10;
+}
+export const nav = {
+    title: "MOBOOK1.0",
+    menu: [
+        {title: "홈", router: "/"},
+        {title: "책 검색", router: "/search"},
+        {title: "책 대여", router: "/rent"},
+        {title: "책 반납", router: "/return"},
+        {title: "책 요청", router: "/request"},
+    ]
+}
 export const CONFIG = {};
 CONFIG.BASE_URL = "http://localhost:8080";
 CONFIG.API_LOGIN = `${CONFIG.BASE_URL}/api/members/login`;
-CONFIG.API_LOGOUT = "http://localhost:8080/api/members/logout";
-CONFIG.API_BOOK_LIST = "http://localhost:8080/api/books/list";
-CONFIG.API_UPLOAD_EXCEL = "http://localhost:8080/api/books/test";
-CONFIG.TEST = "http://localhost:8080/api/books/list";
-
-export const { persistAtom } = recoilPersist();
+CONFIG.API_REFRESH_TOKEN = `${CONFIG.BASE_URL}/api/members/refreshToken`;
+CONFIG.API_LOGOUT = `${CONFIG.BASE_URL}/api/members/logout`;
+CONFIG.API_BOOK_LIST = `${CONFIG.BASE_URL}/api/books/list`;
+CONFIG.API_UPLOAD_EXCEL = `${CONFIG.BASE_URL}/api/books/test`;
+CONFIG.TEST = `${CONFIG.BASE_URL}/api/books/list`;
+// 리코일 atom, selector 시작
+// 로그인한 회원정보(raw)
 export const loginedUserInfoAtom = atom({
     key: "app/loginedUserInfoAtom", // 이 키는 나중에 디버깅시에 의미가 있음
     default: null, // 기본값
     effects_UNSTABLE: [persistAtom] // 이 변수의 값은 로컬 스토리지에 영속적으로 저장, 이렇게 해야 F5 키 눌러도 로그인 유지 가능
 });
-
 // loginedUserInfoAtom 를 기초로 현재 로그인 했는지 알려주는 변수
 export const isLoginedSelector = selector({
     key: "app/isLoginedSelector",
     get: ({ get }) => get(loginedUserInfoAtom) != null
 });
-
+// loginedUserInfoAtom 를 사용하기 좋게 살짝 가공한 버전(앱에서는 이걸 사용한다.)
 export const loginedUserInfoSelector = selector({
     key: "app/loginedUserInfoSelector",
     get: ({ get }) => {
@@ -37,10 +106,6 @@ export const loginedUserInfoSelector = selector({
     }
 });
 
-export function getPayloadFromJWT(token) {
-    const base64Payload = token.split(".")[1];
-    return JSON.parse(atob(base64Payload));
-}
 export function setLogin(setLoginedUserInfo, accessToken, refreshToken) {
     const userInfo = getPayloadFromJWT(accessToken);
     userInfo.accessToken = accessToken; // 이 토큰과

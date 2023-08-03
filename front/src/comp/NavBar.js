@@ -1,7 +1,6 @@
 import {Link, Navigate} from "react-router-dom";
 import {useRecoilValue} from "recoil";
 import {isLoginedSelector, loginedUserInfoSelector} from "../recoil";
-import login from "../pages/Login";
 
 function NavBar(props) {
     const menuList = []
@@ -9,8 +8,8 @@ function NavBar(props) {
         let t = props.nav.menu[i];
         menuList.push(<li class="nav-item" key={i}><Link to={t.router} class="nav-link">{t.title}</Link></li>);
     }
-    const loginedUserInfo = useRecoilValue(loginedUserInfoSelector);
     const isLogined = useRecoilValue(isLoginedSelector);
+    const loginedUserInfo = useRecoilValue(loginedUserInfoSelector);
     let isAdmin = null
     if(isLogined) isAdmin = loginedUserInfo.isAdmin
     return (
@@ -34,6 +33,9 @@ function NavBar(props) {
                         )}
                         {isLogined && (
                             <li className="nav-item"><Link to={"/logout"} class="nav-link">로그아웃</Link></li>
+                        )}
+                        {isLogined && (
+                            <li className="nav-item"><Link to={"/"} class="nav-link">{loginedUserInfo.name}</Link></li>
                         )}
                         {isLogined || (
                             <li className="nav-item"><Link to={"/login"} class="nav-link">로그인</Link></li>

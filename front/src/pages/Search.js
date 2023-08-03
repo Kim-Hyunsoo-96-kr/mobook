@@ -50,21 +50,21 @@ function Search() {
                                 <table className="table table-hover table-striped">
                                     <thead>
                                     <tr>
-                                        <th>책 고유번호</th>
+                                        <th className="text-align-center">책 고유번호</th>
                                         <th>제목</th>
-                                        <th>좋아요</th>
-                                        <th>작성일</th>
-                                        <th>대여가능여부</th>
+                                        <th className="text-align-center">좋아요</th>
+                                        <th className="text-align-center">작성일</th>
+                                        <th className="text-align-center">대여가능여부</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                         {bookData.bookList.map((book)=>(
                                             <tr key={book.bookId}>
-                                                <td>{book.bookNumber}</td>
+                                                <td className="text-align-center">{book.bookNumber}</td>
                                                 <td>{book.bookName}</td>
-                                                <td>{book.stars}</td>
-                                                <td>{book.regDate}</td>
-                                                <td>{book.isAble ? "Y" : "N"}</td>
+                                                <td className="text-align-center">{book.stars}</td>
+                                                <td className="text-align-center">{book.regDate}</td>
+                                                <td className="text-align-center">{book.isAble ? "Y" : "N"}</td>
                                                 <td><button onClick={() => console.log("Button clicked!")}>
                                                     대여신청
                                                 </button></td>
