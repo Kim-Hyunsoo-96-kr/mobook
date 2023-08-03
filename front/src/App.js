@@ -7,10 +7,17 @@ import Logout from "./pages/Logout";
 import Test from "./pages/Test";
 import Search from "./pages/Search";
 import AddBook from "./pages/AddBook";
-import {axiosInstance, CONFIG, isLoginedSelector, loginedUserInfoAtom, nav, setLogin} from "./recoil";
+import {
+    axiosInstance,
+    CONFIG,
+    isLoginedSelector,
+    loginedUserInfoAtom,
+    nav, needToRefreshAccessToken,
+    needToRefreshRefreshToken,
+    setLogin
+} from "./recoil";
 import {useEffect, useState} from "react";
 import {useRecoilState, useRecoilValue} from "recoil";
-import {needToRefreshAccessToken, needToRefreshRefreshToken} from "./recoil/jwt";
 import axios from "axios";
 function App() {
     const [isReady, setIsReady] = useState(false);
@@ -43,7 +50,9 @@ function App() {
                 const needToRefreshAccessToken_ = needToRefreshAccessToken(
                     loginedUserInfo.accessToken
                 );
-
+                console.log(`needToRefreshAccessToken_ : ${needToRefreshAccessToken_}`)
+                console.log(`needToRefreshRefreshToken_ : ${needToRefreshRefreshToken_}`)
+                console.log(`loginedUserInfo.accessToken : ${loginedUserInfo.accessToken}`)
                 // 엑세스 토큰과 리프레시 토큰이 둘다 유효하다면, 헤더에 엑세스 토큰 추가 하여 리턴
                 if (
                     needToRefreshAccessToken_ == false &&
@@ -102,11 +111,11 @@ function App() {
 
                         setLogin(
                             setLoginedUserInfo,
-                            response.data.access,
+                            response.data.accessToken,
                             loginedUserInfo.refreshToken
                         );
 
-                        config.headers.Authorization = `Bearer ${response.data.access}`;
+                        config.headers.Authorization = `Bearer ${response.data.accessToken}`;
 
                         return config;
                     } catch (e) {

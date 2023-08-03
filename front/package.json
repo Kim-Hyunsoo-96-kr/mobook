@@ -5,8 +5,6 @@
   "dependencies": {
     "@react-navigation/native": "^6.1.7",
     "@reduxjs/toolkit": "^1.9.5",
-    "@tanstack/react-query": "^4.32.1",
-    "@tanstack/react-query-devtools": "^4.32.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -14,11 +12,14 @@
     "react": "^18.2.0",
     "react-bootstrap": "^2.8.0",
     "react-dom": "^18.2.0",
+    "react-query": "^3.39.3",
+    "react-query-subscription": "^1.8.1",
     "react-redux": "^8.1.1",
     "react-router-dom": "^6.14.2",
     "react-scripts": "5.0.1",
     "recoil": "^0.7.7",
     "recoil-persist": "^5.1.0",
+    "rxjs": "^7.8.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

@@ -1,7 +1,7 @@
 import {atom, selector} from "recoil";
 import {recoilPersist} from "recoil-persist";
-import {QueryClient} from "@tanstack/react-query";
 import axios from "axios";
+import {QueryClient} from "react-query";
 
 // 리액트 쿼리(useEffect 없이 API 통신 가능하도록, API 통신 쉽게 해줌)
 export const queryClient = new QueryClient();
@@ -11,10 +11,6 @@ export const axiosInstance = axios.create()
 export const { persistAtom } = recoilPersist();
 
 // 일반 lib 시작
-// 숫장에 콤마(,) 붙이기
-function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
 
 // 어떠한 시각이 현재로 부터 몇초 남았는지
 function secondsDiffFromNow(exp) {
@@ -38,27 +34,27 @@ const base64UrlDecode = (input) => {
     return utf8decoder.decode(utf8Array);
 };
 // 토큰에서 페이로드(데이터) 부분 가져오기
-function getPayloadFromJWT(token) {
+export function getPayloadFromJWT(token) {
     const base64Payload = token.split(".")[1];
     const decodedPayload = base64UrlDecode(base64Payload);
     return JSON.parse(decodedPayload);
 }
 
 // 토큰의 페이로드 부분에서 만료시간 가져오기
-function getPayloadFromJWTExp(token) {
+export function getPayloadFromJWTExp(token) {
     const base64Payload = atob(token.split(".")[1]);
     return base64Payload.split('"exp":')[1].split(',"')[0];
 }
 
-function needToRefreshAccessToken(token) {
+export function needToRefreshAccessToken(token) {
     const exp = getPayloadFromJWTExp(token);
-    return secondsDiffFromNow(exp) < 60 * 0;
+    return false;
 }
 
 // 리프레시 토큰을 재발급(리프레시) 해야하는지 체크
-function needToRefreshRefreshToken(token) {
+export function needToRefreshRefreshToken(token) {
     const exp = getPayloadFromJWTExp(token);
-    return secondsDiffFromNow(exp) < 60 * 60 * 24 * 10;
+    return false;
 }
 export const nav = {
     title: "MOBOOK1.0",

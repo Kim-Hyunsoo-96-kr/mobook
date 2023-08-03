@@ -3,12 +3,12 @@ import {CONFIG, isLoginedSelector, loginedUserInfoAtom, setLogin} from "../recoi
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {Navigate} from "react-router-dom";
 
-function LoginSection() {
+const LoginSection = () => {
     const setLoginedUserInfo = useSetRecoilState(loginedUserInfoAtom);
     const isLogined = useRecoilValue(isLoginedSelector);
-    if(isLogined) return <Navigate to={"/"}/>;
+    if (isLogined) return <Navigate to="/" replace />;
+
     const onSubmit = async (event) => {
-        console.log("onSubmit 들어옴")
         event.preventDefault();
 
         const form = event.target;

@@ -1,37 +1,29 @@
 import '../App.css';
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {CONFIG, isLoginedSelector, loginedUserInfoAtom, loginedUserInfoSelector} from "../recoil";
+import {axiosInstance, CONFIG, isLoginedSelector, loginedUserInfoAtom, loginedUserInfoSelector} from "../recoil";
 import {Link, Navigate} from "react-router-dom";
-import axios from "axios";
-import {useEffect, useState} from "react";
+import {useQuery} from "react-query";
 
-function Search() {
-    const loginedUserInfo = useRecoilValue(loginedUserInfoSelector);
-    const isLogined = useRecoilValue(isLoginedSelector);
-    const [bookData, setBookData] = useState(null)
-    const [loading, setLoading] = useState(true)
-    useEffect(()=> {
-        const getData = async () => {
-            try {
-                //응답 성공
-                const response = await axios.get(CONFIG.API_BOOK_LIST, {
-                    headers: {
-                        Authorization: `Bearer ${loginedUserInfo.accessToken}`
-                    }
-                })
-                    .then(resp => {
-                        setBookData(resp.data)
-                    });
-            } catch (error) {
-                //응답 실패
-                console.error(error);
-            }
-            setLoading(false);
-        }
-        getData();
-    }, []);
-    if(!isLogined) return <Navigate to={"/"}/>;
-    if(loading) return <div>로딩 중</div>
+const Search = () => {
+    const { isLoading, error, data } = useQuery("bookList", async () => {
+        // productList 는 캐싱키, 참고로 지금은 캐시 사용 안함
+        // 참고로 axiosInstance 로 요청하면 알아서 엑세스 키가 헤더에 붙어서 요청됩니다.
+        // 그것은 액시오스 인터셉터에서 자동으로 해줍니다.
+        // 우리가 App 함수에서 그렇게 세팅 했습니다.
+        const response = await axiosInstance.get(CONFIG.API_BOOK_LIST);
+
+        return response.data;
+    });
+    const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
+    if (isLoading) {
+        return <div class="loading-1">로딩중</div>;
+    }
+
+    if (error) {
+        return <div class="error-1">{error.message}</div>;
+    }
+    if (!isLogined) return <Navigate to="/" replace />; // 로그인 안했다면 메인화면으로 보냄
+
     return (
         <section className="py-5">
             <div className="container px-5 my-5">
@@ -58,7 +50,7 @@ function Search() {
                                     </tr>
                                     </thead>
                                     <tbody>
-                                        {bookData.bookList.map((book)=>(
+                                        {data.bookList.map((book)=>(
                                             <tr key={book.bookId}>
                                                 <td className="text-align-center">{book.bookNumber}</td>
                                                 <td>{book.bookName}</td>
