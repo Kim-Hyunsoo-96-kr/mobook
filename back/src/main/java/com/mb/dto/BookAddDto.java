@@ -13,4 +13,7 @@ public class BookAddDto {
     @Size(max = 100, message = "100자 이하로 입력해주세요.")
     @Schema(description = "책 제목", nullable = false, example = "아토믹 코틀린")
     private String name;
+
+    @NotBlank(message = "책 넘버링을 입력해주세요.")
+    private String bookNumber;
 }

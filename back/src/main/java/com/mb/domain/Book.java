@@ -14,6 +14,9 @@ public class Book {
 
     private String bookName;
 
+    @Column(unique = true)
+    private String bookNumber;
+
     private Integer stars;
 
     private String regDate;

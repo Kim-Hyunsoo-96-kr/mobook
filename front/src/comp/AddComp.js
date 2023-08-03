@@ -2,11 +2,14 @@ import {useState} from "react";
 import axios from "axios";
 import {CONFIG, isLoginedSelector, loginedUserInfoSelector} from "../recoil";
 import {useRecoilValue} from "recoil";
+import {Navigate} from "react-router-dom";
 
 function AddComp() {
     const loginedUserInfo = useRecoilValue(loginedUserInfoSelector);
     const isLogined = useRecoilValue(isLoginedSelector);
     const [file,setFile] = useState()
+    const [isSuccess, setIsSuccess] = useState(false);
+
     const fileChangedHandler = (event)=>{
         event.preventDefault()
         const formData = new FormData();
@@ -26,18 +29,26 @@ function AddComp() {
         event.preventDefault()
         const formData = new FormData();
         formData.append('testFile',file)
-        try {
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${loginedUserInfo.accessToken}`}
-            }
-            //응답 성공
-            axios.post(CONFIG.API_UPLOAD_EXCEL, formData,config)
-        } catch (error) {
-            //응답 실패
-            console.error(error);
+        const config = {
+            headers: {
+                Authorization: `Bearer ${loginedUserInfo.accessToken}`}
         }
+        axios.post(CONFIG.API_UPLOAD_EXCEL, formData, config)
+            .then(response => {
+                // 서버 응답 성공
+                alert("DB 저장 성공")
+                setIsSuccess(true);
+            })
+            .catch(error => {
+                // 서버 응답 실패
+                if (error.response && error.response.status === 500) {
+                    alert("잘못된 엑셀 파일입니다. 책 넘버링이 중복되지 않는 지 확인해주세요.");
+                } else {
+                    console.log("오류 발생: ", error);
+                }
+            });
     }
+    if(isSuccess) return <Navigate to="/search" />
 
 
     return (

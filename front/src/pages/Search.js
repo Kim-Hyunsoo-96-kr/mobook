@@ -9,10 +9,9 @@ function Search() {
     const loginedUserInfo = useRecoilValue(loginedUserInfoSelector);
     const isLogined = useRecoilValue(isLoginedSelector);
     const [bookData, setBookData] = useState(null)
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     useEffect(()=> {
         const getData = async () => {
-            setLoading(true);
             try {
                 //응답 성공
                 const response = await axios.get(CONFIG.API_BOOK_LIST, {
@@ -51,17 +50,24 @@ function Search() {
                                 <table className="table table-hover table-striped">
                                     <thead>
                                     <tr>
-                                        <th>글번호</th>
+                                        <th>책 고유번호</th>
                                         <th>제목</th>
-                                        <th>조회수</th>
+                                        <th>좋아요</th>
                                         <th>작성일</th>
+                                        <th>대여가능여부</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                         {bookData.bookList.map((book)=>(
-                                            <tr>
-                                                <td>{book.bookId}</td>
+                                            <tr key={book.bookId}>
+                                                <td>{book.bookNumber}</td>
                                                 <td>{book.bookName}</td>
+                                                <td>{book.stars}</td>
+                                                <td>{book.regDate}</td>
+                                                <td>{book.isAble ? "Y" : "N"}</td>
+                                                <td><button onClick={() => console.log("Button clicked!")}>
+                                                    대여신청
+                                                </button></td>
                                             </tr>
                                         ))}
                                     </tbody>

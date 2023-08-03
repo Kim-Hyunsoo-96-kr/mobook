@@ -25,7 +25,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Tag(name="BookController", description = "책 컨트롤러")
@@ -43,7 +45,11 @@ public class BookController {
         Book newBook = new Book();
 
         newBook.setBookName(bookAddDto.getName());
+        newBook.setBookNumber(bookAddDto.getBookNumber());
         newBook.setIsAble(true);
+        Date today = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        newBook.setRegDate(formatter.format(today));
 
         Book addBook = bookService.addBook(newBook);
 
@@ -127,7 +133,7 @@ public class BookController {
 
         XSSFSheet sheet = workbook.getSheetAt(0);
 
-        for (int i=0; i<sheet.getLastRowNum() + 1; i++) {
+        for (int i=1; i<sheet.getLastRowNum() + 1; i++) {
 
             Book newBook = new Book();
 
@@ -141,9 +147,21 @@ public class BookController {
             // 행의 첫 번째 열(이름)
             XSSFCell cell = row.getCell(0);
             if (null != cell) {
-                newBook.setBookName(cell.getStringCellValue());
+                if(cell.getRawValue() != null) newBook.setBookNumber(cell.getRawValue().split("\\.")[0]);
             }
 
+            // 행의 첫 번째 열(이름)
+            cell = row.getCell(1);
+            if (null != cell) {
+                if(cell.getStringCellValue() != null) newBook.setBookName(cell.getStringCellValue());
+            }
+
+            newBook.setIsAble(true);
+            Date today = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            newBook.setRegDate(formatter.format(today));
+            newBook.setStars(0);
+            newBook.setRentalMemberId(0L);
             // 리스트에 담는다.
             list.add(newBook);
 
