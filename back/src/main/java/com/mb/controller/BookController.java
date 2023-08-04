@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.mb.enum_.BookStatus.Rent;
+import static com.mb.enum_.BookStatus.Return;
 
 @Tag(name="BookController", description = "책 컨트롤러")
 @Controller
@@ -103,13 +104,18 @@ public class BookController {
     }
 
     @Operation(summary = "책 반납", description = "해당 책을 대여가능 상태로 DB에 저장합니다.")
-    @PostMapping("/{bookId}/return")
-    public ResponseEntity bookReturn(@PathVariable Long bookId, Authentication authentication){
+    @PostMapping("/return/{bookNumber}")
+    public ResponseEntity bookReturn(@PathVariable String bookNumber, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
-        Book book = bookService.findById(bookId);
+        Book book = bookService.findByBookNumber(bookNumber);
         if(loginMember.getMemberId() == book.getRentalMemberId()){
             book.setIsAble(true);
             bookService.addBook(book);
+            BookMember bookMember = new BookMember();
+            bookMember.setBook(book);
+            bookMember.setMember(loginMember);
+            bookMember.setStatus(Return.getBookStatus());
+            bookMemberService.addBookMember(bookMember);
             BookReturnResponseDto bookReturnResponseDto = new BookReturnResponseDto();
             bookReturnResponseDto.setMemberName(loginMember.getName());
             bookReturnResponseDto.setBookName(book.getBookName());

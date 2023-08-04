@@ -41,12 +41,6 @@ const Search = () => {
                         <h1 className="mt-4">책 목록</h1>
 
                         <div className="card mb-4">
-                            <div className="card-header">
-                                <a className="btn btn-primary float-end"
-                                   href="register">
-                                    <i className="fas fa-edit"></i> 글 작성
-                                </a>
-                            </div>
                             <div className="card-body">
                                 <table className="table table-hover table-striped">
                                     <thead>

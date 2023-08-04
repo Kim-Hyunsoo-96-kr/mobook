@@ -22,28 +22,24 @@ function NavBar(props) {
                         {menuList}
                         {isLogined && (
                             <li className="nav-item dropdown">
-                                <a className="nav-link dropdown-toggle" id="navbarDropdownBlog" href="#" role="button"
-                                   data-bs-toggle="dropdown" aria-expanded="false">마이 페이지</a>
+                                {isLogined && (
+                                    <a className="nav-link dropdown-toggle" id="navbarDropdownBlog" href="#" role="button"
+                                       data-bs-toggle="dropdown" aria-expanded="false">{loginedUserInfo.name} 님</a>
+                                )}
+
                                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownBlog">
-                                    <li><a className="dropdown-item">내 정보</a></li>
-                                    <li><a className="dropdown-item">비밀번호 변경</a></li>
-                                    <li><a className="dropdown-item">비밀번호 변경</a></li>
+                                    <li><Link to="/myBook" className="dropdown-item">내 책 관리</Link></li>
+                                    <li><Link to="/myInfo" className="dropdown-item">내 정보</Link></li>
+                                    {isLogined && (
+                                        <li><Link to={"/logout"} class="dropdown-item">로그아웃</Link></li>
+                                    )}
                                 </ul>
                             </li>
-                        )}
-                        {isLogined && (
-                            <li className="nav-item"><Link to={"/logout"} class="nav-link">로그아웃</Link></li>
-                        )}
-                        {isLogined && (
-                            <li className="nav-item"><Link to={"/"} class="nav-link">{loginedUserInfo.name}</Link></li>
-                        )}
-                        {isLogined || (
-                            <li className="nav-item"><Link to={"/login"} class="nav-link">로그인</Link></li>
                         )}
                         {isAdmin && (
                             <li className="nav-item dropdown">
                                 <a className="nav-link dropdown-toggle" id="navbarDropdownBlog" href="#" role="button"
-                                   data-bs-toggle="dropdown" aria-expanded="false">관리자 페이지</a>
+                                   data-bs-toggle="dropdown" aria-expanded="false">Admin</a>
                                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownBlog">
                                     <li><Link to={"/add"} className="dropdown-item">책 추가</Link></li>
                                     <li><a className="dropdown-item">Tempate1</a></li>
@@ -51,6 +47,10 @@ function NavBar(props) {
                                 </ul>
                             </li>
                         )}
+                        {isLogined || (
+                            <li className="nav-item"><Link to={"/login"} class="nav-link">로그인</Link></li>
+                        )}
+
                     </ul>
                 </div>
             </div>

@@ -7,6 +7,7 @@ import Logout from "./pages/Logout";
 import Test from "./pages/Test";
 import Search from "./pages/Search";
 import AddBook from "./pages/AddBook";
+import MyBook from "./pages/MyBook";
 import {
     axiosInstance,
     CONFIG,
@@ -167,6 +168,7 @@ function App() {
               <Route path="/search" element={<Search />} />
               <Route path="/add" element={<AddBook />} />
               <Route path="/test" element={<Test />} />
+              <Route path="/myBook" element={<MyBook />} />
           </Routes>
           </div>
       </BrowserRouter>

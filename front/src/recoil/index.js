@@ -80,8 +80,6 @@ export const nav = {
     menu: [
         {title: "홈", router: "/"},
         {title: "책 검색", router: "/search"},
-        {title: "책 대여", router: "/rent"},
-        {title: "책 반납", router: "/return"},
         {title: "책 요청", router: "/request"},
     ]
 }
