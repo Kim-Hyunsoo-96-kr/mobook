@@ -44,4 +44,9 @@ public class BookService {
             bookRepository.save(book);
         }
     }
+
+    public Book findByBookNumber(String bookNumber) {
+        Book findBook = bookRepository.findByBookNumber(bookNumber).orElseThrow(()-> new IllegalArgumentException("등로되지 않은 책입니다."));
+        return findBook;
+    }
 }

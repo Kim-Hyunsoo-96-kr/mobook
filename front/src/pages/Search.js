@@ -14,6 +14,15 @@ const Search = () => {
 
         return response.data;
     });
+
+    const rentBook = async (bookNumber) => {
+        try{
+            const response = await axiosInstance.post(`${CONFIG.API_BOOK_RENT}${bookNumber}`);
+            alert("대여 성공");
+        } catch (e) {
+            alert("대여가 불가능한 책 입니다.")
+        }
+    }
     const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
     if (isLoading) {
         return <div class="loading-1">로딩중</div>;
@@ -57,7 +66,7 @@ const Search = () => {
                                                 <td className="text-align-center">{book.stars}</td>
                                                 <td className="text-align-center">{book.regDate}</td>
                                                 <td className="text-align-center">{book.isAble ? "Y" : "N"}</td>
-                                                <td><button onClick={() => console.log("Button clicked!")}>
+                                                <td><button onClick={() => rentBook(book.bookNumber)}>
                                                     대여신청
                                                 </button></td>
                                             </tr>

@@ -1,8 +1,11 @@
 package com.mb.controller;
 
 import com.mb.domain.Book;
+import com.mb.domain.BookMember;
 import com.mb.domain.Member;
 import com.mb.dto.*;
+import com.mb.enum_.BookStatus;
+import com.mb.service.BookMemberService;
 import com.mb.service.BookService;
 import com.mb.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.mb.enum_.BookStatus.Rent;
+
 @Tag(name="BookController", description = "책 컨트롤러")
 @Controller
 @RequestMapping("/api/books")
@@ -38,13 +43,14 @@ public class BookController {
 
     private final BookService bookService;
     private final MemberService memberService;
+    private final BookMemberService bookMemberService;
 
     @Operation(summary = "책 추가", description = "DB에 책을 추가합니다.")
     @PostMapping("/add")
     public ResponseEntity addBook(@RequestBody BookAddDto bookAddDto){
         Book newBook = new Book();
 
-        newBook.setBookName(bookAddDto.getName());
+        newBook.setBookName(bookAddDto.getBookName());
         newBook.setBookNumber(bookAddDto.getBookNumber());
         newBook.setIsAble(true);
         Date today = new Date();
@@ -69,14 +75,19 @@ public class BookController {
     }
 
     @Operation(summary = "책 대여", description = "해당 책을 대여불가 상태로 DB에 저장합니다.")
-    @PostMapping("/{bookId}/rent")
-    public ResponseEntity bookRent(@PathVariable Long bookId, Authentication authentication){
+    @PostMapping("/rent/{bookNumber}")
+    public ResponseEntity bookRent(@PathVariable String bookNumber, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
-        Book book = bookService.findById(bookId);
+        Book book = bookService.findByBookNumber(bookNumber);
         if(book.getIsAble()){
             book.setRentalMemberId(loginMember.getMemberId());
             book.setIsAble(false);
             bookService.addBook(book);
+            BookMember bookMember = new BookMember();
+            bookMember.setBook(book);
+            bookMember.setMember(loginMember);
+            bookMember.setStatus(Rent.getBookStatus());
+            bookMemberService.addBookMember(bookMember);
             BookRentResponseDto bookRentResponseDto = new BookRentResponseDto();
             bookRentResponseDto.setMemberName(loginMember.getName());
             bookRentResponseDto.setBookName(book.getBookName());
@@ -124,8 +135,8 @@ public class BookController {
         return new ResponseEntity(bookListResponseDto, HttpStatus.OK);
     }
 
-    @PostMapping("/test")
-    public ResponseEntity test(@RequestParam("testFile") MultipartFile mf) throws Exception {
+    @PostMapping("/add/excel")
+    public ResponseEntity test(@RequestParam("excelFile") MultipartFile mf) throws Exception {
         List<Book> list = new ArrayList<>();
 
         OPCPackage opcPackage = OPCPackage.open(mf.getInputStream());

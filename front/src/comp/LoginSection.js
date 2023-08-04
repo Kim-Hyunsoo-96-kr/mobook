@@ -60,7 +60,7 @@ const LoginSection = () => {
                     </div>
                     <div className="row gx-5 justify-content-center">
                         <div className="col-lg-8 col-xl-6">
-                            <form id="contactForm" onSubmit={onSubmit}>
+                            <form onSubmit={onSubmit}>
                                 <div className="form-floating mb-3">
                                     <input className="form-control" id="email" type="email" name='email'
                                            placeholder="name@example.com"/>

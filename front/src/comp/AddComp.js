@@ -10,8 +10,34 @@ function AddComp() {
     const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
     const FileUpload = async () => {
         const formData = new FormData();
-        formData.append('testFile', file)
+        formData.append('excelFile', file)
         const response = await axiosInstance.post(CONFIG.API_UPLOAD_EXCEL, formData);
+        navigate("/search", {replace: true});
+        alert("DB 저장 성공");
+    }
+    const bookAdd = async (event) => {
+        event.preventDefault();
+
+        const form = event.target;
+
+        form.bookNumber.value = form.bookNumber.value.trim();
+        form.bookName.value = form.bookName.value.trim();
+
+        if (form.bookNumber.value.length === 0) {
+            alert("bookNumber 입력해주세요.");
+            form.bookNumber.focus();
+            return;
+        }
+
+        if (form.bookName.value.length === 0) {
+            alert("bookName 입력해주세요.");
+            form.bookName.focus();
+            return;
+        }
+
+        const bookNumber = form.bookNumber.value;
+        const bookName = form.bookName.value;
+        const response = await axiosInstance.post(CONFIG.API_ADD_BOOK, {bookNumber, bookName});
         navigate("/search", {replace: true});
         alert("DB 저장 성공");
     }
@@ -41,27 +67,20 @@ function AddComp() {
                                 </div>
                                 <div className="row gx-5 justify-content-center">
                                     <div className="margin-top30">
-                                        <form id="contactForm">
+                                            <form onSubmit={bookAdd}>
                                             <div className="form-floating mb-3">
-                                                <input className="form-control" id="email" type="email" name='email'
-                                                       placeholder="name@example.com"/>
-                                                <label htmlFor="email">Email address</label>
-                                                <div className="invalid-feedback" data-sb-feedback="email:required">An email is
+                                                <input className="form-control" id="bookNumber" name='bookNumber'/>
+                                                <label htmlFor="bookNumber">책 넘버링</label>
+                                                <div className="invalid-feedback" data-sb-feedback="bookNumber:required">An bookNumber is
                                                     required.
                                                 </div>
-                                                <div className="invalid-feedback" data-sb-feedback="email:email">Email is not
-                                                    valid.
-                                                </div>
                                             </div>
                                             <div className="form-floating mb-3">
-                                                <input className="form-control" id="phone" type="tel" placeholder="(123) 456-7890"
-                                                       name='password'/>
-                                                <label htmlFor="password">Password</label>
+                                                <input className="form-control" id="bookName" name='bookName'/>
+                                                <label htmlFor="bookName">책 제목</label>
                                             </div>
                                             <div className="d-grid">
-                                                <button className="btn btn-primary btn-lg" id="submitButton"
-                                                        type="submit" >Submit
-                                                </button>
+                                                <button className="btn btn-primary btn-lg" type="submit">책 추가</button>
                                             </div>
                                         </form>
                                     </div>
