@@ -1,15 +1,21 @@
 import {useState} from "react";
-import axios from "axios";
-import {CONFIG, isLoginedSelector, loginedUserInfoSelector} from "../recoil";
+import {axiosInstance, CONFIG, isLoginedSelector, loginedUserInfoSelector} from "../recoil";
 import {useRecoilValue} from "recoil";
-import {Navigate} from "react-router-dom";
+import {Navigate, useNavigate} from "react-router-dom";
+import {useQuery} from "react-query";
 
 function AddComp() {
-    const loginedUserInfo = useRecoilValue(loginedUserInfoSelector);
-    const isLogined = useRecoilValue(isLoginedSelector);
+    const navigate = useNavigate();
     const [file,setFile] = useState()
-    const [isSuccess, setIsSuccess] = useState(false);
-
+    const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
+    const FileUpload = async () => {
+        const formData = new FormData();
+        formData.append('testFile', file)
+        const response = await axiosInstance.post(CONFIG.API_UPLOAD_EXCEL, formData);
+        navigate("/search", {replace: true});
+        alert("DB 저장 성공");
+    }
+    if (!isLogined) return <Navigate to="/" replace />; // 로그인 안했다면 메인화면으로 보냄
     const fileChangedHandler = (event)=>{
         event.preventDefault()
         const formData = new FormData();
@@ -17,39 +23,8 @@ function AddComp() {
             const uploadFile = event.target.files[0]
             formData.append('file',uploadFile)
             setFile(uploadFile)
-            console.log(uploadFile)
-            console.log('===useState===')
-            console.log(file)
         }
-        console.log(file)
     }
-
-    console.log(file)
-    const fileUpload = (event) => {
-        event.preventDefault()
-        const formData = new FormData();
-        formData.append('testFile',file)
-        const config = {
-            headers: {
-                Authorization: `Bearer ${loginedUserInfo.accessToken}`}
-        }
-        axios.post(CONFIG.API_UPLOAD_EXCEL, formData, config)
-            .then(response => {
-                // 서버 응답 성공
-                alert("DB 저장 성공")
-                setIsSuccess(true);
-            })
-            .catch(error => {
-                // 서버 응답 실패
-                if (error.response && error.response.status === 500) {
-                    alert("잘못된 엑셀 파일입니다. 책 넘버링이 중복되지 않는 지 확인해주세요.");
-                } else {
-                    console.log("오류 발생: ", error);
-                }
-            });
-    }
-    if(isSuccess) return <Navigate to="/search" />
-
 
     return (
         <section className="bg-light py-5">
@@ -103,7 +78,7 @@ function AddComp() {
                                 <div className="margin-top30">
                                     <input type="file" onChange={fileChangedHandler}/>
                                 </div>
-                                <button className="btn btn-primary btn-lg" onClick={fileUpload}>등록</button>
+                                <button className="btn btn-primary btn-lg" onClick={FileUpload}>등록</button>
                             </div>
                         </div>
                     </div>
