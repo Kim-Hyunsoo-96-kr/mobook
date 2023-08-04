@@ -50,6 +50,7 @@ const Search = () => {
                                         <th className="text-align-center">좋아요</th>
                                         <th className="text-align-center">작성일</th>
                                         <th className="text-align-center">대여가능여부</th>
+                                        <th></th>
                                     </tr>
                                     </thead>
                                     <tbody>

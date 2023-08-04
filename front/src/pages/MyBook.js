@@ -29,8 +29,8 @@ function MyBook() {
                     <h1 class="fw-bolder">내 책 관리</h1>
                 </div>
                 <div class="gx-5 justify-content-center">
-                    <div class="col-lg-6 col-xl-12">
-                        <div class="card mb-5 mb-xl-0">
+                    <div class="col-lg-12 col-xl-12">
+                        <div class="card mb-5">
                             <div class="card-body p-5">
                                 <div class="mb-3">
                                     <span class="text-muted">지금까지의 나의 기록</span>
@@ -43,6 +43,7 @@ function MyBook() {
                                         <th className="text-align-center">좋아요</th>
                                         <th className="text-align-center">작성일</th>
                                         <th className="text-align-center">대여가능여부</th>
+                                        <th></th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -62,8 +63,8 @@ function MyBook() {
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6 col-xl-4">
-                        <div class="card mb-5 mb-xl-0">
+                    <div class="col-lg-12 col-xl-12">
+                        <div class="card mb-5">
                             <div class="card-body p-5">
                                 <div class="mb-3">
                                     <span class="text-muted">대여중인 책</span>
@@ -106,7 +107,7 @@ function MyBook() {
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6 col-xl-4">
+                    <div class="col-lg-12 col-xl-12">
                         <div class="card">
                             <div class="card-body p-5">
                                 <div class="mb-3">

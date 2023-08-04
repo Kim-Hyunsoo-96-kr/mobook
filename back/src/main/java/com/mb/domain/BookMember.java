@@ -1,6 +1,5 @@
 package com.mb.domain;
 
-import com.mb.enum_.BookStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,9 +12,9 @@ public class BookMember {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Boolean stars;
-
     private String status;
+
+    private String regDate;
 
     @ManyToOne
     @JoinColumn(name = "member_id")

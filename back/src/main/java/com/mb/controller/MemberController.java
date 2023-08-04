@@ -1,12 +1,15 @@
 package com.mb.controller;
 
 import com.mb.domain.Book;
+import com.mb.domain.BookMember;
 import com.mb.domain.Member;
 import com.mb.domain.RefreshToken;
 import com.mb.dto.*;
+import com.mb.service.BookMemberService;
 import com.mb.service.BookService;
 import com.mb.service.MemberService;
 import com.mb.service.RefreshTokenService;
+import com.mb.util.BookLog;
 import com.mb.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name="MemberController", description = "멤버 컨트롤러")
@@ -30,6 +34,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final BookService bookService;
+    private final BookMemberService bookMemberService;
     private final RefreshTokenService refreshTokenService;
     private final PasswordEncoder passwordEncoder;
 
@@ -112,7 +117,7 @@ public class MemberController {
     }
 
     @Operation(summary = "마이 페이지(Token 필요)", description = "로그인한 회원의 정보를 조회합니다.")
-    @GetMapping("myPage")
+    @GetMapping("/myPage")
     public ResponseEntity myPage(Authentication authentication){
         Member loginMember = getLoginMember(authentication);
 
@@ -124,13 +129,33 @@ public class MemberController {
             System.out.println(book.getBookId());
         }
 
-
         myPageResponseDto.setName(loginMember.getName());
         myPageResponseDto.setEmail(loginMember.getEmail());
         myPageResponseDto.setIsAdmin(loginMember.getIsAdmin());
         myPageResponseDto.setRentalBookList(rentalBookList);
 
         return new ResponseEntity(myPageResponseDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/myBook")
+    public ResponseEntity myBook(Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+
+        MyBookResponseDto myBookResponseDto = new MyBookResponseDto();
+
+        List<BookMember> bookMemberList = bookMemberService.findBookLogByMemberId(loginMember);
+        List<BookLog> bookLogList = new ArrayList();
+        for (BookMember bookMember : bookMemberList) {
+            String status = bookMember.getStatus();
+            String bookName = bookService.findById(bookMember.getBook().getBookId()).getBookName();
+            String bookNumber = bookService.findById(bookMember.getBook().getBookId()).getBookNumber();
+            BookLog bookLog = new BookLog(bookName, bookNumber, status);
+            bookLogList.add(bookLog);
+        }
+        List<Book> rentBookList =  bookService.findByRentalMemberId(loginMember.getMemberId());
+        myBookResponseDto.setBookLogList(bookLogList);
+        myBookResponseDto.setRentBook(rentBookList);
+        return new ResponseEntity(myBookResponseDto, HttpStatus.OK);
     }
 
     private Member getLoginMember(Authentication authentication) {
