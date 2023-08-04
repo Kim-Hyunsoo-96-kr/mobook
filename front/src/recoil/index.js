@@ -2,6 +2,7 @@ import {atom, selector} from "recoil";
 import {recoilPersist} from "recoil-persist";
 import axios from "axios";
 import {QueryClient} from "react-query";
+import jwtDecode from "jwt-decode";
 
 // 리액트 쿼리(useEffect 없이 API 통신 가능하도록, API 통신 쉽게 해줌)
 export const queryClient = new QueryClient();
@@ -42,19 +43,37 @@ export function getPayloadFromJWT(token) {
 
 // 토큰의 페이로드 부분에서 만료시간 가져오기
 export function getPayloadFromJWTExp(token) {
-    const base64Payload = atob(token.split(".")[1]);
-    return base64Payload.split('"exp":')[1].split(',"')[0];
+    // const base64Payload = atob(token.split(".")[1]);
+    // return base64Payload.split('"exp":')[1].split(',"')[0];
+    const decodedToken = jwtDecode(token);
+    return decodedToken.exp;
 }
 
 export function needToRefreshAccessToken(token) {
-    const exp = getPayloadFromJWTExp(token);
-    return false;
+    try{
+        const exp = getPayloadFromJWTExp(token);
+        const currentTimestamp = Math.floor(Date.now() / 1000); // 현재 시간(epoch 시간) 획득
+
+        // 만료 시간이 현재 시간으로부터 1분 이내이면 true 반환, 그렇지 않으면 false 반환
+        return exp - currentTimestamp <= 60;
+    } catch (e) {
+        // 디코딩에 실패하거나 유효하지 않은 토큰인 경우 false 반환
+        return false;
+    }
 }
 
 // 리프레시 토큰을 재발급(리프레시) 해야하는지 체크
 export function needToRefreshRefreshToken(token) {
-    const exp = getPayloadFromJWTExp(token);
-    return false;
+    try{
+        const exp = getPayloadFromJWTExp(token);
+        const currentTimestamp = Math.floor(Date.now() / 1000); // 현재 시간(epoch 시간) 획득
+
+        // 만료 시간이 현재 시간으로부터 1분 이내이면 true 반환, 그렇지 않으면 false 반환
+        return exp - currentTimestamp <= 60;
+    } catch (e) {
+        // 디코딩에 실패하거나 유효하지 않은 토큰인 경우 false 반환
+        return false;
+    }
 }
 export const nav = {
     title: "MOBOOK1.0",
