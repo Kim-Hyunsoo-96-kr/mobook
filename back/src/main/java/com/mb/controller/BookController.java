@@ -1,9 +1,11 @@
 package com.mb.controller;
 
 import com.mb.domain.Book;
-import com.mb.domain.BookMember;
+import com.mb.domain.BookHeart;
+import com.mb.domain.BookHistory;
 import com.mb.domain.Member;
 import com.mb.dto.*;
+import com.mb.service.BookHeartService;
 import com.mb.service.BookMemberService;
 import com.mb.service.BookService;
 import com.mb.service.MemberService;
@@ -29,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static com.mb.enum_.BookStatus.Rent;
 import static com.mb.enum_.BookStatus.Return;
@@ -42,6 +45,7 @@ public class BookController {
     private final BookService bookService;
     private final MemberService memberService;
     private final BookMemberService bookMemberService;
+    private final BookHeartService bookHeartService;
 
     @Operation(summary = "책 추가", description = "DB에 책을 추가합니다.")
     @PostMapping("/add")
@@ -81,11 +85,14 @@ public class BookController {
             book.setRentalMemberId(loginMember.getMemberId());
             book.setIsAble(false);
             bookService.addBook(book);
-            BookMember bookMember = new BookMember();
-            bookMember.setBook(book);
-            bookMember.setMember(loginMember);
-            bookMember.setStatus(Rent.getBookStatus());
-            bookMemberService.addBookMember(bookMember);
+            BookHistory bookHistory = new BookHistory();
+            bookHistory.setBook(book);
+            bookHistory.setMember(loginMember);
+            bookHistory.setStatus(Rent.getBookStatus());
+            Date today = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            bookHistory.setRegDate(formatter.format(today));
+            bookMemberService.addBookMember(bookHistory);
             BookRentResponseDto bookRentResponseDto = new BookRentResponseDto();
             bookRentResponseDto.setMemberName(loginMember.getName());
             bookRentResponseDto.setBookName(book.getBookName());
@@ -93,13 +100,44 @@ public class BookController {
             return new ResponseEntity(bookRentResponseDto, HttpStatus.OK);
         }
         else {
-            ErrorDto errorDto = new ErrorDto();
-            errorDto.setErrorMessage("대여할 수 없는 책 입니다.");
-            return new ResponseEntity(errorDto ,HttpStatus.BAD_REQUEST);
+            MessageDto messageDto = new MessageDto();
+            messageDto.setMessage("대여할 수 없는 책 입니다.");
+            return new ResponseEntity(messageDto,HttpStatus.BAD_REQUEST);
         }
 
     }
+    @PostMapping("/heart/{bookNumber}")
+    public ResponseEntity bookHeart(@PathVariable String bookNumber, Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+        Book book = bookService.findByBookNumber(bookNumber);
+        MessageDto messageDto = new MessageDto();
+        Optional<BookHeart> bookHeart = bookHeartService.findByMemberAndBook(book, loginMember);
+        if(bookHeart.isEmpty()){
+            BookHeart newBookHeart = new BookHeart();
+            newBookHeart.setMember(loginMember);
+            newBookHeart.setBook(book);
+            bookHeartService.save(newBookHeart);
+            messageDto.setMessage("좋아요 성공");
+        } else {
+            messageDto.setMessage("이미 좋아요를 한 책입니다.");
+        }
+        return new ResponseEntity(messageDto, HttpStatus.OK);
+    }
 
+    @PostMapping("/heart/cancel/{bookNumber}")
+    public ResponseEntity bookHeartCancel(@PathVariable String bookNumber, Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+        Book book = bookService.findByBookNumber(bookNumber);
+        MessageDto messageDto = new MessageDto();
+        Optional<BookHeart> bookHeart = bookHeartService.findByMemberAndBook(book, loginMember);
+        if(bookHeart == null){
+            messageDto.setMessage("좋아요를 한 책이 아닙니다.");
+        } else {
+            bookHeartService.delete(bookHeart);
+            messageDto.setMessage("좋아요 취소 성공");
+        }
+        return new ResponseEntity(messageDto, HttpStatus.OK);
+    }
     @Operation(summary = "책 반납", description = "해당 책을 대여가능 상태로 DB에 저장합니다.")
     @PostMapping("/return/{bookNumber}")
     public ResponseEntity bookReturn(@PathVariable String bookNumber, Authentication authentication){
@@ -108,11 +146,11 @@ public class BookController {
         if(loginMember.getMemberId() == book.getRentalMemberId()){
             book.setIsAble(true);
             bookService.addBook(book);
-            BookMember bookMember = new BookMember();
-            bookMember.setBook(book);
-            bookMember.setMember(loginMember);
-            bookMember.setStatus(Return.getBookStatus());
-            bookMemberService.addBookMember(bookMember);
+            BookHistory bookHistory = new BookHistory();
+            bookHistory.setBook(book);
+            bookHistory.setMember(loginMember);
+            bookHistory.setStatus(Return.getBookStatus());
+            bookMemberService.addBookMember(bookHistory);
             BookReturnResponseDto bookReturnResponseDto = new BookReturnResponseDto();
             bookReturnResponseDto.setMemberName(loginMember.getName());
             bookReturnResponseDto.setBookName(book.getBookName());
@@ -121,9 +159,9 @@ public class BookController {
             return new ResponseEntity(bookReturnResponseDto, HttpStatus.OK);
         }
         else {
-            ErrorDto errorDto = new ErrorDto();
-            errorDto.setErrorMessage("해당 책을 대여하지 않았습니다.");
-            return new ResponseEntity(errorDto ,HttpStatus.BAD_REQUEST);
+            MessageDto messageDto = new MessageDto();
+            messageDto.setMessage("해당 책을 대여하지 않았습니다.");
+            return new ResponseEntity(messageDto,HttpStatus.BAD_REQUEST);
         }
     }
 

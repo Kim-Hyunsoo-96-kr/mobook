@@ -1,7 +1,7 @@
 package com.mb.service;
 
 
-import com.mb.domain.BookMember;
+import com.mb.domain.BookHistory;
 import com.mb.domain.Member;
 import com.mb.repository.BookMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,12 +13,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookMemberService {
     private final BookMemberRepository bookMemberRepository;
-    public void addBookMember(BookMember bookMember) {
-        bookMemberRepository.save(bookMember);
+    public void addBookMember(BookHistory bookHistory) {
+        bookMemberRepository.save(bookHistory);
     }
 
-    public List<BookMember> findBookLogByMemberId(Member member) {
-        List<BookMember> list =  bookMemberRepository.findByMember(member);
+    public List<BookHistory> findBookLogByMemberId(Member member) {
+        List<BookHistory> list =  bookMemberRepository.findByMember(member);
         return list;
     }
 }

@@ -1,7 +1,7 @@
 package com.mb.controller;
 
 import com.mb.domain.Book;
-import com.mb.domain.BookMember;
+import com.mb.domain.BookHistory;
 import com.mb.domain.Member;
 import com.mb.domain.RefreshToken;
 import com.mb.dto.*;
@@ -143,13 +143,14 @@ public class MemberController {
 
         MyBookResponseDto myBookResponseDto = new MyBookResponseDto();
 
-        List<BookMember> bookMemberList = bookMemberService.findBookLogByMemberId(loginMember);
+        List<BookHistory> bookHistoryList = bookMemberService.findBookLogByMemberId(loginMember);
         List<BookLog> bookLogList = new ArrayList();
-        for (BookMember bookMember : bookMemberList) {
-            String status = bookMember.getStatus();
-            String bookName = bookService.findById(bookMember.getBook().getBookId()).getBookName();
-            String bookNumber = bookService.findById(bookMember.getBook().getBookId()).getBookNumber();
-            BookLog bookLog = new BookLog(bookName, bookNumber, status);
+        for (BookHistory bookHistory : bookHistoryList) {
+            String status = bookHistory.getStatus();
+            String bookName = bookService.findById(bookHistory.getBook().getBookId()).getBookName();
+            String bookNumber = bookService.findById(bookHistory.getBook().getBookId()).getBookNumber();
+            String regDate = bookHistory.getRegDate();
+            BookLog bookLog = new BookLog(bookName, bookNumber, status, regDate);
             bookLogList.add(bookLog);
         }
         List<Book> rentBookList =  bookService.findByRentalMemberId(loginMember.getMemberId());

@@ -1,7 +1,6 @@
 package com.mb.dto;
 
 import com.mb.domain.Book;
-import com.mb.domain.BookMember;
 import com.mb.util.BookLog;
 import lombok.Getter;
 import lombok.Setter;

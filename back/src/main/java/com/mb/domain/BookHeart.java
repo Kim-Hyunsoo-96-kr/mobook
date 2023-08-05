@@ -7,14 +7,10 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class BookMember {
+public class BookHeart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String status;
-
-    private String regDate;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -23,6 +19,4 @@ public class BookMember {
     @ManyToOne
     @JoinColumn(name = "book_id")
     private Book book;
-
-
 }
