@@ -1,7 +1,8 @@
 package com.mb.dto;
 
 import com.mb.domain.Book;
-import com.mb.util.BookLog;
+import com.mb.util.BookLogUtil;
+import com.mb.util.RentBookLog;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,9 +11,8 @@ import java.util.List;
 @Getter
 @Setter
 public class MyBookResponseDto {
-    private List<BookLog> bookLogList;
-    private List<Book> rentBook;
-    /**Todo 좋아요한 책 목록*/
-//    private List<Book> likeBook;
+    private List<BookLogUtil> bookLogList;
+    private List<RentBookLog> rentBook;
+    private List<Book> recommendBook;
 }
 

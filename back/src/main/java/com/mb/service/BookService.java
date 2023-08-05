@@ -5,7 +5,6 @@ import com.mb.repository.BookRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -14,7 +13,7 @@ import java.util.List;
 public class BookService {
 
     private final BookRepository bookRepository;
-    public Book addBook(Book newBook) {
+    public Book saveBook(Book newBook) {
         Book saveBook = bookRepository.save(newBook);
         return saveBook;
     }

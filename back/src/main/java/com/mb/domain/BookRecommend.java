@@ -7,7 +7,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class BookHeart {
+public class BookRecommend {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

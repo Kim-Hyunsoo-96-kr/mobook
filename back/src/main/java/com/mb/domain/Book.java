@@ -17,7 +17,7 @@ public class Book {
     @Column(unique = true)
     private String bookNumber;
 
-    private Integer stars;
+    private Integer recommend;
 
     private String regDate;
 

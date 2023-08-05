@@ -1,16 +1,11 @@
 package com.mb.controller;
 
-import com.mb.domain.Book;
-import com.mb.domain.BookHistory;
-import com.mb.domain.Member;
-import com.mb.domain.RefreshToken;
+import com.mb.domain.*;
 import com.mb.dto.*;
-import com.mb.service.BookMemberService;
-import com.mb.service.BookService;
-import com.mb.service.MemberService;
-import com.mb.service.RefreshTokenService;
-import com.mb.util.BookLog;
+import com.mb.service.*;
+import com.mb.util.BookLogUtil;
 import com.mb.util.JwtUtil;
+import com.mb.util.RentBookLog;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -26,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mb.enum_.BookStatus.InRental;
+
 @Tag(name="MemberController", description = "멤버 컨트롤러")
 @Controller
 @RequiredArgsConstructor
@@ -34,7 +31,8 @@ public class MemberController {
 
     private final MemberService memberService;
     private final BookService bookService;
-    private final BookMemberService bookMemberService;
+    private final BookLogService bookLogService;
+    private final BookRecommendService bookRecommendService;
     private final RefreshTokenService refreshTokenService;
     private final PasswordEncoder passwordEncoder;
 
@@ -140,22 +138,37 @@ public class MemberController {
     @GetMapping("/myBook")
     public ResponseEntity myBook(Authentication authentication){
         Member loginMember = getLoginMember(authentication);
-
         MyBookResponseDto myBookResponseDto = new MyBookResponseDto();
 
-        List<BookHistory> bookHistoryList = bookMemberService.findBookLogByMemberId(loginMember);
-        List<BookLog> bookLogList = new ArrayList();
-        for (BookHistory bookHistory : bookHistoryList) {
-            String status = bookHistory.getStatus();
-            String bookName = bookService.findById(bookHistory.getBook().getBookId()).getBookName();
-            String bookNumber = bookService.findById(bookHistory.getBook().getBookId()).getBookNumber();
-            String regDate = bookHistory.getRegDate();
-            BookLog bookLog = new BookLog(bookName, bookNumber, status, regDate);
-            bookLogList.add(bookLog);
+        List<BookLog> bookLogList = bookLogService.findBookLogByMemberId(loginMember);
+        List<BookLogUtil> bookLogUtilList = new ArrayList();
+        for (BookLog bookLog : bookLogList) {
+            String status = bookLog.getStatus();
+            String bookName = bookService.findById(bookLog.getBook().getBookId()).getBookName();
+            String bookNumber = bookService.findById(bookLog.getBook().getBookId()).getBookNumber();
+            String regDate = bookLog.getRegDate();
+            BookLogUtil bookLogUtil = new BookLogUtil(bookName, bookNumber, status, regDate);
+            bookLogUtilList.add(bookLogUtil);
         }
-        List<Book> rentBookList =  bookService.findByRentalMemberId(loginMember.getMemberId());
-        myBookResponseDto.setBookLogList(bookLogList);
-        myBookResponseDto.setRentBook(rentBookList);
+
+        List<RentBookLog> rentBookLogList = new ArrayList();
+        List<BookLog> bookInRendtalLogList =  bookLogService.findByMemberAndStatus(loginMember, InRental);
+        for (BookLog bookLog : bookInRendtalLogList) {
+            Book rentBook = bookLog.getBook();
+            RentBookLog rentBookLog = new RentBookLog(rentBook.getBookNumber(), rentBook.getBookName(),
+                    rentBook.getRecommend(), bookLog.getRegDate(), bookLog.getReturnDate());
+            rentBookLogList.add(rentBookLog);
+        }
+
+        List<BookRecommend> bookRecommendList = bookRecommendService.findByMember(loginMember);
+        List<Book> likeBookList = new ArrayList();
+        for (BookRecommend bookRecommend : bookRecommendList) {
+            Book book = bookRecommend.getBook();
+            likeBookList.add(book);
+        }
+        myBookResponseDto.setBookLogList(bookLogUtilList);
+        myBookResponseDto.setRentBook(rentBookLogList);
+        myBookResponseDto.setRecommendBook(likeBookList);
         return new ResponseEntity(myBookResponseDto, HttpStatus.OK);
     }
 

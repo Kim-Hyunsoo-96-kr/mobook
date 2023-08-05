@@ -7,7 +7,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class BookHistory {
+public class BookLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,6 +15,8 @@ public class BookHistory {
     private String status;
 
     private String regDate;
+
+    private String returnDate;
 
     @ManyToOne
     @JoinColumn(name = "member_id")

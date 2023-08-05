@@ -1,27 +1,28 @@
 import '../App.css';
 import Header from "../comp/Header";
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {CONFIG, isLoginedSelector, loginedUserInfoAtom, loginedUserInfoSelector} from "../recoil";
+import {axiosInstance, CONFIG, isLoginedSelector, loginedUserInfoAtom, loginedUserInfoSelector} from "../recoil";
 import {Navigate} from "react-router-dom";
 import axios from "axios";
+import {useQuery} from "react-query";
 
-function MyBook() {
-    const loginedUserInfo = useRecoilValue(loginedUserInfoSelector);
-    const isLogined = useRecoilValue(isLoginedSelector);
-    if(!isLogined) return <Navigate to={"/"}/>;
-    console.log(loginedUserInfo.accessToken)
-    async function getData() {
-        try {
-            //응답 성공
-            const response = await axios.get(CONFIG.TEST,{headers : {
-                Authorization: `Bearer ${loginedUserInfo.accessToken}`
-            }});
-            console.log(response);
-        } catch (error) {
-            //응답 실패
-            console.error(error);
-        }
+const MyBook = () => {
+    const { isLoading, error, data } = useQuery("myPageList", async () => {
+        const response = await axiosInstance.get(CONFIG.API_MYBOOK);
+
+        return response.data;
+    });
+    const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
+    if (isLoading) {
+        return <div class="loading-1">로딩중</div>;
     }
+
+    if (error) {
+        return <div class="error-1">{error.message}</div>;
+    }
+    if (!isLogined) return <Navigate to="/" replace />; // 로그인 안했다면 메인화면으로 보냄
+
+
     return (
         <section class="bg-light py-5">
             <div class="container px-5 my-5">
@@ -33,30 +34,29 @@ function MyBook() {
                         <div class="card mb-5">
                             <div class="card-body p-5">
                                 <div class="mb-3">
-                                    <span class="text-muted">지금까지의 나의 기록</span>
+                                    <span class="text-muted fs-4">나의 기록</span>
                                 </div>
                                 <table className="table table-hover table-striped">
                                     <thead>
                                     <tr>
-                                        <th className="text-align-center">책 고유번호</th>
+                                        <th className="text-align-center">번호</th>
                                         <th>제목</th>
-                                        <th className="text-align-center">좋아요</th>
-                                        <th className="text-align-center">작성일</th>
-                                        <th className="text-align-center">대여가능여부</th>
+                                        <th className="text-align-center">활동</th>
+                                        <th className="text-align-center">등록일</th>
                                         <th></th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td className="text-align-center">11</td>
-                                        <td>22</td>
-                                        <td className="text-align-center">33</td>
-                                        <td className="text-align-center">44</td>
-                                        <td className="text-align-center">55</td>
-                                        <td><button>
-                                            대여신청
-                                        </button></td>
-                                    </tr>
+                                        {data.bookLogList.map((log)=>(
+                                            <tr key={log.bookNumber}>
+                                                <td className="text-align-center">{log.bookNumber}</td>
+                                                <td>{log.bookName}</td>
+                                                <td className="text-align-center">{log.bookStatus}</td>
+                                                <td className="text-align-center">{log.regDate}</td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                                 <div class="d-grid"><a class="btn btn-outline-primary" href="#!">Choose plan</a></div>
@@ -67,42 +67,37 @@ function MyBook() {
                         <div class="card mb-5">
                             <div class="card-body p-5">
                                 <div class="mb-3">
-                                    <span class="text-muted">대여중인 책</span>
+                                    <span class="text-muted fs-4">대여중인 책</span>
                                 </div>
-                                <ul class="list-unstyled mb-4">
-                                    <li class="mb-2">
-                                        <i class="bi bi-check text-primary"></i>
-                                        <strong>5 users</strong>
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-check text-primary"></i>
-                                        5GB storage
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-check text-primary"></i>
-                                        Unlimited public projects
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-check text-primary"></i>
-                                        Community access
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-check text-primary"></i>
-                                        Unlimited private projects
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-check text-primary"></i>
-                                        Dedicated support
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-check text-primary"></i>
-                                        Free linked domain
-                                    </li>
-                                    <li class="text-muted">
-                                        <i class="bi bi-x"></i>
-                                        Monthly status reports
-                                    </li>
-                                </ul>
+                                <table className="table table-hover table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th className="text-align-center">번호</th>
+                                        <th>제목</th>
+                                        <th className="text-align-center">대여일</th>
+                                        <th className="text-align-center">반납예정일</th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {data.rentBook.map((book)=>(
+                                        <tr key={book.bookId}>
+                                            <td className="text-align-center">{book.bookNumber}</td>
+                                            <td>{book.bookName}</td>
+                                            <td className="text-align-center">{book.bookStatus}</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td><button className="btn btn-outline-primary btn-sm">
+                                                반납기한 연장하기
+                                            </button></td>
+                                            <td><button className="btn btn-outline-success btn-sm">
+                                                반납하기
+                                            </button></td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
                                 <div class="d-grid"><a class="btn btn-primary" href="#!">Choose plan</a></div>
                             </div>
                         </div>
@@ -111,43 +106,35 @@ function MyBook() {
                         <div class="card">
                             <div class="card-body p-5">
                                 <div class="mb-3">
-                                    <span class="text-muted">찜한 책</span>
+                                    <span class="text-muted fs-4">추천한 책</span>
                                 </div>
-                                <ul class="list-unstyled mb-4">
-                                    <li class="mb-2">
-                                        <i class="bi bi-check text-primary"></i>
-                                        <strong>Unlimited users</strong>
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-check text-primary"></i>
-                                        5GB storage
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-check text-primary"></i>
-                                        Unlimited public projects
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-check text-primary"></i>
-                                        Community access
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-check text-primary"></i>
-                                        Unlimited private projects
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-check text-primary"></i>
-                                        Dedicated support
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-check text-primary"></i>
-                                        <strong>Unlimited</strong>
-                                        linked domains
-                                    </li>
-                                    <li class="text-muted">
-                                        <i class="bi bi-check text-primary"></i>
-                                        Monthly status reports
-                                    </li>
-                                </ul>
+                                <table className="table table-hover table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th className="text-align-center">번호</th>
+                                        <th>제목</th>
+                                        <th className="text-align-center">추천 수</th>
+                                        <th className="text-align-center">대여가능여부</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {data.likeBook.map((book)=>(
+                                        <tr key={book.bookId}>
+                                            <td className="text-align-center">{book.bookNumber}</td>
+                                            <td>{book.bookName}</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td><button className="btn btn-outline-success btn-sm">
+                                                추천 취소하기
+                                            </button></td>
+                                            <td><button className="btn btn-outline-primary btn-sm">
+                                                대여하기
+                                            </button></td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
                                 <div class="d-grid"><a class="btn btn-outline-primary" href="#!">Choose plan</a></div>
                             </div>
                         </div>

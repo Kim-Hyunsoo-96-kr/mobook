@@ -23,6 +23,14 @@ const Search = () => {
             alert("대여가 불가능한 책 입니다.")
         }
     }
+    const heartBook = async (bookNumber) => {
+        try{
+            const response = await axiosInstance.post(`${CONFIG.API_BOOK_HEART}${bookNumber}`);
+            alert(response.data.message);
+        } catch (e) {
+            alert("이미 찜한 상태입니다.")
+        }
+    }
     const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
     if (isLoading) {
         return <div class="loading-1">로딩중</div>;
@@ -40,16 +48,17 @@ const Search = () => {
                     <div className="container-fluid px-4">
                         <h1 className="mt-4">책 목록</h1>
 
-                        <div className="card mb-4">
+                        <div className="card mb-4 fs-7">
                             <div className="card-body">
                                 <table className="table table-hover table-striped">
                                     <thead>
                                     <tr>
                                         <th className="text-align-center">책 고유번호</th>
                                         <th>제목</th>
-                                        <th className="text-align-center">좋아요</th>
+                                        <th className="text-align-center">추천 수</th>
                                         <th className="text-align-center">작성일</th>
                                         <th className="text-align-center">대여가능여부</th>
+                                        <th></th>
                                         <th></th>
                                     </tr>
                                     </thead>
@@ -61,7 +70,10 @@ const Search = () => {
                                                 <td className="text-align-center">{book.stars}</td>
                                                 <td className="text-align-center">{book.regDate}</td>
                                                 <td className="text-align-center">{book.isAble ? "Y" : "N"}</td>
-                                                <td><button onClick={() => rentBook(book.bookNumber)}>
+                                                <td><button className="btn btn-outline-success btn-sm" onClick={() => heartBook(book.bookNumber)}>
+                                                    추천하기
+                                                </button></td>
+                                                <td><button className="btn btn-outline-primary btn-sm" onClick={() => rentBook(book.bookNumber)}>
                                                     대여신청
                                                 </button></td>
                                             </tr>

@@ -92,6 +92,8 @@ CONFIG.API_BOOK_LIST = `${CONFIG.BASE_URL}/api/books/list`;
 CONFIG.API_ADD_BOOK = `${CONFIG.BASE_URL}/api/books/add`;
 CONFIG.API_UPLOAD_EXCEL = `${CONFIG.BASE_URL}/api/books/add/excel`;
 CONFIG.API_BOOK_RENT = `${CONFIG.BASE_URL}/api/books/rent/`;
+CONFIG.API_BOOK_HEART = `${CONFIG.BASE_URL}/api/books/heart/`;
+CONFIG.API_MYBOOK = `${CONFIG.BASE_URL}/api/members/myBook`;
 CONFIG.TEST = `${CONFIG.BASE_URL}/api/books/list`;
 // 리코일 atom, selector 시작
 // 로그인한 회원정보(raw)
