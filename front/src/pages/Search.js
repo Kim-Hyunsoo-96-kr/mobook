@@ -25,7 +25,7 @@ const Search = () => {
     }
     const heartBook = async (bookNumber) => {
         try{
-            const response = await axiosInstance.post(`${CONFIG.API_BOOK_HEART}${bookNumber}`);
+            const response = await axiosInstance.post(`${CONFIG.API_BOOK_RECOMMEND}${bookNumber}`);
             alert(response.data.message);
         } catch (e) {
             alert("이미 찜한 상태입니다.")
