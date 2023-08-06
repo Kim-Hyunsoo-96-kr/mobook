@@ -34,14 +34,13 @@ function Test() {
         <div>
             <Header/>
             <div className="p">
-                <h2>Pagination 연습</h2>
-                    <Pagination
-                        activePage={page}
-                        itemsCountPerPage={10}
-                        totalItemsCount={300}
-                        pageRangeDisplayed={10}
-                        onChange={handlePageChange}>
-                    </Pagination>
+                <Pagination
+                    activePage={page}
+                    itemsCountPerPage={10}
+                    totalItemsCount={300}
+                    pageRangeDisplayed={10}
+                    onChange={handlePageChange}>
+                </Pagination>
             </div>
         </div>
     );

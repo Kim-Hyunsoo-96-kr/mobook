@@ -186,9 +186,9 @@ public class BookController {
 
     @Operation(summary = "책 검색", description = "검색값과 일치하는 제목의 책 리스트를 가져옵니다.")
     @GetMapping("/search")
-    public ResponseEntity bookSearch(@RequestBody BookSearchDto bookSearchDto, Pageable pageable){
-        pageable = PageRequest.of(bookSearchDto.getPage(), 10, Sort.by("bookId").descending());
-        List<Book> bookList = bookService.getBookListByKeyword(bookSearchDto.getSearchText(), pageable.withPage(bookSearchDto.getPage()));
+    public ResponseEntity bookSearch(@RequestParam(name = "searchText") String searchText, @RequestParam(name = "page", defaultValue = "1") Integer page, Pageable pageable){
+        pageable = PageRequest.of(page, 10, Sort.by("bookId").descending());
+        List<Book> bookList = bookService.getBookListByKeyword(searchText, pageable.withPage(page));
 
         BookListResponseDto bookListResponseDto = new BookListResponseDto();
         bookListResponseDto.setBookList(bookList);

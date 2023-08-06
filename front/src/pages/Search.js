@@ -1,19 +1,31 @@
 import '../App.css';
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {axiosInstance, CONFIG, isLoginedSelector, loginedUserInfoAtom, loginedUserInfoSelector} from "../recoil";
-import {Link, Navigate} from "react-router-dom";
-import {useQuery} from "react-query";
+import {
+    axiosInstance,
+    CONFIG,
+    isLoginedSelector,
+    loginedUserInfoAtom,
+    loginedUserInfoSelector,
+    queryClient
+} from "../recoil";
+import {Link, Navigate, useLocation, useNavigate} from "react-router-dom";
+import {useQuery, useQueryClient} from "react-query";
+import Pagination from "react-js-pagination";
+import {useState} from "react";
 
 const Search = () => {
-    const { isLoading, error, data } = useQuery("bookList", async () => {
-        // productList 는 캐싱키, 참고로 지금은 캐시 사용 안함
-        // 참고로 axiosInstance 로 요청하면 알아서 엑세스 키가 헤더에 붙어서 요청됩니다.
-        // 그것은 액시오스 인터셉터에서 자동으로 해줍니다.
-        // 우리가 App 함수에서 그렇게 세팅 했습니다.
-        const response = await axiosInstance.get(CONFIG.API_BOOK_LIST);
-
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const searchText = queryParams.get("searchText") || "";
+    const page = parseInt(queryParams.get("page") || "1")-1;
+    const navigate = useNavigate();
+    const { isLoading, error, data } = useQuery(["bookList", page, searchText], async () => {
+        const response = await axiosInstance.get(`${CONFIG.API_BOOK_SEARCH}?page=${page}&searchText=${searchText}`);
         return response.data;
     });
+    const handlePageChange = (page) => {
+        navigate(`/search?searchText=${searchText}&page=${page}`);
+    };
 
     const rentBook = async (bookNumber) => {
         try{
@@ -80,6 +92,15 @@ const Search = () => {
                                         ))}
                                     </tbody>
                                 </table>
+                                <div className="p">
+                                    <Pagination
+                                        activePage={page+1}
+                                        itemsCountPerPage={5}
+                                        totalItemsCount={data.bookList.length}
+                                        pageRangeDisplayed={5}
+                                        onChange={handlePageChange}>
+                                    </Pagination>
+                                </div>
                             </div>
                         </div>
                     </div>
