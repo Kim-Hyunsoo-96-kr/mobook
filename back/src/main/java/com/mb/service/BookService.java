@@ -48,4 +48,9 @@ public class BookService {
         Book findBook = bookRepository.findByBookNumber(bookNumber).orElseThrow(()-> new IllegalArgumentException("등로되지 않은 책입니다."));
         return findBook;
     }
+
+    public Integer getTotalCntBySearchText(String searchText) {
+        List<Book> bookList = bookRepository.findByBookNameContaining(searchText);
+        return bookList.size();
+    }
 }

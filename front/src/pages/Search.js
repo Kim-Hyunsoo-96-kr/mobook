@@ -56,10 +56,16 @@ const Search = () => {
     return (
         <section className="py-5">
             <div className="container px-5 my-5">
-                <main className="mt-5 pt-5">
+                <div className="text-center mb-5">
+                    <h1 className="fw-bolder">책 목록</h1>
+                </div>
+                <div className="search">
+                    <form className="d-flex">
+                        <input className="form-control me-2" type="search" placeholder="책 제목 검색" aria-label="Search"/>
+                            <button className="btn btn-outline-success" type="submit">Search</button>
+                    </form>
+                </div>
                     <div className="container-fluid px-4">
-                        <h1 className="mt-4">책 목록</h1>
-
                         <div className="card mb-4 fs-7">
                             <div className="card-body">
                                 <table className="table table-hover table-striped">
@@ -79,7 +85,7 @@ const Search = () => {
                                             <tr key={book.bookId}>
                                                 <td className="text-align-center">{book.bookNumber}</td>
                                                 <td>{book.bookName}</td>
-                                                <td className="text-align-center">{book.stars}</td>
+                                                <td className="text-align-center">{book.recommend}</td>
                                                 <td className="text-align-center">{book.regDate}</td>
                                                 <td className="text-align-center">{book.isAble ? "Y" : "N"}</td>
                                                 <td><button className="btn btn-outline-success btn-sm" onClick={() => heartBook(book.bookNumber)}>
@@ -95,8 +101,8 @@ const Search = () => {
                                 <div className="p">
                                     <Pagination
                                         activePage={page+1}
-                                        itemsCountPerPage={5}
-                                        totalItemsCount={data.bookList.length}
+                                        itemsCountPerPage={10}
+                                        totalItemsCount={data.totalCnt}
                                         pageRangeDisplayed={5}
                                         onChange={handlePageChange}>
                                     </Pagination>
@@ -104,7 +110,6 @@ const Search = () => {
                             </div>
                         </div>
                     </div>
-                </main>
             </div>
         </section>
     );

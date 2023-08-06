@@ -14,6 +14,8 @@ import java.util.Optional;
 public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findByBookNameContaining(String keyword, Pageable pageable);
 
+    List<Book> findByBookNameContaining(String keyword);
+
     List<Book> findByRentalMemberId(Long memberId);
 
     Optional<Book> findByBookNumber(String bookNumber);

@@ -10,4 +10,6 @@ import java.util.List;
 @Getter
 public class BookListResponseDto {
     private List<Book> bookList;
+
+    private Integer totalCnt;
 }

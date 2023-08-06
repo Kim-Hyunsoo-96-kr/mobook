@@ -189,9 +189,11 @@ public class BookController {
     public ResponseEntity bookSearch(@RequestParam(name = "searchText") String searchText, @RequestParam(name = "page", defaultValue = "1") Integer page, Pageable pageable){
         pageable = PageRequest.of(page, 10, Sort.by("bookId").descending());
         List<Book> bookList = bookService.getBookListByKeyword(searchText, pageable.withPage(page));
+        Integer totalCnt = bookService.getTotalCntBySearchText(searchText) + 1 ;
 
         BookListResponseDto bookListResponseDto = new BookListResponseDto();
         bookListResponseDto.setBookList(bookList);
+        bookListResponseDto.setTotalCnt(totalCnt);
         return new ResponseEntity(bookListResponseDto, HttpStatus.OK);
     }
 

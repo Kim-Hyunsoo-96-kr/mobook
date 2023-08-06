@@ -79,7 +79,7 @@ export const nav = {
     title: "MOBOOK1.0",
     menu: [
         {title: "홈", router: "/"},
-        {title: "책 검색", router: "/search?searchText=&page=0"},
+        {title: "책 검색", router: "/search?searchText=&page=1"},
         {title: "책 요청", router: "/request"},
     ]
 }
