@@ -146,20 +146,7 @@ public class BookController {
     @PostMapping("/request")
     public ResponseEntity bookRequest(@RequestBody BookRequestDto bookRequestDto, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
-
-        BookRequest bookRequest = new BookRequest();
-        bookRequest.setBookName(bookRequestDto.getBookName());
-        bookRequest.setBookWriter(bookRequestDto.getBookWriter());
-        bookRequest.setBookPublisher(bookRequestDto.getBookPublisher());
-        bookRequest.setStatus(Request.getBookStatus());
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        bookRequest.setRegDate(today.format(formatter));
-        bookRequest.setCompleteDate("0");
-        bookRequestService.save(bookRequest);
-
-        MessageDto messageDto = new MessageDto();
-        messageDto.setMessage("성공적으로 책을 요청했습니다.");
+        MessageDto messageDto =  bookService.request(loginMember, bookRequestDto);
 
         return new ResponseEntity(messageDto, HttpStatus.OK);
     }

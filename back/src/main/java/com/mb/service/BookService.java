@@ -1,15 +1,14 @@
 package com.mb.service;
 
-import com.mb.domain.Book;
-import com.mb.domain.BookLog;
-import com.mb.domain.BookRecommend;
-import com.mb.domain.Member;
+import com.mb.domain.*;
 import com.mb.dto.BookAddDto;
 import com.mb.dto.BookAddResponseDto;
+import com.mb.dto.BookRequestDto;
 import com.mb.dto.MessageDto;
 import com.mb.repository.BookLogRepository;
 import com.mb.repository.BookRecommendRepository;
 import com.mb.repository.BookRepository;
+import com.mb.repository.BookRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +28,7 @@ public class BookService {
     private final BookRepository bookRepository;
     private final BookLogRepository bookLogRepository;
     private final BookRecommendRepository bookRecommendRepository;
+    private final BookRequestRepository bookRequestRepository;
     public Book saveBook(Book newBook) {
         Book saveBook = bookRepository.save(newBook);
         return saveBook;
@@ -178,6 +178,25 @@ public class BookService {
         else {
             messageDto.setMessage("해당 책을 대여하지 않았습니다.");
         }
+        return messageDto;
+    }
+
+    public MessageDto request(Member loginMember, BookRequestDto bookRequestDto) {
+        MessageDto messageDto = new MessageDto();
+        BookRequest bookRequest = new BookRequest();
+
+        bookRequest.setBookName(bookRequestDto.getBookName());
+        bookRequest.setBookWriter(bookRequestDto.getBookWriter());
+        bookRequest.setBookPublisher(bookRequestDto.getBookPublisher());
+        bookRequest.setStatus(Request.getBookStatus());
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        bookRequest.setRegDate(today.format(formatter));
+        bookRequest.setCompleteDate("0");
+        bookRequest.setMember(loginMember);
+        bookRequestRepository.save(bookRequest);
+        messageDto.setMessage("성공적으로 책을 요청했습니다.");
+
         return messageDto;
     }
 }
