@@ -13,12 +13,8 @@ const MyRecommendBook = () => {
         return response.data;
     });
     const rentBook = async (bookNumber) => {
-        try{
             const response = await axiosInstance.post(`${CONFIG.API_BOOK_RENT}${bookNumber}`);
-            alert("대여 성공");
-        } catch (e) {
-            alert("대여가 불가능한 책 입니다.")
-        }
+            alert(response.data.message);
     }
     const returnBook = async (bookNumber) => {
         try{

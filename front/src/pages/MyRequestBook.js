@@ -7,7 +7,7 @@ import axios from "axios";
 import {useQuery} from "react-query";
 
 const MyRequestBook = () => {
-    const { isLoading, error, data } = useQuery("myRentBook", async () => {
+    const { isLoading, error, data } = useQuery("myRequestBook", async () => {
         const response = await axiosInstance.get(CONFIG.API_MYREQUESTBOOK);
 
         return response.data;

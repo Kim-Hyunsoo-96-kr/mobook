@@ -165,6 +165,14 @@ public class BookController {
         return new ResponseEntity(messageDto, HttpStatus.OK);
     }
 
+    @PostMapping("/extend/{bookNumber}")
+    public ResponseEntity extendPeriod(@PathVariable String bookNumber, Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+        MessageDto messageDto = bookService.extendPeriod(loginMember, bookNumber);
+
+        return new ResponseEntity(messageDto, HttpStatus.OK);
+    }
+
     private Member getLoginMember(Authentication authentication) {
         if(authentication == null){
             System.out.println("authentication에 아무것도 없음");

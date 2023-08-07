@@ -12,13 +12,9 @@ const MyRentBook = () => {
 
         return response.data;
     });
-    const rentBook = async (bookNumber) => {
-        try{
-            const response = await axiosInstance.post(`${CONFIG.API_BOOK_RENT}${bookNumber}`);
-            alert("대여 성공");
-        } catch (e) {
-            alert("대여가 불가능한 책 입니다.")
-        }
+    const extendPeriod = async (bookNumber) => {
+            const response = await axiosInstance.post(`${CONFIG.API_BOOK_EXTEND_PERIOD}${bookNumber}`);
+            alert(response.data.message);
     }
     const returnBook = async (bookNumber) => {
         try{
@@ -81,7 +77,7 @@ const MyRentBook = () => {
                                             <td className="text-align-center">{book.recommend}</td>
                                             <td className="text-align-center">{book.rentDate}</td>
                                             <td className="text-align-center">{book.returnDate}</td>
-                                            <td><button className="btn btn-outline-primary btn-sm">
+                                            <td><button className="btn btn-outline-primary btn-sm" onClick={() => extendPeriod(book.bookNumber)}>
                                                 반납기한 연장하기
                                             </button></td>
                                             <td><button className="btn btn-outline-success btn-sm" onClick={() => returnBook(book.bookNumber)}>

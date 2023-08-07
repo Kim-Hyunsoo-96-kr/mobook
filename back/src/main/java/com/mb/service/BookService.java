@@ -12,9 +12,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -156,16 +159,17 @@ public class BookService {
         MessageDto messageDto = new MessageDto();
         if(loginMember.getMemberId() == book.getRentalMemberId()) {
             book.setIsAble(true);
+            book.setRentalMemberId(0L);
             bookRepository.save(book);
-            BookLog bookHistory = new BookLog();
-            bookHistory.setBook(book);
-            bookHistory.setMember(loginMember);
-            bookHistory.setStatus(Return.getBookStatus());
+            BookLog bookLog = new BookLog();
+            bookLog.setBook(book);
+            bookLog.setMember(loginMember);
+            bookLog.setStatus(Return.getBookStatus());
             LocalDate today = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            bookHistory.setRegDate(today.format(formatter));
-            bookHistory.setReturnDate("0");
-            bookLogRepository.save(bookHistory);
+            bookLog.setRegDate(today.format(formatter));
+            bookLog.setReturnDate("0");
+            bookLogRepository.save(bookLog);
 
             BookLog bookHistoryLog = bookLogRepository.findByMemberAndBookAndStatus(loginMember, book, InRental.getBookStatus()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 로그입니다."));
             bookHistoryLog.setStatus(Rent.getBookStatus());
@@ -213,5 +217,23 @@ public class BookService {
         }
         requestBookLogResponseDto.setRequestBookLogList(requestBookLogList);
         return requestBookLogResponseDto;
+    }
+
+    public MessageDto extendPeriod(Member loginMember, String bookNumber) {
+        Book book = findByBookNumber(bookNumber);
+        MessageDto messageDto = new MessageDto();
+        Optional<BookLog> bookLog = bookLogRepository.findByMemberAndBookAndStatus(loginMember, book, InRental.getBookStatus());
+        if(!bookLog.isEmpty()){
+            BookLog log = bookLog.get();
+            LocalDate today = LocalDate.now();
+            LocalDate twoWeeksLater = today.plusWeeks(2);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            log.setReturnDate(twoWeeksLater.format(formatter));
+            bookLogRepository.save(log);
+            messageDto.setMessage("대출 기한이 연장되었습니다.");
+        } else {
+            messageDto.setMessage("대여 중인 책이 아닙니다.");
+        }
+        return messageDto;
     }
 }

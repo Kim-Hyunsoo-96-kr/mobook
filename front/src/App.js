@@ -7,7 +7,6 @@ import Logout from "./pages/Logout";
 import Test from "./pages/Test";
 import Search from "./pages/Search";
 import AddBook from "./pages/AddBook";
-import MyBook from "./pages/MyBook";
 import MyRentBook from "./pages/MyRentBook";
 import MyBookLog from "./pages/MyBookLog";
 import MyRecommendBook from "./pages/MyRecommendBook";
@@ -174,7 +173,6 @@ function App() {
               <Route path="/search" element={<Search />} />
               <Route path="/add" element={<AddBook />} />
               <Route path="/test" element={<Test />} />
-              <Route path="/myBook" element={<MyBook />} />
               <Route path="/myBookLog" element={<MyBookLog />} />
               <Route path="/myRentBook" element={<MyRentBook />} />
               <Route path="/myRecommendBook" element={<MyRecommendBook />} />
