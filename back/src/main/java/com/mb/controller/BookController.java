@@ -1,14 +1,8 @@
 package com.mb.controller;
 
-import com.mb.domain.Book;
-import com.mb.domain.BookRecommend;
-import com.mb.domain.BookLog;
-import com.mb.domain.Member;
+import com.mb.domain.*;
 import com.mb.dto.*;
-import com.mb.service.BookRecommendService;
-import com.mb.service.BookLogService;
-import com.mb.service.BookService;
-import com.mb.service.MemberService;
+import com.mb.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -47,141 +41,46 @@ public class BookController {
     private final MemberService memberService;
     private final BookLogService bookLogService;
     private final BookRecommendService bookRecommendService;
+    private final BookRequestService bookRequestService;
 
     @Operation(summary = "책 추가", description = "DB에 책을 추가합니다.")
     @PostMapping("/add")
     public ResponseEntity addBook(@RequestBody BookAddDto bookAddDto){
-        Book newBook = new Book();
-
-        newBook.setBookName(bookAddDto.getBookName());
-        newBook.setBookNumber(bookAddDto.getBookNumber());
-        newBook.setIsAble(true);
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        newBook.setRegDate(today.format(formatter));
-        newBook.setRecommend(0);
-        newBook.setRentalMemberId(0L);
-
-        Book addBook = bookService.saveBook(newBook);
-
-        BookAddResponseDto bookAddResponseDto = new BookAddResponseDto();
-        bookAddResponseDto.setName(addBook.getBookName());
+        BookAddResponseDto bookAddResponseDto = bookService.addBook(bookAddDto);
 
         return new ResponseEntity(bookAddResponseDto, HttpStatus.OK);
-    }
-
-    @Operation(summary = "책 전체 리스트", description = "DB에 저장된 전체 책 리스트를 가져옵니다.")
-    @GetMapping("/list")
-    public ResponseEntity bookList(){
-        List<Book> bookList= bookService.getBooksList();
-        BookListResponseDto bookListResponseDto = new BookListResponseDto();
-        bookListResponseDto.setBookList(bookList);
-        return new ResponseEntity(bookListResponseDto, HttpStatus.OK);
     }
 
     @Operation(summary = "책 대여", description = "해당 책을 대여불가 상태로 DB에 저장합니다.")
     @PostMapping("/rent/{bookNumber}")
     public ResponseEntity bookRent(@PathVariable String bookNumber, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
-        Book book = bookService.findByBookNumber(bookNumber);
-        if(book.getIsAble()){
-            book.setRentalMemberId(loginMember.getMemberId());
-            book.setIsAble(false);
-            bookService.saveBook(book);
+        MessageDto messageDto = bookService.rentBook(loginMember, bookNumber);
 
-            BookLog bookLog = new BookLog();
-            bookLog.setBook(book);
-            bookLog.setMember(loginMember);
-            bookLog.setStatus(InRental.getBookStatus());
-            LocalDate today = LocalDate.now();
-            LocalDate twoWeeksLater = today.plusWeeks(2);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            bookLog.setRegDate(today.format(formatter));
-            bookLog.setReturnDate(twoWeeksLater.format(formatter));
-            bookLogService.addBookMember(bookLog);
-
-            MessageDto messageDto = new MessageDto();
-            messageDto.setMessage("성공적으로 대여했습니다.");
-            return new ResponseEntity(messageDto, HttpStatus.OK);
-        }
-        else {
-            MessageDto messageDto = new MessageDto();
-            messageDto.setMessage("대여할 수 없는 책 입니다.");
-            return new ResponseEntity(messageDto,HttpStatus.BAD_REQUEST);
-        }
-
+        return new ResponseEntity(messageDto, HttpStatus.OK);
     }
     @PostMapping("/recommend/{bookNumber}")
     public ResponseEntity bookRecommend(@PathVariable String bookNumber, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
-        Book book = bookService.findByBookNumber(bookNumber);
-        MessageDto messageDto = new MessageDto();
-        Optional<BookRecommend> bookRecommend = bookRecommendService.findByMemberAndBook(book, loginMember);
-        if(bookRecommend.isEmpty()){
-            Integer recommendCount = book.getRecommend() + 1;
-            book.setRecommend(recommendCount);
-            bookService.saveBook(book);
-            BookRecommend newBookRecommend = new BookRecommend();
-            newBookRecommend.setMember(loginMember);
-            newBookRecommend.setBook(book);
-            bookRecommendService.save(newBookRecommend);
-            messageDto.setMessage("선택하신 책을 추천했습니다.");
-        } else {
-            messageDto.setMessage("이미 추천한 책입니다.");
-        }
+        MessageDto messageDto = bookService.recommendBook(loginMember, bookNumber);
+
         return new ResponseEntity(messageDto, HttpStatus.OK);
     }
 
     @PostMapping("/recommend/cancel/{bookNumber}")
     public ResponseEntity bookRecommendCancel(@PathVariable String bookNumber, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
-        Book book = bookService.findByBookNumber(bookNumber);
-        MessageDto messageDto = new MessageDto();
-        Optional<BookRecommend> bookRecommend = bookRecommendService.findByMemberAndBook(book, loginMember);
-        if(bookRecommend == null){
-            messageDto.setMessage("추천한 책이 아닙니다.");
-        } else {
-            Integer recommendCount = book.getRecommend() - 1;
-            book.setRecommend(recommendCount);
-            bookService.saveBook(book);
-            bookRecommendService.delete(bookRecommend);
-            messageDto.setMessage("선택하신 책의 추천을 취소했습니다.");
-        }
+        MessageDto messageDto = bookService.recommendCancelBook(loginMember, bookNumber);
+
         return new ResponseEntity(messageDto, HttpStatus.OK);
     }
     @Operation(summary = "책 반납", description = "해당 책을 대여가능 상태로 DB에 저장합니다.")
     @PostMapping("/return/{bookNumber}")
     public ResponseEntity bookReturn(@PathVariable String bookNumber, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
-        Book book = bookService.findByBookNumber(bookNumber);
-        if(loginMember.getMemberId() == book.getRentalMemberId()){
-            book.setIsAble(true);
-            bookService.saveBook(book);
-            BookLog bookHistory = new BookLog();
-            bookHistory.setBook(book);
-            bookHistory.setMember(loginMember);
-            bookHistory.setStatus(Return.getBookStatus());
-            LocalDate today = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            bookHistory.setRegDate(today.format(formatter));
-            bookHistory.setReturnDate("0");
-            bookLogService.addBookMember(bookHistory);
+        MessageDto messageDto = bookService.returnBook(loginMember, bookNumber);
 
-            BookLog bookHistoryLog = bookLogService.findByMemberAndBookAndStatus(loginMember, book, InRental);
-            bookHistoryLog.setStatus(Rent.getBookStatus());
-            bookHistoryLog.setReturnDate("0");
-            bookLogService.addBookMember(bookHistoryLog);
-
-            MessageDto messageDto = new MessageDto();
-            messageDto.setMessage("반납을 완료했습니다.");
-
-            return new ResponseEntity(messageDto, HttpStatus.OK);
-        }
-        else {
-            MessageDto messageDto = new MessageDto();
-            messageDto.setMessage("해당 책을 대여하지 않았습니다.");
-            return new ResponseEntity(messageDto,HttpStatus.BAD_REQUEST);
-        }
+        return new ResponseEntity(messageDto, HttpStatus.OK);
     }
 
     @Operation(summary = "책 검색", description = "검색값과 일치하는 제목의 책 리스트를 가져옵니다.")
@@ -244,10 +143,45 @@ public class BookController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    @PostMapping("/request")
+    public ResponseEntity bookRequest(@RequestBody BookRequestDto bookRequestDto, Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+
+        BookRequest bookRequest = new BookRequest();
+        bookRequest.setBookName(bookRequestDto.getBookName());
+        bookRequest.setBookWriter(bookRequestDto.getBookWriter());
+        bookRequest.setBookPublisher(bookRequestDto.getBookPublisher());
+        bookRequest.setStatus(Request.getBookStatus());
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        bookRequest.setRegDate(today.format(formatter));
+        bookRequest.setCompleteDate("0");
+        bookRequestService.save(bookRequest);
+
+        MessageDto messageDto = new MessageDto();
+        messageDto.setMessage("성공적으로 책을 요청했습니다.");
+
+        return new ResponseEntity(messageDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/request/complete/{bookRequestId}")
+    public ResponseEntity requestComplete(@PathVariable Long bookRequestId){
+        BookRequest bookRequest = bookRequestService.findById(bookRequestId);
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        bookRequest.setCompleteDate(today.format(formatter));
+        bookRequest.setStatus(RequestComplete.getBookStatus());
+        bookRequestService.save(bookRequest);
+        MessageDto messageDto = new MessageDto();
+        messageDto.setMessage("성공적으로 처리완료했습니다.");
+
+        return new ResponseEntity(messageDto, HttpStatus.OK);
+    }
+
     private Member getLoginMember(Authentication authentication) {
         if(authentication == null){
             System.out.println("authentication에 아무것도 없음");
-            return memberService.findById(1L);
+            return new Member();
         }
         Long memberId = (Long) authentication.getPrincipal();
         Member loginMember = memberService.findById(memberId);

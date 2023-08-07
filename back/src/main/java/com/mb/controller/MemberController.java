@@ -172,6 +172,54 @@ public class MemberController {
         return new ResponseEntity(myBookResponseDto, HttpStatus.OK);
     }
 
+    @GetMapping("/myBookLog")
+    public ResponseEntity myBookLog(Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+        BookLogResponseDto bookLogResponseDto = new BookLogResponseDto();
+        List<BookLog> bookLogList = bookLogService.findBookLogByMemberId(loginMember);
+        List<BookLogUtil> bookLogUtilList = new ArrayList();
+        for (BookLog bookLog : bookLogList) {
+            String status = bookLog.getStatus();
+            String bookName = bookService.findById(bookLog.getBook().getBookId()).getBookName();
+            String bookNumber = bookService.findById(bookLog.getBook().getBookId()).getBookNumber();
+            String regDate = bookLog.getRegDate();
+            BookLogUtil bookLogUtil = new BookLogUtil(bookName, bookNumber, status, regDate);
+            bookLogUtilList.add(bookLogUtil);
+        }
+        bookLogResponseDto.setBookLogList(bookLogUtilList);
+        return new ResponseEntity(bookLogResponseDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/myRentBook")
+    public ResponseEntity myRentBookList(Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+        RentBookLogResponseDto rentBookLogResponseDto = new RentBookLogResponseDto();
+        List<RentBookLog> rentBookLogList = new ArrayList();
+        List<BookLog> bookInRendtalLogList =  bookLogService.findByMemberAndStatus(loginMember, InRental);
+        for (BookLog bookLog : bookInRendtalLogList) {
+            Book rentBook = bookLog.getBook();
+            RentBookLog rentBookLog = new RentBookLog(rentBook.getBookNumber(), rentBook.getBookName(),
+                    rentBook.getRecommend(), bookLog.getRegDate(), bookLog.getReturnDate());
+            rentBookLogList.add(rentBookLog);
+        }
+        rentBookLogResponseDto.setRentBook(rentBookLogList);
+        return new ResponseEntity(rentBookLogResponseDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/myRecommendBook")
+    public ResponseEntity myRecommendBookList(Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+        RecommendBookLogResponseDto recommendBookLogResponseDto = new RecommendBookLogResponseDto();
+        List<BookRecommend> bookRecommendList = bookRecommendService.findByMember(loginMember);
+        List<Book> recommendBookList = new ArrayList();
+        for (BookRecommend bookRecommend : bookRecommendList) {
+            Book book = bookRecommend.getBook();
+            recommendBookList.add(book);
+        }
+        recommendBookLogResponseDto.setRecommendBook(recommendBookList);
+        return new ResponseEntity(recommendBookLogResponseDto, HttpStatus.OK);
+    }
+
     private Member getLoginMember(Authentication authentication) {
         if(authentication == null){
             System.out.println("authentication에 아무것도 없음");

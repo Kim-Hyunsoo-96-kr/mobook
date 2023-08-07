@@ -8,6 +8,9 @@ import Test from "./pages/Test";
 import Search from "./pages/Search";
 import AddBook from "./pages/AddBook";
 import MyBook from "./pages/MyBook";
+import MyRentBook from "./pages/MyRentBook";
+import MyBookLog from "./pages/MyBookLog";
+import MyRecommendBook from "./pages/MyRecommendBook";
 import {
     axiosInstance,
     CONFIG,
@@ -20,6 +23,7 @@ import {
 import {useEffect, useState} from "react";
 import {useRecoilState, useRecoilValue} from "recoil";
 import axios from "axios";
+
 function App() {
     const [isReady, setIsReady] = useState(false);
     const [loginedUserInfo, setLoginedUserInfo] = useRecoilState(
@@ -169,6 +173,9 @@ function App() {
               <Route path="/add" element={<AddBook />} />
               <Route path="/test" element={<Test />} />
               <Route path="/myBook" element={<MyBook />} />
+              <Route path="/myBookLog" element={<MyBookLog />} />
+              <Route path="/myRentBook" element={<MyRentBook />} />
+              <Route path="/myRecommendBook" element={<MyRecommendBook />} />
           </Routes>
           </div>
       </BrowserRouter>

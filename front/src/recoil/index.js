@@ -97,6 +97,9 @@ CONFIG.API_BOOK_RETURN = `${CONFIG.BASE_URL}/api/books/return/`;
 CONFIG.API_BOOK_RECOMMEND = `${CONFIG.BASE_URL}/api/books/recommend/`;
 CONFIG.API_BOOK_RECOMMEND_CANCEL = `${CONFIG.BASE_URL}/api/books/recommend/cancel/`;
 CONFIG.API_MYBOOK = `${CONFIG.BASE_URL}/api/members/myBook`;
+CONFIG.API_MYBOOKLOG = `${CONFIG.BASE_URL}/api/members/myBookLog`;
+CONFIG.API_MYRECOMMENDBOOK = `${CONFIG.BASE_URL}/api/members/myRecommendBook`;
+CONFIG.API_MYRENTBOOK = `${CONFIG.BASE_URL}/api/members/myRentBook`;
 CONFIG.TEST = `${CONFIG.BASE_URL}/api/books/list`;
 // 리코일 atom, selector 시작
 // 로그인한 회원정보(raw)

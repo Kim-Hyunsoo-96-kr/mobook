@@ -22,17 +22,22 @@ function NavBar(props) {
                         {menuList}
                         {isLogined && (
                             <li className="nav-item dropdown">
-                                {isLogined && (
+                                    <a className="nav-link dropdown-toggle" id="navbarDropdownBlog" href="#" role="button"
+                                       data-bs-toggle="dropdown" aria-expanded="false">내 책 관리</a>
+                                <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownBlog">
+                                    <li><Link to="/myBookLog" className="dropdown-item">내 기록</Link></li>
+                                    <li><Link to="/myRentBook" className="dropdown-item">대여 내역</Link></li>
+                                    <li><Link to="/myRecommendBook" className="dropdown-item">추천한 책 내역</Link></li>
+                                </ul>
+                            </li>
+                        )}
+                        {isLogined && (
+                            <li className="nav-item dropdown">
                                     <a className="nav-link dropdown-toggle" id="navbarDropdownBlog" href="#" role="button"
                                        data-bs-toggle="dropdown" aria-expanded="false">{loginedUserInfo.name} 님</a>
-                                )}
-
                                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownBlog">
-                                    <li><Link to="/myBook" className="dropdown-item">내 책 관리</Link></li>
-                                    <li><Link to="/myInfo" className="dropdown-item">내 정보</Link></li>
-                                    {isLogined && (
-                                        <li><Link to={"/logout"} class="dropdown-item">로그아웃</Link></li>
-                                    )}
+                                    <li><Link to="/myPage" className="dropdown-item">내 정보</Link></li>
+                                    <li><Link to={"/logout"} class="dropdown-item">로그아웃</Link></li>
                                 </ul>
                             </li>
                         )}
