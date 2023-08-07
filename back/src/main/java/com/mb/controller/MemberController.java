@@ -228,6 +228,14 @@ public class MemberController {
         return new ResponseEntity(requestBookLogResponseDto, HttpStatus.OK);
     }
 
+    @PostMapping("/changePw")
+    public ResponseEntity changePassword(@RequestBody ChangePasswordDto changePasswordDto, Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+        MessageDto messageDto = memberService.changePassword(changePasswordDto, loginMember);
+
+        return new ResponseEntity(messageDto, HttpStatus.OK);
+    }
+
 
     private Member getLoginMember(Authentication authentication) {
         if(authentication == null){
