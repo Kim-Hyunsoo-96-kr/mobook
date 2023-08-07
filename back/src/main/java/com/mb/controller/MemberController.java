@@ -220,6 +220,15 @@ public class MemberController {
         return new ResponseEntity(recommendBookLogResponseDto, HttpStatus.OK);
     }
 
+    @GetMapping("/myRequestBook")
+    public ResponseEntity myRequestBook(Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+        RequestBookLogResponseDto requestBookLogResponseDto =  bookService.findMyRequesyBookList(loginMember);
+
+        return new ResponseEntity(requestBookLogResponseDto, HttpStatus.OK);
+    }
+
+
     private Member getLoginMember(Authentication authentication) {
         if(authentication == null){
             System.out.println("authentication에 아무것도 없음");

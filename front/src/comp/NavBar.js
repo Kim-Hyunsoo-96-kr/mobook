@@ -28,6 +28,7 @@ function NavBar(props) {
                                     <li><Link to="/myBookLog" className="dropdown-item">내 기록</Link></li>
                                     <li><Link to="/myRentBook" className="dropdown-item">대여 내역</Link></li>
                                     <li><Link to="/myRecommendBook" className="dropdown-item">추천한 책 내역</Link></li>
+                                    <li><Link to="/myRequestBook" className="dropdown-item">요청한 책 내역</Link></li>
                                 </ul>
                             </li>
                         )}

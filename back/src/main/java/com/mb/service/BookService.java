@@ -1,14 +1,12 @@
 package com.mb.service;
 
 import com.mb.domain.*;
-import com.mb.dto.BookAddDto;
-import com.mb.dto.BookAddResponseDto;
-import com.mb.dto.BookRequestDto;
-import com.mb.dto.MessageDto;
+import com.mb.dto.*;
 import com.mb.repository.BookLogRepository;
 import com.mb.repository.BookRecommendRepository;
 import com.mb.repository.BookRepository;
 import com.mb.repository.BookRequestRepository;
+import com.mb.util.RequestBookLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -198,5 +197,21 @@ public class BookService {
         messageDto.setMessage("성공적으로 책을 요청했습니다.");
 
         return messageDto;
+    }
+
+    public RequestBookLogResponseDto findMyRequesyBookList(Member member) {
+        List<BookRequest> requestBookList =  bookRequestRepository.findByMember(member);
+        List<RequestBookLog> requestBookLogList = new ArrayList();
+        RequestBookLogResponseDto requestBookLogResponseDto = new RequestBookLogResponseDto();
+        for (BookRequest bookRequest : requestBookList) {
+            String bookName = bookRequest.getBookName();
+            String requestDate = bookRequest.getRegDate();
+            String completeDate = bookRequest.getCompleteDate();
+            String status = bookRequest.getStatus();
+            RequestBookLog requestBookLog = new RequestBookLog(bookName, requestDate, completeDate, status);
+            requestBookLogList.add(requestBookLog);
+        }
+        requestBookLogResponseDto.setRequestBookLogList(requestBookLogList);
+        return requestBookLogResponseDto;
     }
 }

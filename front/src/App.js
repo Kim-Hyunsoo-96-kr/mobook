@@ -24,6 +24,7 @@ import {useEffect, useState} from "react";
 import {useRecoilState, useRecoilValue} from "recoil";
 import axios from "axios";
 import Request from "./pages/Request";
+import MyRequestBook from "./pages/MyRequestBook";
 
 function App() {
     const [isReady, setIsReady] = useState(false);
@@ -177,6 +178,7 @@ function App() {
               <Route path="/myBookLog" element={<MyBookLog />} />
               <Route path="/myRentBook" element={<MyRentBook />} />
               <Route path="/myRecommendBook" element={<MyRecommendBook />} />
+              <Route path="/myRequestBook" element={<MyRequestBook />} />
               <Route path="/request" element={<Request />} />
           </Routes>
           </div>
