@@ -4,20 +4,16 @@ import {
     axiosInstance,
     CONFIG,
     isLoginedSelector,
-    loginedUserInfoAtom,
-    loginedUserInfoSelector,
-    queryClient
 } from "../recoil";
 import {Link, Navigate, useLocation, useNavigate} from "react-router-dom";
 import {useQuery, useQueryClient} from "react-query";
 import Pagination from "react-js-pagination";
-import {useState} from "react";
 
 const Search = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const searchText = queryParams.get("searchText") || "";
-    const page = parseInt(queryParams.get("page") || "1")-1;
+    const page = parseInt(queryParams.get("page") || "1") - 1;
     const navigate = useNavigate();
     const { isLoading, error, data } = useQuery(["bookList", page, searchText], async () => {
         const response = await axiosInstance.get(`${CONFIG.API_BOOK_SEARCH}?page=${page}&searchText=${searchText}`);
@@ -25,6 +21,19 @@ const Search = () => {
     });
     const handlePageChange = (page) => {
         navigate(`/search?searchText=${searchText}&page=${page}`);
+    };
+
+    const submitSearch = (event) => {
+        event.preventDefault();
+        const form = event.target;
+        form.searchText.value = form.searchText.value.trim();
+        if (form.searchText.value.length === 0) {
+            console.log("빈 값");
+            navigate(`/search?searchText=&page=1`);
+        } else {
+            const searchText = form.searchText.value;
+            navigate(`/search?searchText=${searchText}&page=1`);
+        }
     };
 
     const rentBook = async (bookNumber) => {
@@ -60,8 +69,8 @@ const Search = () => {
                     <h1 className="fw-bolder">책 목록</h1>
                 </div>
                 <div className="search">
-                    <form className="d-flex">
-                        <input className="form-control me-2" type="search" placeholder="책 제목 검색" aria-label="Search"/>
+                    <form className="d-flex" onSubmit={submitSearch}>
+                        <input className="form-control me-2" name="searchText" type="search" placeholder="책 제목 검색" aria-label="Search"/>
                             <button className="btn btn-outline-success" type="submit">Search</button>
                     </form>
                 </div>
