@@ -9,20 +9,25 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class MailService {
     private final JavaMailSender javaMailSender;
+    private final TemplateEngine templateEngine;
 
-    public void sendHtmlEmail(String[] receiverList, String subject, String htmlContentTemplate) throws MessagingException, IOException {
-        String htmlContent = loadHtmlContentFromFile(htmlContentTemplate);
+    public void sendHtmlEmail(String[] receiverList, String subject, String htmlContentTemplate, Map<String, Object> model) throws MessagingException, IOException {
 
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+        String htmlContent = processTemplate(htmlContentTemplate, model);
 
         helper.setTo(receiverList); // Pass an array of email addresses
         helper.setSubject(subject);
@@ -31,9 +36,9 @@ public class MailService {
         javaMailSender.send(message);
     }
 
-    public String loadHtmlContentFromFile(String filePath) throws IOException {
-        Resource resource = new ClassPathResource(filePath);
-        byte[] contentBytes = FileCopyUtils.copyToByteArray(resource.getInputStream());
-        return new String(contentBytes, "UTF-8");
+    private String processTemplate(String htmlContentTemplate, Map<String, Object> model) {
+        Context context = new Context();
+        context.setVariables(model);
+        return templateEngine.process(htmlContentTemplate, context);
     }
 }

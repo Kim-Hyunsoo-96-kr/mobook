@@ -7,19 +7,20 @@ import com.mb.repository.BookRecommendRepository;
 import com.mb.repository.BookRepository;
 import com.mb.repository.BookRequestRepository;
 import com.mb.util.RequestBookLog;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.mb.enum_.BookStatus.*;
 
@@ -31,6 +32,8 @@ public class BookService {
     private final BookLogRepository bookLogRepository;
     private final BookRecommendRepository bookRecommendRepository;
     private final BookRequestRepository bookRequestRepository;
+    private final MailService mailService;
+    private final MemberService memberService;
     public Book saveBook(Book newBook) {
         Book saveBook = bookRepository.save(newBook);
         return saveBook;
@@ -86,6 +89,20 @@ public class BookService {
         newBook.setRentalMemberId(0L);
 
         bookRepository.save(newBook);
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+            @Override
+            public void afterCommit() {
+                String[] receiveArray =  memberService.findMailReceiveArray();
+                Map<String, Object> model = new HashMap<>();
+                model.put("newBook", newBook);
+                try {
+                    mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.0]책 추가 안내", "bookAddTemplate.html", model);
+                }  catch (MessagingException | IOException e) {
+                    throw new IllegalArgumentException("메시지 발송 관련 오류");
+                }
+            }
+        });
 
         BookAddResponseDto bookAddResponseDto = new BookAddResponseDto();
         bookAddResponseDto.setName(newBook.getBookName());

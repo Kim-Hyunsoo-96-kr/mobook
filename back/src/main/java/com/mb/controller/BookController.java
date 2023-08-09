@@ -49,14 +49,7 @@ public class BookController {
     @PostMapping("/add")
     public ResponseEntity addBook(@RequestBody BookAddDto bookAddDto){
         BookAddResponseDto bookAddResponseDto = bookService.addBook(bookAddDto);
-        String[] receiveArray =  memberService.findMailReceiveArray();
-        try{
-            mailService.sendHtmlEmail(receiveArray, "책 추가 안내", "bookAddTemplate.html");
-        } catch (MessagingException | IOException e){
-            MessageDto messageDto = new MessageDto();
-            messageDto.setMessage("이메일 발송 오류");
-            return new ResponseEntity(messageDto, HttpStatus.OK);
-        }
+
         return new ResponseEntity(bookAddResponseDto, HttpStatus.OK);
     }
 
