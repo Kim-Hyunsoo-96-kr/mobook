@@ -5,6 +5,7 @@ import com.mb.dto.*;
 import com.mb.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -21,13 +22,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import static com.mb.enum_.BookStatus.*;
 
@@ -42,12 +43,20 @@ public class BookController {
     private final BookLogService bookLogService;
     private final BookRecommendService bookRecommendService;
     private final BookRequestService bookRequestService;
+    private final MailService mailService;
 
     @Operation(summary = "책 추가", description = "DB에 책을 추가합니다.")
     @PostMapping("/add")
     public ResponseEntity addBook(@RequestBody BookAddDto bookAddDto){
         BookAddResponseDto bookAddResponseDto = bookService.addBook(bookAddDto);
-
+        String[] receiveArray =  memberService.findMailReceiveArray();
+        try{
+            mailService.sendHtmlEmail(receiveArray, "책 추가 안내", "bookAddTemplate.html");
+        } catch (MessagingException | IOException e){
+            MessageDto messageDto = new MessageDto();
+            messageDto.setMessage("이메일 발송 오류");
+            return new ResponseEntity(messageDto, HttpStatus.OK);
+        }
         return new ResponseEntity(bookAddResponseDto, HttpStatus.OK);
     }
 

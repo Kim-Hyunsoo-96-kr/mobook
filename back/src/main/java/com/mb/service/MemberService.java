@@ -5,15 +5,20 @@ import com.mb.dto.ChangePasswordDto;
 import com.mb.dto.MessageDto;
 import com.mb.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JavaMailSender javaMailSender;
 
     public Member addMember(Member member) {
         Member saveMember = memberRepository.save(member);
@@ -41,5 +46,16 @@ public class MemberService {
             messageDto.setMessage("기존 비밀번호와 일치하지 않습니다.");
         }
         return messageDto;
+    }
+
+    public String[] findMailReceiveArray() {
+        List<Member> allMemberList = memberRepository.findAll();
+        List<String> emailList = new ArrayList();
+        for (Member member : allMemberList) {
+            String email = member.getEmail();
+            emailList.add(email);
+        }
+        String[] receiverList = emailList.toArray(new String[0]);
+        return receiverList;
     }
 }
