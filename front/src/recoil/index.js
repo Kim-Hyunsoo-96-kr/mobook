@@ -104,6 +104,7 @@ CONFIG.API_MYRENTBOOK = `${CONFIG.BASE_URL}/api/members/myRentBook`;
 CONFIG.API_MYREQUESTBOOK = `${CONFIG.BASE_URL}/api/members/myRequestBook`;
 CONFIG.API_CHANGE_PW = `${CONFIG.BASE_URL}/api/members/changePw`;
 CONFIG.API_FIND_PW = `${CONFIG.BASE_URL}/api/members/findPw`;
+CONFIG.API_CREATE_ACCOUNT = `${CONFIG.BASE_URL}/api/members/signUp`;
 CONFIG.API_REQUEST = `${CONFIG.BASE_URL}/api/books/request`;
 CONFIG.TEST = `${CONFIG.BASE_URL}/api/books/list`;
 // 리코일 atom, selector 시작

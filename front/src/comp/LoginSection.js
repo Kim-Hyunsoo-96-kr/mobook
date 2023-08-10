@@ -73,8 +73,7 @@ const LoginSection = () => {
                                     </div>
                                 </div>
                                 <div className="form-floating mb-3">
-                                    <input className="form-control" id="phone" type="tel" placeholder="(123) 456-7890"
-                                           name='password'/>
+                                    <input className="form-control" id="phone" type="password" name='password'/>
                                     <label htmlFor="password">Password</label>
                                 </div>
                                 <div className="d-grid">

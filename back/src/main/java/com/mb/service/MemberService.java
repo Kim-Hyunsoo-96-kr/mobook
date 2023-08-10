@@ -1,9 +1,7 @@
 package com.mb.service;
 
 import com.mb.domain.Member;
-import com.mb.dto.ChangePasswordDto;
-import com.mb.dto.FindPasswordDto;
-import com.mb.dto.MessageDto;
+import com.mb.dto.*;
 import com.mb.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -27,9 +25,26 @@ public class MemberService {
     private static final String DIGITS = "0123456789";
     private static final String SPECIAL_CHARACTERS = "!@#$%^&*()-_+=<>?";
 
-    public Member addMember(Member member) {
-        Member saveMember = memberRepository.save(member);
-        return saveMember;
+    @Transactional
+    public MemberSignUpResponseDto addMember(MemberSignUpDto memberSignUpDto) {
+        String name = memberSignUpDto.getName();
+        String email = memberSignUpDto.getEmail();
+        String password = memberSignUpDto.getPassword();
+
+        Member member = new Member();
+        member.setEmail(email);
+        member.setPassword(passwordEncoder.encode(password));
+        member.setIsAdmin(false);
+        member.setName(name);
+
+        memberRepository.save(member);
+
+        MemberSignUpResponseDto memberSignUpResponseDto = new MemberSignUpResponseDto();
+
+        memberSignUpResponseDto.setEmail(member.getEmail());
+        memberSignUpResponseDto.setName(member.getName());
+
+        return memberSignUpResponseDto;
     }
 
     public Member findByEmail(String email) {

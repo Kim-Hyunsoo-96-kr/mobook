@@ -26,6 +26,7 @@ import Request from "./pages/Request";
 import MyRequestBook from "./pages/MyRequestBook";
 import PasswordChange from "./pages/PasswordChange";
 import FindPassword from "./pages/FindPassword";
+import CreateAccount from "./pages/CreateAccount";
 
 function App() {
     const [isReady, setIsReady] = useState(false);
@@ -182,6 +183,7 @@ function App() {
               <Route path="/myRecommendBook" element={<MyRecommendBook />} />
               <Route path="/myRequestBook" element={<MyRequestBook />} />
               <Route path="/request" element={<Request />} />
+              <Route path="/createAccount" element={<CreateAccount />} />
           </Routes>
           </div>
       </BrowserRouter>

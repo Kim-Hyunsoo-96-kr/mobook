@@ -43,26 +43,18 @@ public class MemberController {
 
     @Operation(summary = "회원 가입", description = "입력값으로 회원가입을 요청합니다.")
     @PostMapping("/signUp")
-    public ResponseEntity join(@RequestBody @Valid MemberSignUpDto memberSignUpDto) {
+    public ResponseEntity join(@RequestBody @Valid MemberSignUpDto memberSignUpDto, Authentication authentication) {
 
-        String name = memberSignUpDto.getName();
-        String email = memberSignUpDto.getEmail();
-        String password = memberSignUpDto.getPassword();
+        Member loginMember = getLoginMember(authentication);
+        if(loginMember.getIsAdmin()){
+            MemberSignUpResponseDto memberSignUpResponseDto = memberService.addMember(memberSignUpDto);
+            return new ResponseEntity(memberSignUpResponseDto, HttpStatus.CREATED);
+        } else {
+            MessageDto messageDto = new MessageDto();
+            messageDto.setMessage("관리자가 아닙니다.");
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        }
 
-        Member member = new Member();
-        member.setEmail(email);
-        member.setPassword(passwordEncoder.encode(password));
-        member.setIsAdmin(false);
-        member.setName(name);
-
-        Member saveMember = memberService.addMember(member);
-
-        MemberSignUpResponseDto memberSignUpResponseDto = new MemberSignUpResponseDto();
-
-        memberSignUpResponseDto.setEmail(saveMember.getEmail());
-        memberSignUpResponseDto.setName(saveMember.getName());
-
-        return new ResponseEntity(memberSignUpResponseDto, HttpStatus.CREATED);
     }
     @Operation(summary = "로그인(Token 필요)", description = "입력값으로 로그인을 합니다.")
     @PostMapping("/login")
