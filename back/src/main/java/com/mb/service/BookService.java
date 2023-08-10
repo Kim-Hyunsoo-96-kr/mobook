@@ -9,14 +9,21 @@ import com.mb.repository.BookRequestRepository;
 import com.mb.util.RequestBookLog;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -59,12 +66,6 @@ public class BookService {
         return bookList;
     }
 
-    public void addBookByExcel(List<Book> list) {
-        for (Book book : list) {
-            bookRepository.save(book);
-        }
-    }
-
     public Book findByBookNumber(String bookNumber) {
         Book findBook = bookRepository.findByBookNumber(bookNumber).orElseThrow(()-> new IllegalArgumentException("등로되지 않은 책입니다."));
         return findBook;
@@ -93,7 +94,7 @@ public class BookService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
             @Override
             public void afterCommit() {
-                String[] receiveArray =  memberService.findMailReceiveArray();
+                String[] receiveArray =  memberService.findAllMemberMailReceiveArray();
                 Map<String, Object> model = new HashMap<>();
                 model.put("newBook", newBook);
                 try {
@@ -107,6 +108,136 @@ public class BookService {
         BookAddResponseDto bookAddResponseDto = new BookAddResponseDto();
         bookAddResponseDto.setName(newBook.getBookName());
         return bookAddResponseDto;
+    }
+
+    @Transactional
+    public MessageDto addBookByExcel(MultipartFile mf) {
+
+        MessageDto messageDto = new MessageDto();
+        List<Book> list = new ArrayList<>();
+        try{
+            OPCPackage opcPackage = OPCPackage.open(mf.getInputStream());
+            XSSFWorkbook workbook = new XSSFWorkbook(opcPackage);
+            XSSFSheet sheet = workbook.getSheetAt(0);
+
+            for (int i=1; i<sheet.getLastRowNum() + 1; i++) {
+
+                Book newBook = new Book();
+
+                XSSFRow row = sheet.getRow(i);
+
+                // 행이 존재하지 않으면 패스한다.
+                if (null == row) {
+                    continue;
+                }
+
+                // 행의 첫 번째 열(이름)
+                XSSFCell cell = row.getCell(0);
+                if (null != cell) {
+                    if(cell.getRawValue() != null) newBook.setBookNumber(cell.getRawValue().split("\\.")[0]);
+                }
+
+                // 행의 첫 번째 열(이름)
+                cell = row.getCell(1);
+                if (null != cell) {
+                    if(cell.getStringCellValue() != null) newBook.setBookName(cell.getStringCellValue());
+                }
+                newBook.setIsAble(true);
+                Date today = new Date();
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                newBook.setRegDate(formatter.format(today));
+                newBook.setRecommend(0);
+                newBook.setRentalMemberId(0L);
+                // 리스트에 담는다.
+                list.add(newBook);
+
+            }
+        } catch (IOException | InvalidFormatException e){
+            messageDto.setMessage("엑셀 관련 오류");
+        }
+
+        try{
+            for (Book book : list) {
+                bookRepository.save(book);
+            }
+            messageDto.setMessage("책 추가 성공");
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                @Override
+                public void afterCommit() {
+                    String[] receiveArray =  memberService.findAllMemberMailReceiveArray();
+                    Map<String, Object> model = new HashMap<>();
+                    model.put("newBookList", list);
+                    try {
+                        mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.0]책 추가 안내", "bookAddExcelTemplate.html", model);
+                    }  catch (MessagingException | IOException e) {
+                        throw new IllegalArgumentException("메일 발송 관련 오류");
+                    }
+                }
+            });
+        } catch (Exception e){
+            messageDto.setMessage("DB관련 오류 : " + e);
+        }
+
+        return messageDto;
+    }
+
+    @Transactional
+    public MessageDto request(Member loginMember, BookRequestDto bookRequestDto) {
+        MessageDto messageDto = new MessageDto();
+        BookRequest bookRequest = new BookRequest();
+
+        bookRequest.setBookName(bookRequestDto.getBookName());
+        bookRequest.setBookWriter(bookRequestDto.getBookWriter());
+        bookRequest.setBookPublisher(bookRequestDto.getBookPublisher());
+        bookRequest.setStatus(Request.getBookStatus());
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        bookRequest.setRegDate(today.format(formatter));
+        bookRequest.setCompleteDate("0");
+        bookRequest.setMember(loginMember);
+        bookRequestRepository.save(bookRequest);
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+            @Override
+            public void afterCommit() {
+                String[] receiveArray =  memberService.findAllAdminMailReceiveArray();
+                Map<String, Object> model = new HashMap<>();
+                model.put("member", loginMember);
+                model.put("bookRequest", bookRequest);
+                try {
+                    mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.0]책 신청 안내", "bookRequestTemplate.html", model);
+                }  catch (Exception e) {
+                    throw new IllegalArgumentException("메일 발송 관련 오류");
+                }
+            }
+        });
+
+        messageDto.setMessage("성공적으로 책을 요청했습니다.");
+
+        return messageDto;
+    }
+
+    /**매일 아침 10시에 반납예정인 책을 대여자의 계정 이메일로 발송*/
+    @Scheduled(cron = "0 17 18 * * ?")
+    public void returnBookMail(){
+        System.out.println("이메일 발송");
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate returnDate = today.plusDays(3);
+        List<BookLog> bookLogList = bookLogRepository.findByReturnDate(returnDate.format(formatter));
+        List<String> emailList = new ArrayList();
+        for (BookLog bookLog : bookLogList) {
+            String email = bookLog.getMember().getEmail();
+            emailList.add(email);
+        }
+        String[] receiverArray = emailList.toArray(new String[0]);
+        Map<String, Object> model = new HashMap<>();
+        model.put("bookLogList", bookLogList);
+        try {
+            mailService.sendHtmlEmail(receiverArray, "[MOBOOK1.0]책 반납 일정 안내", "bookReturnTemplate.html", model);
+        }  catch (Exception e) {
+            throw new IllegalArgumentException("메일 발송 관련 오류");
+        }
     }
 
     @Transactional
@@ -198,25 +329,6 @@ public class BookService {
         else {
             messageDto.setMessage("해당 책을 대여하지 않았습니다.");
         }
-        return messageDto;
-    }
-
-    public MessageDto request(Member loginMember, BookRequestDto bookRequestDto) {
-        MessageDto messageDto = new MessageDto();
-        BookRequest bookRequest = new BookRequest();
-
-        bookRequest.setBookName(bookRequestDto.getBookName());
-        bookRequest.setBookWriter(bookRequestDto.getBookWriter());
-        bookRequest.setBookPublisher(bookRequestDto.getBookPublisher());
-        bookRequest.setStatus(Request.getBookStatus());
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        bookRequest.setRegDate(today.format(formatter));
-        bookRequest.setCompleteDate("0");
-        bookRequest.setMember(loginMember);
-        bookRequestRepository.save(bookRequest);
-        messageDto.setMessage("성공적으로 책을 요청했습니다.");
-
         return messageDto;
     }
 

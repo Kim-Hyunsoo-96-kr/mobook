@@ -17,4 +17,6 @@ public interface BookLogRepository extends JpaRepository<BookLog, Long> {
     Optional<BookLog> findByMemberAndBookAndStatus(Member member, Book book, String status);
 
     List<BookLog> findByMemberAndStatus(Member member, String bookStatus);
+
+    List<BookLog> findByReturnDate(String returnDate);
 }

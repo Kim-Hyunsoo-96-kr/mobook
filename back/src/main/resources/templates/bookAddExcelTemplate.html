@@ -6,35 +6,33 @@
 </head>
 <table style="margin:0 auto;width:650px; color:#000000; padding: 12px;font-family:'Noto Sans','Noto Sans KR','sans-serif';font-size:14px">
     <tr><td><img width="200px" alt="BoundX" src="https://i.ibb.co/rkmQr6f/MOBOOK.png"></td></tr>
-    <tr><td style="font-size:40px"><b>책 신청</b></td></tr>
+    <tr><td style="font-size:40px"><b>책 추가 안내</b></td></tr>
     <tr style="height:12px"></tr>
-    <tr><td th:text="${member.name} + '님이 아래의 책을 신청했습니다.'"></td></tr>
+    <tr><td>아래의 책이 추가되었습니다.</td></tr>
     <tr style="height:12px"></tr>
     <tr>
         <td style="padding:15px 20px;border-radius:10px;background-color:#f2f2f2">
             <table>
                 <tr style="font-weight:bold;">
-                    <td width="33.33%">책 제목</td>
-                    <td width="33.33%">작가</td>
-                    <td width="33.33%">출판사</td>
+                    <td width="50%">책 번호</td>
+                    <td width="50%">책 제목</td>
                 </tr>
-                <tr>
-                    <td th:text="${bookRequest.bookName}"></td>
-                    <td th:text="${bookRequest.bookWriter}"></td>
-                    <td th:text="${bookRequest.bookPublisher}"></td>
-                </tr>
+                <div th:each="newBook: ${newBookList}">
+                    <tr>
+                        <td th:text="${newBook.bookNumber}"></td>
+                        <td th:text="${newBook.bookName}"></td>
+                    </tr>
+                </div>
             </table>
         </td>
     </tr>
     <tr style="height:12px"></tr>
     <tr style="height:12px"></tr>
-    <tr><td><a style="text-decoration: none"><span style="border-radius:8px;background-color:#566AE5;padding:14px;vertical-align:middle;font-size:16px;font-weight:bold; color: #FFFFFF">책 요청 리스트 보러가기</span></a></td></tr>
+    <tr><td><a style="text-decoration: none"><span style="border-radius:8px;background-color:#566AE5;padding:14px;vertical-align:middle;font-size:16px;font-weight:bold; color: #FFFFFF">책 보러가기</span></a></td></tr>
     <tr style="height:12px"><td></td></tr>
     <tr><td><hr style="background-color: #F4F4F4;height: 1px;border: none;"></td></tr>
     <tr style="height:12px"><td></td></tr>
     <tr><td><img width="100px" alt="BoundX" src="https://i.ibb.co/rkmQr6f/MOBOOK.png"></td></tr>
-    <tr style="height: 12px"><td></td></tr>
-    <tr><td style="font-size: 12px">이 메일은 관리자로 등록된 계정으로만 발송됩니다.</td></tr>
     <tr style="height: 12px"><td></td></tr>
     <tr><td style="font-size: 12px">문의 및 지원: joohwan9607@mobility42.io</td></tr>
 </table>

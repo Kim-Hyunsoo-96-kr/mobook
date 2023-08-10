@@ -48,10 +48,21 @@ public class MemberService {
         return messageDto;
     }
 
-    public String[] findMailReceiveArray() {
+    public String[] findAllMemberMailReceiveArray() {
         List<Member> allMemberList = memberRepository.findAll();
         List<String> emailList = new ArrayList();
         for (Member member : allMemberList) {
+            String email = member.getEmail();
+            emailList.add(email);
+        }
+        String[] receiverList = emailList.toArray(new String[0]);
+        return receiverList;
+    }
+
+    public String[] findAllAdminMailReceiveArray() {
+        List<Member> allAdminList = memberRepository.findByIsAdmin(true);
+        List<String> emailList = new ArrayList();
+        for (Member member : allAdminList) {
             String email = member.getEmail();
             emailList.add(email);
         }
