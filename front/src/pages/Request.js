@@ -9,7 +9,7 @@ import {Navigate, useNavigate} from "react-router-dom";
 const Request = () => {
     const isLogined = useRecoilValue(isLoginedSelector);
     const navigate = useNavigate();
-    if (!isLogined) return <Navigate to="/" replace />;
+    if (!isLogined) return <Navigate to="/login" replace />;
     const onSubmit = async (event) => {
         event.preventDefault();
 

@@ -11,7 +11,7 @@ function AddBook() {
     const isLogined = useRecoilValue(isLoginedSelector);
     let isAdmin = null
     if(isLogined) isAdmin = loginedUserInfo.isAdmin
-    if(!isLogined) return <Navigate to={"/"}/>;
+    if(!isLogined) return <Navigate to={"/login"}/>;
     if(!isAdmin) {
         alert("관리자만 접근할 수 있는 페이지입니다.")
         return <Navigate to={"/"}/>;

@@ -12,6 +12,9 @@ const MyRentBook = () => {
 
         return response.data;
     });
+    const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
+    if (!isLogined) return <Navigate to="/login" replace />; // 로그인 안했다면 메인화면으로 보냄
+
     const extendPeriod = async (bookNumber) => {
             const response = await axiosInstance.post(`${CONFIG.API_BOOK_EXTEND_PERIOD}${bookNumber}`);
             alert(response.data.message);
@@ -33,7 +36,6 @@ const MyRentBook = () => {
             alert("추천하지 않은 책 입니다.")
         }
     }
-    const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
     if (isLoading) {
         return <div class="loading-1">로딩중</div>;
     }
@@ -41,7 +43,6 @@ const MyRentBook = () => {
     if (error) {
         return <div class="error-1">{error.message}</div>;
     }
-    if (!isLogined) return <Navigate to="/" replace />; // 로그인 안했다면 메인화면으로 보냄
 
 
     return (

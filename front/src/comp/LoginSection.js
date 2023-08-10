@@ -1,7 +1,7 @@
 import axios from "axios";
 import {CONFIG, isLoginedSelector, loginedUserInfoAtom, setLogin} from "../recoil";
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {Navigate} from "react-router-dom";
+import {Link, Navigate} from "react-router-dom";
 
 const LoginSection = () => {
     const setLoginedUserInfo = useSetRecoilState(loginedUserInfoAtom);
@@ -81,6 +81,7 @@ const LoginSection = () => {
                                     <button className="btn btn-primary btn-lg" id="submitButton"
                                             type="submit" >Submit
                                     </button>
+                                <Link to="/findPassword" type="button" className="btn btn-link">비밀번호를 모르시나요?</Link>
                                 </div>
                             </form>
                         </div>

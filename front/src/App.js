@@ -25,6 +25,7 @@ import axios from "axios";
 import Request from "./pages/Request";
 import MyRequestBook from "./pages/MyRequestBook";
 import PasswordChange from "./pages/PasswordChange";
+import FindPassword from "./pages/FindPassword";
 
 function App() {
     const [isReady, setIsReady] = useState(false);
@@ -172,6 +173,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/logout" element={<Logout />} />
               <Route path="/passwordChange" element={<PasswordChange />} />
+              <Route path="/findPassword" element={<FindPassword />} />
               <Route path="/search" element={<Search />} />
               <Route path="/add" element={<AddBook />} />
               <Route path="/test" element={<Test />} />

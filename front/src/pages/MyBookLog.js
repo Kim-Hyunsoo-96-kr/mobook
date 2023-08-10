@@ -13,6 +13,7 @@ const MyBookLog = () => {
         return response.data;
     });
     const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
+    if (!isLogined) return <Navigate to="/login" replace />; // 로그인 안했다면 메인화면으로 보냄
     if (isLoading) {
         return <div class="loading-1">로딩중</div>;
     }
@@ -20,7 +21,6 @@ const MyBookLog = () => {
     if (error) {
         return <div class="error-1">{error.message}</div>;
     }
-    if (!isLogined) return <Navigate to="/" replace />; // 로그인 안했다면 메인화면으로 보냄
 
 
     return (

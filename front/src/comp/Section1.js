@@ -7,13 +7,13 @@ function Section1() {
                 <div className="row gx-5 row-cols-1 row-cols-sm-2 row-cols-xl-4 justify-content-center">
                     <div className="col mb-5 mb-5 mb-xl-0">
                         <div className="text-center">
-                            <Link to="/rent"><img className="img-fluid mb-4 px-4 cursor" src="img/bookMan.png" alt="..." /></Link>
+                            <Link to="/search"><img className="img-fluid mb-4 px-4 cursor" src="img/bookMan.png" alt="..." /></Link>
                             <h5 className="fw-bolder">책 대여</h5>
                         </div>
                     </div>
                     <div className="col mb-5 mb-5 mb-xl-0">
                         <div className="text-center">
-                            <Link to="/return"><img className="img-fluid mb-4 px-4 cursor" src="img/bookClock.png" alt="..."/></Link>
+                            <Link to="/myRentBook"><img className="img-fluid mb-4 px-4 cursor" src="img/bookClock.png" alt="..."/></Link>
                             <h5 className="fw-bolder">책 반납</h5>
                         </div>
                     </div>
