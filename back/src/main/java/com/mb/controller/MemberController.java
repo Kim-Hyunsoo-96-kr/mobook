@@ -236,6 +236,13 @@ public class MemberController {
         return new ResponseEntity(messageDto, HttpStatus.OK);
     }
 
+    @PostMapping("/findPw")
+    public ResponseEntity findPassword(@RequestBody FindPasswordDto findPasswordDto){
+        MessageDto messageDto = memberService.findPassword(findPasswordDto);
+
+        return new ResponseEntity(messageDto, HttpStatus.OK);
+    }
+
 
     private Member getLoginMember(Authentication authentication) {
         if(authentication == null){

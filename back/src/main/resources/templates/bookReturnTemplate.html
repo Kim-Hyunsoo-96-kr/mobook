@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>책 반납 일정 안내</title>
+    <title>책 추가 안내</title>
 </head>
 <table style="margin:0 auto;width:650px; color:#000000; padding: 12px;font-family:'Noto Sans','Noto Sans KR','sans-serif';font-size:14px">
     <tr><td><img width="200px" alt="MOBOOK1.0" src="https://i.ibb.co/rkmQr6f/MOBOOK.png"></td></tr>
@@ -34,7 +34,11 @@
     </tr>
     <tr style="height:12px"></tr>
     <tr style="height:12px"></tr>
-    <tr><td><a style="text-decoration: none"><span style="border-radius:8px;background-color:#566AE5;padding:14px;vertical-align:middle;font-size:16px;font-weight:bold; color: #FFFFFF">책 반납하러가기</span></a></td></tr>
+    <tr><td>
+        <a th:href="${@environment.getProperty('mobook.domain')}" style="text-decoration: none">
+            <span style="border-radius:8px;background-color:#566AE5;padding:14px;vertical-align:middle;font-size:16px;font-weight:bold; color: #FFFFFF">책 보러가기</span>
+        </a>
+    </td></tr>
     <tr style="height:12px"><td></td></tr>
     <tr><td><hr style="background-color: #F4F4F4;height: 1px;border: none;"></td></tr>
     <tr style="height:12px"><td></td></tr>

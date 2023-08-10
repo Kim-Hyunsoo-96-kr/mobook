@@ -218,7 +218,7 @@ public class BookService {
     }
 
     /**매일 아침 10시에 반납예정인 책을 대여자의 계정 이메일로 발송*/
-    @Scheduled(cron = "0 17 18 * * ?")
+    @Scheduled(cron = "0 0 10 * * ?")
     public void returnBookMail(){
         System.out.println("이메일 발송");
         LocalDate today = LocalDate.now();

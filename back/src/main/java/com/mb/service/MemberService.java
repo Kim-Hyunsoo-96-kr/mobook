@@ -2,6 +2,7 @@ package com.mb.service;
 
 import com.mb.domain.Member;
 import com.mb.dto.ChangePasswordDto;
+import com.mb.dto.FindPasswordDto;
 import com.mb.dto.MessageDto;
 import com.mb.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,16 +10,22 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.security.SecureRandom;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JavaMailSender javaMailSender;
+    private final MailService mailService;
+    private static final String LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
+    private static final String UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String DIGITS = "0123456789";
+    private static final String SPECIAL_CHARACTERS = "!@#$%^&*()-_+=<>?";
 
     public Member addMember(Member member) {
         Member saveMember = memberRepository.save(member);
@@ -68,5 +75,51 @@ public class MemberService {
         }
         String[] receiverList = emailList.toArray(new String[0]);
         return receiverList;
+    }
+
+    @Transactional
+    public MessageDto findPassword(FindPasswordDto findPasswordDto) {
+        MessageDto messageDto = new MessageDto();
+        Member member =  memberRepository.findByEmailAndName(findPasswordDto.getEmail(), findPasswordDto.getName());
+        String newPassword = generateRandomPassword();
+        member.setPassword(passwordEncoder.encode(newPassword));
+        memberRepository.save(member);
+        messageDto.setMessage("이메일로 새로운 비밀번호를 발송했습니다.");
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+            @Override
+            public void afterCommit() {
+                String[] receiveArray = {member.getEmail()};
+                Map<String, Object> model = new HashMap<>();
+                model.put("newPassword", newPassword);
+                try {
+                    mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.0]새로운 비밀번호 안내", "findPassword.html", model);
+                } catch (Exception e) {
+                    messageDto.setMessage("메일 발송 관련 오류");
+                }
+            }
+        });
+        return messageDto;
+    }
+
+    public static String generateRandomPassword() {
+        String characters = LOWERCASE + UPPERCASE + DIGITS + SPECIAL_CHARACTERS;
+        int minLength = 8;
+        int maxLength = 20;
+
+        SecureRandom random = new SecureRandom();
+        int passwordLength = random.nextInt(maxLength - minLength + 1) + minLength;
+
+        List<Character> passwordChars = new ArrayList<>();
+        for (int i = 0; i < passwordLength; i++) {
+            int randomIndex = random.nextInt(characters.length());
+            passwordChars.add(characters.charAt(randomIndex));
+        }
+
+        StringBuilder password = new StringBuilder();
+        for (Character character : passwordChars) {
+            password.append(character);
+        }
+
+        return password.toString();
     }
 }
