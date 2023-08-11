@@ -5,10 +5,25 @@ import axios from "axios";
 import {axiosInstance, CONFIG, isLoginedSelector, setLogin} from "../recoil";
 import {useRecoilValue} from "recoil";
 import {Navigate, useNavigate} from "react-router-dom";
+import Swal from "sweetalert2";
 
 const FindPassword = () => {
     const navigate = useNavigate();
     const isLogined = useRecoilValue(isLoginedSelector);
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-right',
+        showConfirmButton: false,
+        timer: 1000,
+        timerProgressBar: true,
+    })
+    const Toast2 = Swal.mixin({
+        toast: true,
+        position: 'top-right',
+        showConfirmButton: false,
+        timer: 10000,
+        timerProgressBar: true,
+    })
     if (isLogined) return <Navigate to="/" replace />;
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -19,13 +34,21 @@ const FindPassword = () => {
         form.name.value = form.name.value.trim();
 
         if (form.email.value.length === 0) {
-            alert("이메일은 필수입니다.");
+            Swal.fire(
+                '이메일을 입력해주세요',
+                '이메일로 새로운 비밀번호가 전송됩니다.',
+                'warning'
+            )
             form.email.focus();
             return;
         }
 
         if (form.name.value.length === 0) {
-            alert("이름은 필수입니다.");
+            Swal.fire(
+                '이름을 입력해주세요',
+                '이름은 필수입니다.',
+                'warning'
+            )
             form.name.focus();
             return;
         }
@@ -33,10 +56,37 @@ const FindPassword = () => {
         const email = form.email.value;
         const name = form.name.value;
 
-        const response = await axios.post(CONFIG.API_FIND_PW, {email, name});
-        navigate("/login", {replace: true});
-        alert(response.data.message)
+        try {
+            // 로딩 상태 시작
+            Toast2.fire({
+                icon: 'info',
+                title: '작업 중...'
+            });
 
+            const response = await axios.post(CONFIG.API_FIND_PW, {email, name});
+            navigate("/login", {replace: true});
+
+            // 로딩 상태 종료
+            Toast.fire({
+                icon: 'success',
+                title: response.data.message
+            });
+        } catch (error) {
+            // 에러 처리 및 로딩 상태 종료
+            if(error.response.status === 400){
+                Swal.fire(
+                    error.response.data.message,
+                    '다시 확인해주세요.',
+                    'warning'
+                )
+            } else {
+                Swal.fire(
+                    '예상치 못한 에러',
+                    '송주환 사원에게 문의해주세요.',
+                    'warning'
+                )
+            }
+        }
     }
     return (
         <div>

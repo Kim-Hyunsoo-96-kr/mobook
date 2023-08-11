@@ -63,7 +63,7 @@ function AddComp() {
                         <div className="card mb-5 mb-xl-0">
                             <div className="card-body p-5">
                                 <div className="mb-3">
-                                    <span className="display-4 fw-bold">직접 입력</span>
+                                    <span className="display-6 fw-bold">한 권씩 추가하기</span>
                                 </div>
                                 <div className="row gx-5 justify-content-center">
                                     <div className="margin-top30">
@@ -71,9 +71,6 @@ function AddComp() {
                                             <div className="form-floating mb-3">
                                                 <input className="form-control" id="bookNumber" name='bookNumber'/>
                                                 <label htmlFor="bookNumber">책 넘버링</label>
-                                                <div className="invalid-feedback" data-sb-feedback="bookNumber:required">An bookNumber is
-                                                    required.
-                                                </div>
                                             </div>
                                             <div className="form-floating mb-3">
                                                 <input className="form-control" id="bookName" name='bookName'/>
@@ -92,12 +89,14 @@ function AddComp() {
                         <div className="card mb-5 mb-xl-0">
                             <div className="card-body p-5">
                                 <div className="mb-3">
-                                    <span className="display-4 fw-bold">엑셀 파일</span>
+                                    <span className="display-6 fw-bold">엑셀로 추가하기</span>
                                 </div>
-                                <div className="margin-top30">
-                                    <input type="file" onChange={fileChangedHandler}/>
+                                <div className="margin-top78">
+                                    <input className="form-control" type="file" onChange={fileChangedHandler}/>
                                 </div>
-                                <button className="btn btn-primary btn-lg" onClick={FileUpload}>등록</button>
+                                <div className="d-grid margin-top78">
+                                    <button className="btn btn-primary btn-lg" onClick={FileUpload}>등록</button>
+                                </div>
                             </div>
                         </div>
                     </div>

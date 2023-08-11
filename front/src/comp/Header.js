@@ -1,6 +1,9 @@
 import {Link} from "react-router-dom";
+import {useRecoilValue} from "recoil";
+import {isLoginedSelector} from "../recoil";
 
 function Header() {
+    const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
     return (
         <header class="bg-dark">
             <div class="container px-5">
@@ -11,7 +14,9 @@ function Header() {
                             <p class="lead fw-normal text-white-50 mb-4 mt-5">추천 도서는 매월 1일 바뀝니다.<br/>추천 수, 대여 수 등을 기준으로 관리자가 선정합니다.</p>
                             <div class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start">
                                 <Link to="/search" class="btn btn-primary btn-lg px-4 me-sm-3 mt-5" href="#features">다른 책 보러가기</Link>
-                                <Link to="/login" class="btn btn-outline-light btn-lg px-4 mt-5" href="#!">로그인</Link>
+                                {isLogined ||(
+                                    <Link to="/login" class="btn btn-outline-light btn-lg px-4 mt-5" href="#!">로그인</Link>
+                                )}
                             </div>
                         </div>
                     </div>

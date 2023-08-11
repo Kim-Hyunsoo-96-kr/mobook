@@ -1,6 +1,5 @@
 import '../App.css';
 import LoginSection from "../comp/LoginSection";
-import Section2 from "../comp/Section2";
 import {Navigate} from "react-router-dom";
 import {axiosInstance, CONFIG, loginedUserInfoAtom, loginedUserInfoSelector, setLogout} from "../recoil";
 import {useRecoilValue, useSetRecoilState} from "recoil";
@@ -20,7 +19,16 @@ function Logout() {
     async function getData() {
         try {
             //응답 성공
-            const response = await axiosInstance.post(CONFIG.API_LOGOUT, {refreshToken: loginedUserInfo.refreshToken});
+            const response = await axios.post(CONFIG.API_LOGOUT,
+                {
+                    refreshToken: loginedUserInfo.refreshToken
+                },
+                {
+                    headers : {
+                        Authorization: `Bearer ${loginedUserInfo.accessToken}`
+                    }
+                });
+            console.log(response);
             Toast.fire({
                 icon: 'success',
                 title: '로그아웃 성공'

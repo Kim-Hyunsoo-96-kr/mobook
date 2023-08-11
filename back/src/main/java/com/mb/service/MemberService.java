@@ -115,24 +115,29 @@ public class MemberService {
     @Transactional
     public ResponseEntity findPassword(FindPasswordDto findPasswordDto) {
         MessageDto messageDto = new MessageDto();
-        Member member =  memberRepository.findByEmailAndName(findPasswordDto.getEmail(), findPasswordDto.getName());
-        String newPassword = generateRandomPassword();
-        member.setPassword(passwordEncoder.encode(newPassword));
-        memberRepository.save(member);
-        messageDto.setMessage("이메일로 새로운 비밀번호를 발송했습니다.");
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
-            @Override
-            public void afterCommit() {
-                String[] receiveArray = {member.getEmail()};
-                Map<String, Object> model = new HashMap<>();
-                model.put("newPassword", newPassword);
-                try {
-                    mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.0]새로운 비밀번호 안내", "findPassword.html", model);
-                } catch (Exception e) {
-                    messageDto.setMessage("메일 발송 관련 오류");
+        try{
+            Member member =  memberRepository.findByEmailAndName(findPasswordDto.getEmail(), findPasswordDto.getName()).orElseThrow(()->new IllegalArgumentException("일치하는 회원이 없습니다."));
+            String newPassword = generateRandomPassword();
+            member.setPassword(passwordEncoder.encode(newPassword));
+            memberRepository.save(member);
+            messageDto.setMessage("이메일로 새로운 비밀번호를 발송했습니다.");
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                @Override
+                public void afterCommit() {
+                    String[] receiveArray = {member.getEmail()};
+                    Map<String, Object> model = new HashMap<>();
+                    model.put("newPassword", newPassword);
+                    try {
+                        mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.0]새로운 비밀번호 안내", "findPassword.html", model);
+                    } catch (Exception e) {
+                        messageDto.setMessage("메일 발송 관련 오류");
+                    }
                 }
-            }
-        });
+            });
+        } catch (IllegalArgumentException e){
+            messageDto.setMessage(e.getMessage());
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity(messageDto, HttpStatus.OK);
     }
 
