@@ -2,10 +2,18 @@ import axios from "axios";
 import {CONFIG, isLoginedSelector, loginedUserInfoAtom, setLogin} from "../recoil";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {Link, Navigate} from "react-router-dom";
+import Swal, {fire} from "sweetalert2";
 
 const LoginSection = () => {
     const setLoginedUserInfo = useSetRecoilState(loginedUserInfoAtom);
     const isLogined = useRecoilValue(isLoginedSelector);
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-right',
+        showConfirmButton: false,
+        timer: 1000,
+        timerProgressBar: true,
+    })
     if (isLogined) return <Navigate to="/" replace />;
 
     const onSubmit = async (event) => {
@@ -17,13 +25,21 @@ const LoginSection = () => {
         form.password.value = form.password.value.trim();
 
         if (form.email.value.length === 0) {
-            alert("email을 입력해주세요.");
+            Swal.fire(
+                '이메일을 입력해주세요',
+                '아이디는 이메일 형식입니다.',
+                'warning'
+            )
             form.email.focus();
             return;
         }
 
         if (form.password.value.length === 0) {
-            alert("password를 입력해주세요.");
+            Swal.fire(
+                '비밀번호를 입력해주세요',
+                '비밀번호가 기억나지 않으시면 로그인 버튼 아래 링크를 클릭해주세요.',
+                'warning'
+            )
             form.password.focus();
             return;
         }
@@ -34,14 +50,25 @@ const LoginSection = () => {
         try {
             const response = await axios.post(CONFIG.API_LOGIN, {email, password});
             setLogin(setLoginedUserInfo, response.data.accessToken, response.data.refreshToken)
-            alert("로그인 성공")
+            Toast.fire({
+                icon: 'success',
+                title: '로그인 성공'
+            })
         }
         catch (e) {
+            console.log(e)
             if(e.response.status == 400){
-                alert("비밀번호가 일치하지 않습니다.")
-                form.email.focus()
+                Swal.fire(
+                    e.response.data.message,
+                    '다시 입력해주세요.',
+                    'warning'
+                )
             } else if(e.response.status == 500){
-                alert("일치하는 아이디가 없습니다.")
+                Swal.fire(
+                    '서버에러 : 요청값 에러',
+                    '다시 입력해주세요.',
+                    'warning'
+                )
                 form.password.focus()
             } else {
                 alert("내가 예상하지 못한 오류")
@@ -62,15 +89,8 @@ const LoginSection = () => {
                         <div className="col-lg-8 col-xl-6">
                             <form onSubmit={onSubmit}>
                                 <div className="form-floating mb-3">
-                                    <input className="form-control" id="email" type="email" name='email'
-                                           placeholder="name@example.com"/>
+                                    <input className="form-control" id="email" type="email" name='email'/>
                                     <label htmlFor="email">Email address</label>
-                                    <div className="invalid-feedback" data-sb-feedback="email:required">An email is
-                                        required.
-                                    </div>
-                                    <div className="invalid-feedback" data-sb-feedback="email:email">Email is not
-                                        valid.
-                                    </div>
                                 </div>
                                 <div className="form-floating mb-3">
                                     <input className="form-control" id="phone" type="password" name='password'/>

@@ -5,12 +5,20 @@ import axios from "axios";
 import {axiosInstance, CONFIG, isLoginedSelector, setLogin} from "../recoil";
 import {useRecoilValue} from "recoil";
 import {Navigate, useNavigate} from "react-router-dom";
+import Swal from "sweetalert2";
 
 const PasswordChange = () => {
     const isLogined = useRecoilValue(isLoginedSelector);
     const navigate = useNavigate();
     if (!isLogined) return <Navigate to="/login" replace />;
     const onSubmit = async (event) => {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-right',
+            showConfirmButton: false,
+            timer: 1000,
+            timerProgressBar: true,
+        })
         event.preventDefault();
 
         const form = event.target;
@@ -19,13 +27,21 @@ const PasswordChange = () => {
         form.newPassword.value = form.newPassword.value.trim();
 
         if (form.oldPassword.value.length === 0) {
-            alert("기존 비밀번호는 필수입니다.");
+            Swal.fire(
+                '기존 비밀번호를 입력해주세요',
+                '기존 비밀번호는 필수입니다.',
+                'warning'
+            )
             form.oldPassword.focus();
             return;
         }
 
         if (form.newPassword.value.length === 0) {
-            alert("새로운 비밀번호는 필수입니다.");
+            Swal.fire(
+                '새로운 비밀번호를 입력해주세요',
+                '새로운 비밀번호는 필수입니다.',
+                'warning'
+            )
             form.newPassword.focus();
             return;
         }
@@ -33,9 +49,22 @@ const PasswordChange = () => {
         const oldPassword = form.oldPassword.value;
         const newPassword = form.newPassword.value;
 
-        const response = await axiosInstance.post(CONFIG.API_CHANGE_PW, {oldPassword, newPassword});
-        navigate("/", {replace: true});
-        alert(response.data.message)
+        try{
+            const response = await axiosInstance.post(CONFIG.API_CHANGE_PW, {oldPassword, newPassword});
+            navigate("/", {replace: true});
+            Toast.fire({
+                icon: 'success',
+                title: '비밀번호 변경 성공'
+            })
+        } catch(e) {
+            if(e.response.status == 400){
+                Swal.fire(
+                    e.response.data.message,
+                    '다시 입력해주세요.',
+                    'warning'
+                )
+            }
+        }
 
     }
     return (

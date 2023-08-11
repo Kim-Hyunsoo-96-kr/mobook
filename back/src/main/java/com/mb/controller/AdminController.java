@@ -17,12 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AdminController {
 
     private final MemberService memberService;
-    private final BookService bookService;
 
     @GetMapping("")
     public ResponseEntity admin(Authentication authentication){
         Member loginMember = getLoginMember(authentication);
-        //Todo
         return new ResponseEntity(HttpStatus.OK);
 
     }

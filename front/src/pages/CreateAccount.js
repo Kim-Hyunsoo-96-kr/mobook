@@ -5,6 +5,7 @@ import axios from "axios";
 import {axiosInstance, CONFIG, isLoginedSelector, loginedUserInfoSelector, setLogin} from "../recoil";
 import {useRecoilValue} from "recoil";
 import {Navigate, useNavigate} from "react-router-dom";
+import Swal, {fire} from "sweetalert2";
 
 const CreateAccount = () => {
     const isLogined = useRecoilValue(isLoginedSelector);
@@ -24,13 +25,21 @@ const CreateAccount = () => {
         form.email.value = form.email.value.trim();
 
         if (form.name.value.length === 0) {
-            alert("이름은 필수사항입니다.");
+            Swal.fire(
+                '이름은 필수입니다.',
+                '다시 입력해주세요',
+                'warning'
+            )
             form.name.focus();
             return;
         }
 
         if (form.email.value.length === 0) {
-            alert("이메일은 필수사항입니다.");
+            Swal.fire(
+                '아이디/이메일은 필수입니다.',
+                '다시 입력해주세요',
+                'warning'
+            )
             form.email.focus();
             return;
         }
@@ -39,9 +48,28 @@ const CreateAccount = () => {
         const email = form.email.value;
         const password = "qwer1234!"
 
-        const response = await axiosInstance.post(CONFIG.API_CREATE_ACCOUNT, {name, email, password});
-        navigate("/login", {replace: true});
-        alert("계정을 생성했습니다.")
+        try{
+            const response = await axiosInstance.post(CONFIG.API_CREATE_ACCOUNT, {name, email, password});
+            if(response.status == 201){
+                Swal.fire(
+                    '계정이 생성되었습니다.',
+                    '초기 비밀번호는 \'qwer1234!\'입니다.',
+                    'success'
+                )
+            }
+            navigate("/login", {replace: true});
+
+        } catch (e){
+            if(e.response.status == 400){
+                Swal.fire(
+                    '이름과 아이디를 확인해주세요.',
+                    '아이디는 이메일 형식입니다. <br/>이름은 100글자 이하입니다.',
+                    'success'
+                )
+            }
+        }
+
+
 
     }
   return (

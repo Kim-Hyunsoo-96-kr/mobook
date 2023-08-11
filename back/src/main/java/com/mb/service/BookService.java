@@ -16,6 +16,9 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,7 +80,7 @@ public class BookService {
     }
 
     @Transactional
-    public BookAddResponseDto addBook(BookAddDto bookAddDto) {
+    public ResponseEntity addBook(BookAddDto bookAddDto) {
         Book newBook = new Book();
 
         newBook.setBookName(bookAddDto.getBookName());
@@ -107,11 +110,11 @@ public class BookService {
 
         BookAddResponseDto bookAddResponseDto = new BookAddResponseDto();
         bookAddResponseDto.setName(newBook.getBookName());
-        return bookAddResponseDto;
+        return new ResponseEntity(bookAddResponseDto, HttpStatus.OK);
     }
 
     @Transactional
-    public MessageDto addBookByExcel(MultipartFile mf) {
+    public ResponseEntity addBookByExcel(MultipartFile mf) {
 
         MessageDto messageDto = new MessageDto();
         List<Book> list = new ArrayList<>();
@@ -154,6 +157,7 @@ public class BookService {
             }
         } catch (IOException | InvalidFormatException e){
             messageDto.setMessage("엑셀 관련 오류");
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         }
 
         try{
@@ -176,13 +180,14 @@ public class BookService {
             });
         } catch (Exception e){
             messageDto.setMessage("DB관련 오류 : " + e);
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         }
 
-        return messageDto;
+        return new ResponseEntity(messageDto, HttpStatus.OK);
     }
 
     @Transactional
-    public MessageDto request(Member loginMember, BookRequestDto bookRequestDto) {
+    public ResponseEntity request(Member loginMember, BookRequestDto bookRequestDto) {
         MessageDto messageDto = new MessageDto();
         BookRequest bookRequest = new BookRequest();
 
@@ -214,7 +219,7 @@ public class BookService {
 
         messageDto.setMessage("성공적으로 책을 요청했습니다.");
 
-        return messageDto;
+        return new ResponseEntity(messageDto, HttpStatus.OK);
     }
 
     /**매일 아침 10시에 반납예정인 책을 대여자의 계정 이메일로 발송*/
@@ -241,7 +246,7 @@ public class BookService {
     }
 
     @Transactional
-    public MessageDto rentBook(Member loginMember, String bookNumber) {
+    public ResponseEntity rentBook(Member loginMember, String bookNumber) {
         MessageDto messageDto = new MessageDto();
         Book book = findByBookNumber(bookNumber);
         if (book.getIsAble()) {
@@ -260,10 +265,10 @@ public class BookService {
             bookLog.setReturnDate(twoWeeksLater.format(formatter));
             bookLogRepository.save(bookLog);
             messageDto.setMessage("성공적으로 대여했습니다.");
-            return messageDto;
+            return new ResponseEntity(messageDto, HttpStatus.OK);
         } else {
             messageDto.setMessage("대여할 수 없는 책 입니다.");
-            return messageDto;
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         }
     }
 

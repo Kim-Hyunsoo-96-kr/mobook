@@ -1,10 +1,18 @@
 package com.mb.service;
 
-import com.mb.domain.Member;
+import com.mb.domain.*;
 import com.mb.dto.*;
+import com.mb.repository.BookRepository;
+import com.mb.repository.BookRequestRepository;
 import com.mb.repository.MemberRepository;
+import com.mb.util.BookLogUtil;
+import com.mb.util.JwtUtil;
+import com.mb.util.RentBookLog;
+import com.mb.util.RequestBookLog;
 import lombok.RequiredArgsConstructor;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,12 +22,24 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.security.SecureRandom;
 import java.util.*;
 
+import static com.mb.enum_.BookStatus.InRental;
+
 @Service
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenService refreshTokenService;
+    private final BookRecommendService bookRecommendService;
+    private final BookLogService bookLogService;
+    private final BookRepository bookRepository;
     private final MailService mailService;
+    private final BookRequestRepository bookRequestRepository;
+
+    @Value("${jwt.secretKey}")
+    public String accessSecretKey;
+    @Value("${jwt.refreshKey}")
+    public String refreshSecretKey;
     private static final String LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
     private static final String UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final String DIGITS = "0123456789";
@@ -93,7 +113,7 @@ public class MemberService {
     }
 
     @Transactional
-    public MessageDto findPassword(FindPasswordDto findPasswordDto) {
+    public ResponseEntity findPassword(FindPasswordDto findPasswordDto) {
         MessageDto messageDto = new MessageDto();
         Member member =  memberRepository.findByEmailAndName(findPasswordDto.getEmail(), findPasswordDto.getName());
         String newPassword = generateRandomPassword();
@@ -113,7 +133,7 @@ public class MemberService {
                 }
             }
         });
-        return messageDto;
+        return new ResponseEntity(messageDto, HttpStatus.OK);
     }
 
     public static String generateRandomPassword() {
@@ -136,5 +156,205 @@ public class MemberService {
         }
 
         return password.toString();
+    }
+
+    @Transactional
+    public ResponseEntity login(MemberLoginDto memberLoginDto) {
+        MessageDto messageDto = new MessageDto();
+
+        // 입력받은 이메일로 멤버를 찾을 수 없는 경우
+        try{
+            Member findMember = findByEmail(memberLoginDto.getEmail());
+            if (!passwordEncoder.matches(memberLoginDto.getPassword(), findMember.getPassword())) {
+                messageDto.setMessage("비밀번호가 일치하지 않습니다.");
+                return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+            }
+            String accessToken = JwtUtil.createAccessToken(findMember, accessSecretKey);
+            String refreshToken = JwtUtil.createRefreshToken(findMember, refreshSecretKey);
+
+            RefreshToken saveRefreshToken = new RefreshToken();
+            saveRefreshToken.setMemberId(findMember.getMemberId());
+            saveRefreshToken.setValue(refreshToken);
+            refreshTokenService.addToken(saveRefreshToken);
+
+            MemberLoginResponseDto memberLoginResponseDto = new MemberLoginResponseDto();
+            memberLoginResponseDto.setName(findMember.getName());
+            memberLoginResponseDto.setAccessToken(accessToken);
+            memberLoginResponseDto.setRefreshToken(refreshToken);
+
+            return new ResponseEntity(memberLoginResponseDto, HttpStatus.OK);
+        } catch (IllegalArgumentException e){
+            messageDto.setMessage(e.getMessage());
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        }
+
+
+
+    }
+
+    public ResponseEntity join(Member loginMember, MemberSignUpDto memberSignUpDto) {
+        if(loginMember.getIsAdmin()){
+            String name = memberSignUpDto.getName();
+            String email = memberSignUpDto.getEmail();
+            String password = memberSignUpDto.getPassword();
+            Member member = new Member();
+            member.setEmail(email);
+            member.setPassword(passwordEncoder.encode(password));
+            member.setIsAdmin(false);
+            member.setName(name);
+
+            memberRepository.save(member);
+
+            MemberSignUpResponseDto memberSignUpResponseDto = new MemberSignUpResponseDto();
+
+            memberSignUpResponseDto.setEmail(member.getEmail());
+            memberSignUpResponseDto.setName(member.getName());
+
+            MessageDto messageDto = new MessageDto();
+            messageDto.setMessage("회원가입이 완료되었습니다.");
+            return new ResponseEntity(messageDto, HttpStatus.CREATED);
+        } else {
+            MessageDto messageDto = new MessageDto();
+            messageDto.setMessage("관리자가 아닙니다.");
+            return new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);
+        }
+    }
+
+    public ResponseEntity refreshToken(RefreshTokenDto refreshTokenDto) {
+        MessageDto messageDto = new MessageDto();
+        try{
+            RefreshToken refreshToken = refreshTokenService.findRefreshToken(refreshTokenDto.getRefreshToken());
+            Long memberId = JwtUtil.getMemberId(refreshToken.getValue(), refreshSecretKey);
+            Member member = findById(memberId);
+            String accessToken = JwtUtil.createAccessToken(member, accessSecretKey);
+
+            MemberLoginResponseDto memberLoginResponseDto = new MemberLoginResponseDto();
+            memberLoginResponseDto.setName(member.getName());
+            memberLoginResponseDto.setAccessToken(accessToken);
+            memberLoginResponseDto.setRefreshToken(refreshToken.getValue());
+            return new ResponseEntity(memberLoginResponseDto, HttpStatus.OK);
+        } catch(IllegalArgumentException e){
+            messageDto.setMessage(e.getMessage());
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public ResponseEntity logout(RefreshTokenDto refreshTokenDto) {
+        MessageDto messageDto = new MessageDto();
+        refreshTokenService.deleteRefreshToken(refreshTokenDto.getRefreshToken());
+        messageDto.setMessage("로그아웃 하셨습니다.");
+        return new ResponseEntity(messageDto, HttpStatus.OK);
+    }
+
+    public ResponseEntity myBook(Member loginMember) {
+        MyBookResponseDto myBookResponseDto = new MyBookResponseDto();
+        try{
+            List<BookLog> bookLogList = bookLogService.findBookLogByMemberId(loginMember);
+            List<BookLogUtil> bookLogUtilList = new ArrayList();
+            for (BookLog bookLog : bookLogList) {
+                String status = bookLog.getStatus();
+                String bookName = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등로되지 않은 책입니다.")).getBookName();
+                String bookNumber = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등로되지 않은 책입니다.")).getBookNumber();
+                String regDate = bookLog.getRegDate();
+                BookLogUtil bookLogUtil = new BookLogUtil(bookName, bookNumber, status, regDate);
+                bookLogUtilList.add(bookLogUtil);
+            }
+
+            List<RentBookLog> rentBookLogList = new ArrayList();
+            List<BookLog> bookInRendtalLogList =  bookLogService.findByMemberAndStatus(loginMember, InRental);
+            for (BookLog bookLog : bookInRendtalLogList) {
+                Book rentBook = bookLog.getBook();
+                RentBookLog rentBookLog = new RentBookLog(rentBook.getBookNumber(), rentBook.getBookName(),
+                        rentBook.getRecommend(), bookLog.getRegDate(), bookLog.getReturnDate());
+                rentBookLogList.add(rentBookLog);
+            }
+
+            List<BookRecommend> bookRecommendList = bookRecommendService.findByMember(loginMember);
+            List<Book> likeBookList = new ArrayList();
+            for (BookRecommend bookRecommend : bookRecommendList) {
+                Book book = bookRecommend.getBook();
+                likeBookList.add(book);
+            }
+            myBookResponseDto.setBookLogList(bookLogUtilList);
+            myBookResponseDto.setRentBook(rentBookLogList);
+            myBookResponseDto.setRecommendBook(likeBookList);
+
+            return new ResponseEntity(myBookResponseDto, HttpStatus.OK);
+        } catch (IllegalArgumentException e){
+            MessageDto messageDto = new MessageDto();
+            messageDto.setMessage(e.getMessage());
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public ResponseEntity myRentBook(Member loginMember) {
+        RentBookLogResponseDto rentBookLogResponseDto = new RentBookLogResponseDto();
+        List<RentBookLog> rentBookLogList = new ArrayList();
+        List<BookLog> bookInRendtalLogList =  bookLogService.findByMemberAndStatus(loginMember, InRental);
+        for (BookLog bookLog : bookInRendtalLogList) {
+            Book rentBook = bookLog.getBook();
+            RentBookLog rentBookLog = new RentBookLog(rentBook.getBookNumber(), rentBook.getBookName(),
+                    rentBook.getRecommend(), bookLog.getRegDate(), bookLog.getReturnDate());
+            rentBookLogList.add(rentBookLog);
+        }
+        rentBookLogResponseDto.setRentBook(rentBookLogList);
+        return new ResponseEntity(rentBookLogResponseDto, HttpStatus.OK);
+    }
+
+    public ResponseEntity myBookLog(Member loginMember) {
+        BookLogResponseDto bookLogResponseDto = new BookLogResponseDto();
+        List<BookLog> bookLogList = bookLogService.findBookLogByMemberId(loginMember);
+        List<BookLogUtil> bookLogUtilList = new ArrayList();
+        for (BookLog bookLog : bookLogList) {
+            String status = bookLog.getStatus();
+            String bookName = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등로되지 않은 책입니다.")).getBookName();
+            String bookNumber = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등로되지 않은 책입니다.")).getBookName();
+            String regDate = bookLog.getRegDate();
+            BookLogUtil bookLogUtil = new BookLogUtil(bookName, bookNumber, status, regDate);
+            bookLogUtilList.add(bookLogUtil);
+        }
+        bookLogResponseDto.setBookLogList(bookLogUtilList);
+        return new ResponseEntity(bookLogResponseDto, HttpStatus.OK);
+    }
+
+    public ResponseEntity myRecommendBook(Member loginMember) {
+        RecommendBookLogResponseDto recommendBookLogResponseDto = new RecommendBookLogResponseDto();
+        List<BookRecommend> bookRecommendList = bookRecommendService.findByMember(loginMember);
+        List<Book> recommendBookList = new ArrayList();
+        for (BookRecommend bookRecommend : bookRecommendList) {
+            Book book = bookRecommend.getBook();
+            recommendBookList.add(book);
+        }
+        recommendBookLogResponseDto.setRecommendBook(recommendBookList);
+        return new ResponseEntity(recommendBookLogResponseDto, HttpStatus.OK);
+    }
+
+    public ResponseEntity changePw(Member loginMember, ChangePasswordDto changePasswordDto) {
+        MessageDto messageDto = new MessageDto();
+        if(passwordEncoder.matches(changePasswordDto.getOldPassword(), loginMember.getPassword())){
+            loginMember.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
+            memberRepository.save(loginMember);
+            messageDto.setMessage("비밀번호를 변경했습니다.");
+            return new ResponseEntity(messageDto, HttpStatus.OK);
+        } else{
+            messageDto.setMessage("기존 비밀번호와 일치하지 않습니다.");
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public ResponseEntity myRequestBook(Member loginMember) {
+        RequestBookLogResponseDto requestBookLogResponseDto =  new RequestBookLogResponseDto();
+        List<BookRequest> requestBookList =  bookRequestRepository.findByMember(loginMember);
+        List<RequestBookLog> requestBookLogList = new ArrayList();
+        for (BookRequest bookRequest : requestBookList) {
+            String bookName = bookRequest.getBookName();
+            String requestDate = bookRequest.getRegDate();
+            String completeDate = bookRequest.getCompleteDate();
+            String status = bookRequest.getStatus();
+            RequestBookLog requestBookLog = new RequestBookLog(bookName, requestDate, completeDate, status);
+            requestBookLogList.add(requestBookLog);
+        }
+        requestBookLogResponseDto.setRequestBookLogList(requestBookLogList);
+        return new ResponseEntity(requestBookLogResponseDto, HttpStatus.OK);
     }
 }

@@ -40,41 +40,43 @@ public class BookController {
 
     private final BookService bookService;
     private final MemberService memberService;
-    private final BookLogService bookLogService;
-    private final BookRecommendService bookRecommendService;
     private final BookRequestService bookRequestService;
-    private final MailService mailService;
 
+    /**
+     * 200 : 성공 : 메세지 O
+     * */
     @Operation(summary = "책 추가", description = "DB에 책을 추가합니다.")
     @PostMapping("/add")
     public ResponseEntity addBook(@RequestBody BookAddDto bookAddDto){
-        BookAddResponseDto bookAddResponseDto = bookService.addBook(bookAddDto);
-
-        return new ResponseEntity(bookAddResponseDto, HttpStatus.OK);
+        return bookService.addBook(bookAddDto);
     }
+
+    /**
+     * 400 : 서비스 오류 : 메세지 O
+     * 200 : 성공 : 메세지 O
+     * */
     @Operation(summary = "엑셀 파일로 책 추가", description = "DB에 엑셀 파일에 있는 책을 추가합니다.")
     @PostMapping("/add/excel")
     public ResponseEntity addExcel(@RequestParam("excelFile") MultipartFile mf){
-        MessageDto messageDto = bookService.addBookByExcel(mf);
-
-        return new ResponseEntity(messageDto, HttpStatus.OK);
+        return bookService.addBookByExcel(mf);
     }
+
     @Operation(summary = "책 요청", description = "사용자가 원하는 책을 관리자에게 요청합니다.")
     @PostMapping("/request")
     public ResponseEntity bookRequest(@RequestBody BookRequestDto bookRequestDto, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
-        MessageDto messageDto =  bookService.request(loginMember, bookRequestDto);
-
-        return new ResponseEntity(messageDto, HttpStatus.OK);
+        return bookService.request(loginMember, bookRequestDto);
     }
 
+    /**
+     * 200 : 성공 : 메세지 O
+     * 400 : 에러 : 대여 불가능한 경우 : 메세지 O
+     * */
     @Operation(summary = "책 대여", description = "해당 책을 대여불가 상태로 DB에 저장합니다.")
     @PostMapping("/rent/{bookNumber}")
     public ResponseEntity bookRent(@PathVariable String bookNumber, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
-        MessageDto messageDto = bookService.rentBook(loginMember, bookNumber);
-
-        return new ResponseEntity(messageDto, HttpStatus.OK);
+        return bookService.rentBook(loginMember, bookNumber);
     }
     @PostMapping("/recommend/{bookNumber}")
     public ResponseEntity bookRecommend(@PathVariable String bookNumber, Authentication authentication){
@@ -137,7 +139,6 @@ public class BookController {
 
     private Member getLoginMember(Authentication authentication) {
         if(authentication == null){
-            System.out.println("authentication에 아무것도 없음");
             return new Member();
         }
         Long memberId = (Long) authentication.getPrincipal();
