@@ -3,11 +3,12 @@ import {useRecoilValue, useSetRecoilState} from "recoil";
 import {
     axiosInstance,
     CONFIG,
-    isLoginedSelector,
+    isLoginedSelector, queryClient, Toast,
 } from "../recoil";
 import {Link, Navigate, useLocation, useNavigate} from "react-router-dom";
 import {useQuery, useQueryClient} from "react-query";
 import Pagination from "react-js-pagination";
+import Swal from "sweetalert2";
 
 const Search = () => {
     const location = useLocation();
@@ -24,34 +25,65 @@ const Search = () => {
     const handlePageChange = (page) => {
         navigate(`/search?searchText=${searchText}&page=${page}`);
     };
-
     const submitSearch = (event) => {
         event.preventDefault();
         const form = event.target;
         form.searchText.value = form.searchText.value.trim();
         if (form.searchText.value.length === 0) {
-            console.log("빈 값");
             navigate(`/search?searchText=&page=1`);
         } else {
             const searchText = form.searchText.value;
             navigate(`/search?searchText=${searchText}&page=1`);
         }
     };
-
     const rentBook = async (bookNumber) => {
         try{
             const response = await axiosInstance.post(`${CONFIG.API_BOOK_RENT}${bookNumber}`);
-            alert("대여 성공");
+            Swal.fire(
+                response.data.message,
+                '내 책 관리에서 대여 내역을 볼 수 있습니다.',
+                'success'
+            ).then(() => {
+                queryClient.invalidateQueries(["bookList", page, searchText]);
+            })
         } catch (e) {
-            alert("대여가 불가능한 책 입니다.")
+            if(e.response.status == 400)
+                Swal.fire(
+                e.response.data.message,
+                '한번 더 확인해주세요.',
+                'warning'
+                )
+            else
+                Swal.fire(
+                    '예상치 못한 오류',
+                    error.message,
+                    'warning'
+                )
         }
     }
     const heartBook = async (bookNumber) => {
         try{
             const response = await axiosInstance.post(`${CONFIG.API_BOOK_RECOMMEND}${bookNumber}`);
-            alert(response.data.message);
+            Swal.fire(
+                response.data.message,
+                '내 책 관리에서 추천한 책 내역을 볼 수 있습니다.',
+                'success'
+            ).then(() => {
+                queryClient.invalidateQueries(["bookList", page, searchText]);
+            })
         } catch (e) {
-            alert("이미 찜한 상태입니다.")
+            if(e.response.status == 400)
+                Swal.fire(
+                    e.response.data.message,
+                    '한번 더 확인해주세요.',
+                    'warning'
+                )
+            else
+                Swal.fire(
+                    '예상치 못한 오류',
+                    error.message,
+                    'warning'
+                )
         }
     }
 
