@@ -15,7 +15,9 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +46,7 @@ public class BookService {
     private final BookRequestRepository bookRequestRepository;
     private final MailService mailService;
     private final MemberService memberService;
+    private final BookRequestService bookRequestService;
     public Book saveBook(Book newBook) {
         Book saveBook = bookRepository.save(newBook);
         return saveBook;
@@ -155,7 +158,7 @@ public class BookService {
                 list.add(newBook);
 
             }
-        } catch (IOException | InvalidFormatException e){
+        } catch (Exception e){
             messageDto.setMessage("엑셀 관련 오류");
             return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         }
@@ -272,7 +275,7 @@ public class BookService {
         }
     }
 
-    public MessageDto recommendBook(Member loginMember, String bookNumber) {
+    public ResponseEntity recommendBook(Member loginMember, String bookNumber) {
         Book book = findByBookNumber(bookNumber);
         MessageDto messageDto = new MessageDto();
         Optional<BookRecommend> bookRecommend = bookRecommendRepository.findByMemberAndBook(loginMember, book);
@@ -285,29 +288,31 @@ public class BookService {
             newBookRecommend.setBook(book);
             bookRecommendRepository.save(newBookRecommend);
             messageDto.setMessage("선택하신 책을 추천했습니다.");
+            return new ResponseEntity(messageDto, HttpStatus.OK);
         } else {
             messageDto.setMessage("이미 추천한 책입니다.");
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         }
-        return messageDto;
     }
 
-    public MessageDto recommendCancelBook(Member loginMember, String bookNumber) {
+    public ResponseEntity recommendCancelBook(Member loginMember, String bookNumber) {
         Book book = findByBookNumber(bookNumber);
         MessageDto messageDto = new MessageDto();
         Optional<BookRecommend> bookRecommend = bookRecommendRepository.findByMemberAndBook(loginMember, book);
         if(bookRecommend == null){
             messageDto.setMessage("추천한 책이 아닙니다.");
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         } else {
             Integer recommendCount = book.getRecommend() - 1;
             book.setRecommend(recommendCount);
             bookRepository.save(book);
             bookRecommendRepository.delete(bookRecommend.orElseThrow(()-> new IllegalArgumentException("존재하지 않는 데이터입니다.")));
             messageDto.setMessage("선택하신 책의 추천을 취소했습니다.");
+            return new ResponseEntity(messageDto, HttpStatus.OK);
         }
-        return messageDto;
     }
 
-    public MessageDto returnBook(Member loginMember, String bookNumber) {
+    public ResponseEntity returnBook(Member loginMember, String bookNumber) {
         Book book = findByBookNumber(bookNumber);
         MessageDto messageDto = new MessageDto();
         if(loginMember.getMemberId() == book.getRentalMemberId()) {
@@ -330,11 +335,12 @@ public class BookService {
             bookLogRepository.save(bookHistoryLog);
 
             messageDto.setMessage("반납을 완료했습니다.");
+            return new ResponseEntity(messageDto, HttpStatus.OK);
         }
         else {
             messageDto.setMessage("해당 책을 대여하지 않았습니다.");
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         }
-        return messageDto;
     }
 
     public RequestBookLogResponseDto findMyRequesyBookList(Member member) {
@@ -353,7 +359,7 @@ public class BookService {
         return requestBookLogResponseDto;
     }
 
-    public MessageDto extendPeriod(Member loginMember, String bookNumber) {
+    public ResponseEntity extendPeriod(Member loginMember, String bookNumber) {
         Book book = findByBookNumber(bookNumber);
         MessageDto messageDto = new MessageDto();
         Optional<BookLog> bookLog = bookLogRepository.findByMemberAndBookAndStatus(loginMember, book, InRental.getBookStatus());
@@ -365,9 +371,34 @@ public class BookService {
             log.setReturnDate(twoWeeksLater.format(formatter));
             bookLogRepository.save(log);
             messageDto.setMessage("대출 기한이 연장되었습니다.");
+            return new ResponseEntity(messageDto, HttpStatus.OK);
         } else {
             messageDto.setMessage("대여 중인 책이 아닙니다.");
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         }
-        return messageDto;
+    }
+
+    public ResponseEntity bookSearch(String searchText, Integer page, Pageable pageable) {
+        pageable = PageRequest.of(page, 10, Sort.by("bookId").descending());
+        List<Book> bookList = getBookListByKeyword(searchText, pageable.withPage(page));
+        Integer totalCnt = getTotalCntBySearchText(searchText) + 1 ;
+
+        BookListResponseDto bookListResponseDto = new BookListResponseDto();
+        bookListResponseDto.setBookList(bookList);
+        bookListResponseDto.setTotalCnt(totalCnt);
+        return new ResponseEntity(bookListResponseDto, HttpStatus.OK);
+    }
+
+    public ResponseEntity requestComplete(Long bookRequestId) {
+        BookRequest bookRequest = bookRequestService.findById(bookRequestId);
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        bookRequest.setCompleteDate(today.format(formatter));
+        bookRequest.setStatus(RequestComplete.getBookStatus());
+        bookRequestService.save(bookRequest);
+        MessageDto messageDto = new MessageDto();
+        messageDto.setMessage("성공적으로 처리완료했습니다.");
+
+        return new ResponseEntity(messageDto, HttpStatus.OK);
     }
 }

@@ -3,17 +3,51 @@ import {axiosInstance, CONFIG, isLoginedSelector, loginedUserInfoSelector} from 
 import {useRecoilValue} from "recoil";
 import {Navigate, useNavigate} from "react-router-dom";
 import {useQuery} from "react-query";
+import Swal from "sweetalert2";
 
 function AddComp() {
     const navigate = useNavigate();
-    const [file,setFile] = useState()
+    const [file,setFile] = useState(null)
     const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-right',
+        showConfirmButton: false,
+        timer: 1000,
+        timerProgressBar: true,
+    })
+    const Toast2 = Swal.mixin({
+        toast: true,
+        position: 'top-right',
+        showConfirmButton: false,
+        timer: 10000,
+        timerProgressBar: true,
+    })
     const FileUpload = async () => {
-        const formData = new FormData();
-        formData.append('excelFile', file)
-        const response = await axiosInstance.post(CONFIG.API_UPLOAD_EXCEL, formData);
-        navigate("/search", {replace: true});
-        alert("DB 저장 성공");
+        if(file === null){
+            Swal.fire(
+                '파일이 선택되지 않았습니다.',
+                '파일을 선택해주세요.',
+                'warning'
+            )
+        } else {
+            const formData = new FormData();
+            formData.append('excelFile', file)
+
+            // 로딩 상태 시작
+            Toast2.fire({
+                icon: 'info',
+                title: '작업 중...'
+            });
+
+            const response = await axiosInstance.post(CONFIG.API_UPLOAD_EXCEL, formData);
+            navigate("/search", {replace: true});
+            // 로딩 상태 종료
+            Toast.fire({
+                icon: 'success',
+                title: 'DB 저장 성공'
+            });
+        }
     }
     const bookAdd = async (event) => {
         event.preventDefault();
@@ -24,13 +58,21 @@ function AddComp() {
         form.bookName.value = form.bookName.value.trim();
 
         if (form.bookNumber.value.length === 0) {
-            alert("bookNumber 입력해주세요.");
+            Swal.fire(
+                '책 번호를 입력해주세요.',
+                '책 번호는 필수입니다.',
+                'warning'
+            )
             form.bookNumber.focus();
             return;
         }
 
         if (form.bookName.value.length === 0) {
-            alert("bookName 입력해주세요.");
+            Swal.fire(
+                '책 제목을 입력해주세요.',
+                '책 제목은 필수입니다.',
+                'warning'
+            )
             form.bookName.focus();
             return;
         }
@@ -70,7 +112,7 @@ function AddComp() {
                                             <form onSubmit={bookAdd}>
                                             <div className="form-floating mb-3">
                                                 <input className="form-control" id="bookNumber" name='bookNumber'/>
-                                                <label htmlFor="bookNumber">책 넘버링</label>
+                                                <label htmlFor="bookNumber">책 번호</label>
                                             </div>
                                             <div className="form-floating mb-3">
                                                 <input className="form-control" id="bookName" name='bookName'/>
@@ -85,7 +127,7 @@ function AddComp() {
                             </div>
                         </div>
                     </div>
-                    <div className="col-lg-6 col-xl-4">
+                    <div className="col-lg-6 col-xl-6">
                         <div className="card mb-5 mb-xl-0">
                             <div className="card-body p-5">
                                 <div className="mb-3">
