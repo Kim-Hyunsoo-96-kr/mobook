@@ -5,28 +5,13 @@ import com.mb.dto.*;
 import com.mb.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-
-import static com.mb.enum_.BookStatus.*;
 
 @Tag(name="BookController", description = "책 컨트롤러")
 @Controller
@@ -36,7 +21,6 @@ public class BookController {
 
     private final BookService bookService;
     private final MemberService memberService;
-    private final BookRequestService bookRequestService;
 
     /**
      * 500 : 메일 관련 오류 : 메세지 X

@@ -29,6 +29,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -84,8 +85,8 @@ public class BookService {
 
     @Transactional
     public ResponseEntity addBook(BookAddDto bookAddDto) {
+        MessageDto messageDto = new MessageDto();
         Book newBook = new Book();
-
         newBook.setBookName(bookAddDto.getBookName());
         newBook.setBookNumber(bookAddDto.getBookNumber());
         newBook.setIsAble(true);
@@ -94,26 +95,23 @@ public class BookService {
         newBook.setRegDate(today.format(formatter));
         newBook.setRecommend(0);
         newBook.setRentalMemberId(0L);
-
         bookRepository.save(newBook);
 
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
             @Override
             public void afterCommit() {
-                String[] receiveArray =  memberService.findAllMemberMailReceiveArray();
+                String[] receiveArray = memberService.findAllMemberMailReceiveArray();
                 Map<String, Object> model = new HashMap<>();
                 model.put("newBook", newBook);
                 try {
                     mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.0]책 추가 안내", "bookAddTemplate.html", model);
-                }  catch (MessagingException | IOException e) {
+                } catch (MessagingException | IOException e) {
                     throw new IllegalArgumentException("메시지 발송 관련 오류");
                 }
             }
         });
-
-        BookAddResponseDto bookAddResponseDto = new BookAddResponseDto();
-        bookAddResponseDto.setName(newBook.getBookName());
-        return new ResponseEntity(bookAddResponseDto, HttpStatus.OK);
+        messageDto.setMessage("책 추가 성공!");
+        return new ResponseEntity(messageDto, HttpStatus.OK);
     }
 
     @Transactional

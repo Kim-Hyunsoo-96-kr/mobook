@@ -56,7 +56,6 @@ const LoginSection = () => {
             })
         }
         catch (e) {
-            console.log(e)
             if(e.response.status == 400){
                 Swal.fire(
                     e.response.data.message,

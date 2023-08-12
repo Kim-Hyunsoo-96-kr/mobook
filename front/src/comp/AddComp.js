@@ -20,7 +20,7 @@ function AddComp() {
         toast: true,
         position: 'top-right',
         showConfirmButton: false,
-        timer: 10000,
+        timer: 50000,
         timerProgressBar: true,
     })
     const FileUpload = async () => {
@@ -34,19 +34,33 @@ function AddComp() {
             const formData = new FormData();
             formData.append('excelFile', file)
 
-            // 로딩 상태 시작
-            Toast2.fire({
-                icon: 'info',
-                title: '작업 중...'
-            });
+            try{
+                Toast2.fire({
+                    icon: 'info',
+                    title: '작업 중...'
+                });
+                const response = await axiosInstance.post(CONFIG.API_UPLOAD_EXCEL, formData);
+                navigate("/search", {replace: true});
+                // 로딩 상태 종료
+                Toast.fire({
+                    icon: 'success',
+                    title: response.data.message
+                });
+            } catch (e){
+                if(e.response.status == 400)
+                Swal.fire(
+                    e.response.data.message,
+                    '첨부 파일을 확인해주세요.',
+                    'warning'
+                )
+                if(e.response.status == 500)
+                    Swal.fire(
+                        '예상치 못한 오류',
+                        '<b style="color: red">중복되는 책 번호가 없는 지 한번 더 확인해주세요.</b> <br/><br/> 이 에러가 반복되면 송주환 사원에게 문의해주세요.',
+                        'warning'
+                    )
+            }
 
-            const response = await axiosInstance.post(CONFIG.API_UPLOAD_EXCEL, formData);
-            navigate("/search", {replace: true});
-            // 로딩 상태 종료
-            Toast.fire({
-                icon: 'success',
-                title: 'DB 저장 성공'
-            });
         }
     }
     const bookAdd = async (event) => {
@@ -79,9 +93,31 @@ function AddComp() {
 
         const bookNumber = form.bookNumber.value;
         const bookName = form.bookName.value;
-        const response = await axiosInstance.post(CONFIG.API_ADD_BOOK, {bookNumber, bookName});
-        navigate("/search", {replace: true});
-        alert("DB 저장 성공");
+
+        try{
+            // 로딩 상태 시작
+            Toast2.fire({
+                icon: 'info',
+                title: '작업 중...'
+            });
+
+            const response = await axiosInstance.post(CONFIG.API_ADD_BOOK, {bookNumber, bookName});
+            navigate("/search", {replace: true});
+
+            Toast.fire({
+                icon: 'success',
+                title: response.data.message
+            });
+        } catch (e) {
+            if(e.response.status == 500)
+                Swal.fire(
+                    '예상치 못한 오류',
+                    '<b style="color: red">중복되는 책 번호가 없는 지 한번 더 확인해주세요.</b> <br/><br/> 이 에러가 반복되면 송주환 사원에게 문의해주세요.',
+                    'warning'
+                )
+
+        }
+
     }
     if (!isLogined) return <Navigate to="/" replace />; // 로그인 안했다면 메인화면으로 보냄
     const fileChangedHandler = (event)=>{
