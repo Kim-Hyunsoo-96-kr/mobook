@@ -2,9 +2,10 @@ import '../App.css';
 import LoginSection from "../comp/LoginSection";
 import Section2 from "../comp/Section2";
 import axios from "axios";
-import {axiosInstance, CONFIG, isLoginedSelector, setLogin} from "../recoil";
+import {axiosInstance, CONFIG, isLoginedSelector, setLogin, Toast, Toast2} from "../recoil";
 import {useRecoilValue} from "recoil";
 import {Navigate, useNavigate} from "react-router-dom";
+import Swal from "sweetalert2";
 
 const Request = () => {
     const isLogined = useRecoilValue(isLoginedSelector);
@@ -18,7 +19,11 @@ const Request = () => {
         form.bookName.value = form.bookName.value.trim();
 
         if (form.bookName.value.length === 0) {
-            alert("책 제목은 필수사항입니다.");
+            Swal.fire(
+                '책 제목을 입력해주세요.',
+                '책 제목은 필수입니다.',
+                'warning'
+            )
             form.bookName.focus();
             return;
         }
@@ -27,9 +32,25 @@ const Request = () => {
         const bookPublisher = form.bookPublisher.value;
         const bookWriter = form.bookWriter.value;
 
-        const response = await axiosInstance.post(CONFIG.API_REQUEST, {bookName, bookPublisher, bookWriter});
-        navigate("/", {replace: true});
-        alert("책을 성공적으로 요청했습니다.")
+        try{
+            Toast2.fire({
+                icon: 'info',
+                title: '작업 중...'
+            });
+            const response = await axiosInstance.post(CONFIG.API_REQUEST, {bookName, bookPublisher, bookWriter});
+            navigate("/", {replace: true});
+            Toast.fire({
+                icon: 'success',
+                title: response.data.message
+            });
+        } catch (e){
+            Swal.fire(
+                '예상치 못한 오류',
+                '이 에러가 반복되면 송주환 사원에게 문의해주세요.',
+                'warning'
+            )
+        }
+
 
     }
   return (

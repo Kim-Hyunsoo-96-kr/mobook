@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {axiosInstance, CONFIG, isLoginedSelector, loginedUserInfoSelector} from "../recoil";
+import {axiosInstance, CONFIG, isLoginedSelector, loginedUserInfoSelector, Toast, Toast2} from "../recoil";
 import {useRecoilValue} from "recoil";
 import {Navigate, useNavigate} from "react-router-dom";
 import {useQuery} from "react-query";
@@ -9,20 +9,6 @@ function AddComp() {
     const navigate = useNavigate();
     const [file,setFile] = useState(null)
     const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
-    const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-right',
-        showConfirmButton: false,
-        timer: 1000,
-        timerProgressBar: true,
-    })
-    const Toast2 = Swal.mixin({
-        toast: true,
-        position: 'top-right',
-        showConfirmButton: false,
-        timer: 50000,
-        timerProgressBar: true,
-    })
     const FileUpload = async () => {
         if(file === null){
             Swal.fire(

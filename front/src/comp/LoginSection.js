@@ -1,5 +1,5 @@
 import axios from "axios";
-import {CONFIG, isLoginedSelector, loginedUserInfoAtom, setLogin} from "../recoil";
+import {CONFIG, isLoginedSelector, loginedUserInfoAtom, setLogin, Toast} from "../recoil";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {Link, Navigate} from "react-router-dom";
 import Swal, {fire} from "sweetalert2";
@@ -7,13 +7,6 @@ import Swal, {fire} from "sweetalert2";
 const LoginSection = () => {
     const setLoginedUserInfo = useSetRecoilState(loginedUserInfoAtom);
     const isLogined = useRecoilValue(isLoginedSelector);
-    const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-right',
-        showConfirmButton: false,
-        timer: 1000,
-        timerProgressBar: true,
-    })
     if (isLogined) return <Navigate to="/" replace />;
 
     const onSubmit = async (event) => {

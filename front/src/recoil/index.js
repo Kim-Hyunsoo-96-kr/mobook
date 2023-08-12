@@ -3,6 +3,7 @@ import {recoilPersist} from "recoil-persist";
 import axios from "axios";
 import {QueryClient} from "react-query";
 import jwtDecode from "jwt-decode";
+import Swal from "sweetalert2";
 
 // 리액트 쿼리(useEffect 없이 API 통신 가능하도록, API 통신 쉽게 해줌)
 export const queryClient = new QueryClient();
@@ -145,3 +146,18 @@ export function setLogin(setLoginedUserInfo, accessToken, refreshToken) {
 export function setLogout(setLoginedUserInfo) {
     setLoginedUserInfo(null);
 }
+
+export const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-right',
+    showConfirmButton: false,
+    timer: 1000,
+    timerProgressBar: true,
+})
+export const Toast2 = Swal.mixin({
+    toast: true,
+    position: 'top-right',
+    showConfirmButton: false,
+    timer: 25000,
+    timerProgressBar: true,
+})

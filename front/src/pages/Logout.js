@@ -1,7 +1,7 @@
 import '../App.css';
 import LoginSection from "../comp/LoginSection";
 import {Navigate} from "react-router-dom";
-import {axiosInstance, CONFIG, loginedUserInfoAtom, loginedUserInfoSelector, setLogout} from "../recoil";
+import {axiosInstance, CONFIG, loginedUserInfoAtom, loginedUserInfoSelector, setLogout, Toast} from "../recoil";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -9,13 +9,6 @@ import Swal from "sweetalert2";
 function Logout() {
     const loginedUserInfo = useRecoilValue(loginedUserInfoSelector);
     const setLoginedUserInfo = useSetRecoilState(loginedUserInfoAtom);
-    const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-right',
-        showConfirmButton: false,
-        timer: 1000,
-        timerProgressBar: true,
-    })
     async function getData() {
         try {
             //응답 성공
@@ -28,7 +21,6 @@ function Logout() {
                         Authorization: `Bearer ${loginedUserInfo.accessToken}`
                     }
                 });
-            console.log(response);
             Toast.fire({
                 icon: 'success',
                 title: '로그아웃 성공'

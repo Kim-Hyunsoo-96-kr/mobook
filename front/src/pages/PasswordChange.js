@@ -2,7 +2,7 @@ import '../App.css';
 import LoginSection from "../comp/LoginSection";
 import Section2 from "../comp/Section2";
 import axios from "axios";
-import {axiosInstance, CONFIG, isLoginedSelector, setLogin} from "../recoil";
+import {axiosInstance, CONFIG, isLoginedSelector, setLogin, Toast} from "../recoil";
 import {useRecoilValue} from "recoil";
 import {Navigate, useNavigate} from "react-router-dom";
 import Swal from "sweetalert2";
@@ -12,13 +12,6 @@ const PasswordChange = () => {
     const navigate = useNavigate();
     if (!isLogined) return <Navigate to="/login" replace />;
     const onSubmit = async (event) => {
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-right',
-            showConfirmButton: false,
-            timer: 1000,
-            timerProgressBar: true,
-        })
         event.preventDefault();
 
         const form = event.target;
