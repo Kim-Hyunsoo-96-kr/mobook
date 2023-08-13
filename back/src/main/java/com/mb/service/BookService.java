@@ -305,7 +305,7 @@ public class BookService {
             book.setRecommend(recommendCount);
             bookRepository.save(book);
             bookRecommendRepository.delete(bookRecommend.orElseThrow(()-> new IllegalArgumentException("존재하지 않는 데이터입니다.")));
-            messageDto.setMessage("선택하신 책의 추천을 취소했습니다.");
+            messageDto.setMessage("추천을 취소했습니다.");
             return new ResponseEntity(messageDto, HttpStatus.OK);
         }
     }

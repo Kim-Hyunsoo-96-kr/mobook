@@ -1,10 +1,18 @@
 import '../App.css';
 import Header from "../comp/Header";
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {axiosInstance, CONFIG, isLoginedSelector, loginedUserInfoAtom, loginedUserInfoSelector} from "../recoil";
+import {
+    axiosInstance,
+    CONFIG,
+    isLoginedSelector,
+    loginedUserInfoAtom,
+    loginedUserInfoSelector,
+    queryClient
+} from "../recoil";
 import {Navigate} from "react-router-dom";
 import axios from "axios";
 import {useQuery} from "react-query";
+import Swal from "sweetalert2";
 
 const MyRecommendBook = () => {
     const { isLoading, error, data } = useQuery("myRecommendBook", async () => {
@@ -16,8 +24,29 @@ const MyRecommendBook = () => {
     if (!isLogined) return <Navigate to="/login" replace />; // 로그인 안했다면 메인화면으로 보냄
 
     const rentBook = async (bookNumber) => {
+        try{
             const response = await axiosInstance.post(`${CONFIG.API_BOOK_RENT}${bookNumber}`);
-            alert(response.data.message);
+            Swal.fire(
+                response.data.message,
+                '내 책 관리에서 대여 내역을 볼 수 있습니다.',
+                'success'
+            ).then(() => {
+                queryClient.invalidateQueries(["myRecommendBook"]);
+            })
+        } catch (e) {
+            if(e.response.status == 400)
+                Swal.fire(
+                    e.response.data.message,
+                    '한번 더 확인해주세요.',
+                    'warning'
+                )
+            else
+                Swal.fire(
+                    '예상치 못한 오류',
+                    error.message,
+                    'warning'
+                )
+        }
     }
     const returnBook = async (bookNumber) => {
         try{
@@ -31,9 +60,26 @@ const MyRecommendBook = () => {
     const recommendCancel = async (bookNumber) => {
         try{
             const response = await axiosInstance.post(`${CONFIG.API_BOOK_RECOMMEND_CANCEL}${bookNumber}`);
-            alert("추천을 취소했습니다.");
+            Swal.fire(
+                response.data.message,
+                '책 검색 페이지에서 추천할 수 있습니다.',
+                'success'
+            ).then(() => {
+                queryClient.invalidateQueries(["myRecommendBook"]);
+            })
         } catch (e) {
-            alert("추천하지 않은 책 입니다.")
+            if(e.response.status == 400)
+                Swal.fire(
+                    e.response.data.message,
+                    '한번 더 확인해주세요.',
+                    'warning'
+                )
+            else
+                Swal.fire(
+                    '예상치 못한 오류',
+                    error.message,
+                    'warning'
+                )
         }
     }
 

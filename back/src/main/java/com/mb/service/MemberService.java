@@ -312,8 +312,8 @@ public class MemberService {
         List<BookLogUtil> bookLogUtilList = new ArrayList();
         for (BookLog bookLog : bookLogList) {
             String status = bookLog.getStatus();
-            String bookName = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등로되지 않은 책입니다.")).getBookName();
-            String bookNumber = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등로되지 않은 책입니다.")).getBookName();
+            String bookName = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등록되지 않은 책입니다.")).getBookName();
+            String bookNumber = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등록되지 않은 책입니다.")).getBookNumber();
             String regDate = bookLog.getRegDate();
             BookLogUtil bookLogUtil = new BookLogUtil(bookName, bookNumber, status, regDate);
             bookLogUtilList.add(bookLogUtil);
