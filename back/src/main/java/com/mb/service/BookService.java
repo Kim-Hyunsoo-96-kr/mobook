@@ -6,6 +6,7 @@ import com.mb.repository.BookLogRepository;
 import com.mb.repository.BookRecommendRepository;
 import com.mb.repository.BookRepository;
 import com.mb.repository.BookRequestRepository;
+import com.mb.util.BookLogUtil;
 import com.mb.util.RequestBookLog;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,7 @@ public class BookService {
     private final MailService mailService;
     private final MemberService memberService;
     private final BookRequestService bookRequestService;
+    private final BookLogService bookLogService;
     public Book saveBook(Book newBook) {
         Book saveBook = bookRepository.save(newBook);
         return saveBook;
@@ -84,107 +86,118 @@ public class BookService {
     }
 
     @Transactional
-    public ResponseEntity addBook(BookAddDto bookAddDto) {
+    public ResponseEntity addBook(BookAddDto bookAddDto, Member loginMember) {
         MessageDto messageDto = new MessageDto();
-        Book newBook = new Book();
-        newBook.setBookName(bookAddDto.getBookName());
-        newBook.setBookNumber(bookAddDto.getBookNumber());
-        newBook.setIsAble(true);
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        newBook.setRegDate(today.format(formatter));
-        newBook.setRecommend(0);
-        newBook.setRentalMemberId(0L);
-        bookRepository.save(newBook);
+        if(loginMember.getIsAdmin()){
+            Book newBook = new Book();
+            newBook.setBookName(bookAddDto.getBookName());
+            newBook.setBookNumber(bookAddDto.getBookNumber());
+            newBook.setIsAble(true);
+            LocalDate today = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            newBook.setRegDate(today.format(formatter));
+            newBook.setRecommend(0);
+            newBook.setRentalMemberId(0L);
+            bookRepository.save(newBook);
 
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
-            @Override
-            public void afterCommit() {
-                String[] receiveArray = memberService.findAllMemberMailReceiveArray();
-                Map<String, Object> model = new HashMap<>();
-                model.put("newBook", newBook);
-                try {
-                    mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.0]책 추가 안내", "bookAddTemplate.html", model);
-                } catch (MessagingException | IOException e) {
-                    throw new IllegalArgumentException("메시지 발송 관련 오류");
-                }
-            }
-        });
-        messageDto.setMessage("책 추가 성공!");
-        return new ResponseEntity(messageDto, HttpStatus.OK);
-    }
-
-    @Transactional
-    public ResponseEntity addBookByExcel(MultipartFile mf) {
-
-        MessageDto messageDto = new MessageDto();
-        List<Book> list = new ArrayList<>();
-        try{
-            OPCPackage opcPackage = OPCPackage.open(mf.getInputStream());
-            XSSFWorkbook workbook = new XSSFWorkbook(opcPackage);
-            XSSFSheet sheet = workbook.getSheetAt(0);
-
-            for (int i=1; i<sheet.getLastRowNum() + 1; i++) {
-
-                Book newBook = new Book();
-
-                XSSFRow row = sheet.getRow(i);
-
-                // 행이 존재하지 않으면 패스한다.
-                if (null == row) {
-                    continue;
-                }
-
-                // 행의 첫 번째 열(이름)
-                XSSFCell cell = row.getCell(0);
-                if (null != cell) {
-                    if(cell.getRawValue() != null) newBook.setBookNumber(cell.getRawValue().split("\\.")[0]);
-                }
-
-                // 행의 첫 번째 열(이름)
-                cell = row.getCell(1);
-                if (null != cell) {
-                    if(cell.getStringCellValue() != null) newBook.setBookName(cell.getStringCellValue());
-                }
-                newBook.setIsAble(true);
-                Date today = new Date();
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                newBook.setRegDate(formatter.format(today));
-                newBook.setRecommend(0);
-                newBook.setRentalMemberId(0L);
-                // 리스트에 담는다.
-                list.add(newBook);
-
-            }
-        } catch (Exception e){
-            messageDto.setMessage("엑셀 관련 오류");
-            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
-        }
-
-        try{
-            for (Book book : list) {
-                bookRepository.save(book);
-            }
-            messageDto.setMessage("책 추가 성공");
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
                 @Override
                 public void afterCommit() {
-                    String[] receiveArray =  memberService.findAllMemberMailReceiveArray();
+                    String[] receiveArray = memberService.findAllMemberMailReceiveArray();
                     Map<String, Object> model = new HashMap<>();
-                    model.put("newBookList", list);
+                    model.put("newBook", newBook);
                     try {
-                        mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.0]책 추가 안내", "bookAddExcelTemplate.html", model);
-                    }  catch (MessagingException | IOException e) {
-                        throw new IllegalArgumentException("메일 발송 관련 오류");
+                        mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.0]책 추가 안내", "bookAddTemplate.html", model);
+                    } catch (MessagingException | IOException e) {
+                        throw new IllegalArgumentException("메시지 발송 관련 오류");
                     }
                 }
             });
-        } catch (Exception e){
-            messageDto.setMessage("DB관련 오류 : " + e);
-            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+            messageDto.setMessage("책 추가 성공!");
+            return new ResponseEntity(messageDto, HttpStatus.OK);
+        } else {
+            messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
+            return  new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);
         }
 
-        return new ResponseEntity(messageDto, HttpStatus.OK);
+    }
+
+    @Transactional
+    public ResponseEntity addBookByExcel(MultipartFile mf, Member loginMember) {
+
+        MessageDto messageDto = new MessageDto();
+        if(loginMember.getIsAdmin()){
+            List<Book> list = new ArrayList<>();
+            try{
+                OPCPackage opcPackage = OPCPackage.open(mf.getInputStream());
+                XSSFWorkbook workbook = new XSSFWorkbook(opcPackage);
+                XSSFSheet sheet = workbook.getSheetAt(0);
+
+                for (int i=1; i<sheet.getLastRowNum() + 1; i++) {
+
+                    Book newBook = new Book();
+
+                    XSSFRow row = sheet.getRow(i);
+
+                    // 행이 존재하지 않으면 패스한다.
+                    if (null == row) {
+                        continue;
+                    }
+
+                    // 행의 첫 번째 열(이름)
+                    XSSFCell cell = row.getCell(0);
+                    if (null != cell) {
+                        if(cell.getRawValue() != null) newBook.setBookNumber(cell.getRawValue().split("\\.")[0]);
+                    }
+
+                    // 행의 첫 번째 열(이름)
+                    cell = row.getCell(1);
+                    if (null != cell) {
+                        if(cell.getStringCellValue() != null) newBook.setBookName(cell.getStringCellValue());
+                    }
+                    newBook.setIsAble(true);
+                    Date today = new Date();
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                    newBook.setRegDate(formatter.format(today));
+                    newBook.setRecommend(0);
+                    newBook.setRentalMemberId(0L);
+                    // 리스트에 담는다.
+                    list.add(newBook);
+
+                }
+            } catch (Exception e){
+                messageDto.setMessage("엑셀 관련 오류");
+                return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+            }
+
+            try{
+                for (Book book : list) {
+                    bookRepository.save(book);
+                }
+                messageDto.setMessage("책 추가 성공");
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                    @Override
+                    public void afterCommit() {
+                        String[] receiveArray =  memberService.findAllMemberMailReceiveArray();
+                        Map<String, Object> model = new HashMap<>();
+                        model.put("newBookList", list);
+                        try {
+                            mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.0]책 추가 안내", "bookAddExcelTemplate.html", model);
+                        }  catch (MessagingException | IOException e) {
+                            throw new IllegalArgumentException("메일 발송 관련 오류");
+                        }
+                    }
+                });
+            } catch (Exception e){
+                messageDto.setMessage("DB관련 오류 : " + e);
+                return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity(messageDto, HttpStatus.OK);
+        } else {
+            messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
+            return  new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);
+        }
+
     }
 
     @Transactional
@@ -398,5 +411,27 @@ public class BookService {
         messageDto.setMessage("성공적으로 처리완료했습니다.");
 
         return new ResponseEntity(messageDto, HttpStatus.OK);
+    }
+
+    public ResponseEntity bookLog(Member loginMember) {
+        if(loginMember.getIsAdmin()){
+            BookLogResponseDto bookLogResponseDto = new BookLogResponseDto();
+            List<BookLog> bookLogList = bookLogService.findAll();
+            List<BookLogUtil> bookLogUtilList = new ArrayList();
+            for (BookLog bookLog : bookLogList) {
+                String status = bookLog.getStatus();
+                String bookName = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등록되지 않은 책입니다.")).getBookName();
+                String bookNumber = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등록되지 않은 책입니다.")).getBookNumber();
+                String regDate = bookLog.getRegDate();
+                BookLogUtil bookLogUtil = new BookLogUtil(bookName, bookNumber, status, regDate);
+                bookLogUtilList.add(bookLogUtil);
+            }
+            bookLogResponseDto.setBookLogList(bookLogUtilList);
+            return new ResponseEntity(bookLogResponseDto, HttpStatus.OK);
+        } else {
+            MessageDto messageDto = new MessageDto();
+            messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
+            return  new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);
+        }
     }
 }

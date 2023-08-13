@@ -86,18 +86,12 @@ export const nav = {
 }
 export const CONFIG = {};
 CONFIG.BASE_URL = "http://localhost:8080";
+CONFIG.API_CREATE_ACCOUNT = `${CONFIG.BASE_URL}/api/admin/signUp`;
+CONFIG.API_ADD_BOOK = `${CONFIG.BASE_URL}/api/admin/add`;
+CONFIG.API_UPLOAD_EXCEL = `${CONFIG.BASE_URL}/api/admin/add/excel`;
 CONFIG.API_LOGIN = `${CONFIG.BASE_URL}/api/members/login`;
 CONFIG.API_REFRESH_TOKEN = `${CONFIG.BASE_URL}/api/members/refreshToken`;
 CONFIG.API_LOGOUT = `${CONFIG.BASE_URL}/api/members/logout`;
-CONFIG.API_BOOK_LIST = `${CONFIG.BASE_URL}/api/books/list`;
-CONFIG.API_BOOK_SEARCH = `${CONFIG.BASE_URL}/api/books/search`;
-CONFIG.API_ADD_BOOK = `${CONFIG.BASE_URL}/api/books/add`;
-CONFIG.API_UPLOAD_EXCEL = `${CONFIG.BASE_URL}/api/books/add/excel`;
-CONFIG.API_BOOK_RENT = `${CONFIG.BASE_URL}/api/books/rent/`;
-CONFIG.API_BOOK_EXTEND_PERIOD = `${CONFIG.BASE_URL}/api/books/extend/`;
-CONFIG.API_BOOK_RETURN = `${CONFIG.BASE_URL}/api/books/return/`;
-CONFIG.API_BOOK_RECOMMEND = `${CONFIG.BASE_URL}/api/books/recommend/`;
-CONFIG.API_BOOK_RECOMMEND_CANCEL = `${CONFIG.BASE_URL}/api/books/recommend/cancel/`;
 CONFIG.API_MYBOOK = `${CONFIG.BASE_URL}/api/members/myBook`;
 CONFIG.API_MYBOOKLOG = `${CONFIG.BASE_URL}/api/members/myBookLog`;
 CONFIG.API_MYRECOMMENDBOOK = `${CONFIG.BASE_URL}/api/members/myRecommendBook`;
@@ -105,17 +99,22 @@ CONFIG.API_MYRENTBOOK = `${CONFIG.BASE_URL}/api/members/myRentBook`;
 CONFIG.API_MYREQUESTBOOK = `${CONFIG.BASE_URL}/api/members/myRequestBook`;
 CONFIG.API_CHANGE_PW = `${CONFIG.BASE_URL}/api/members/changePw`;
 CONFIG.API_FIND_PW = `${CONFIG.BASE_URL}/api/members/findPw`;
-CONFIG.API_CREATE_ACCOUNT = `${CONFIG.BASE_URL}/api/members/signUp`;
+CONFIG.API_BOOK_LIST = `${CONFIG.BASE_URL}/api/books/list`;
+CONFIG.API_BOOK_SEARCH = `${CONFIG.BASE_URL}/api/books/search`;
+CONFIG.API_BOOK_RENT = `${CONFIG.BASE_URL}/api/books/rent/`;
+CONFIG.API_BOOK_EXTEND_PERIOD = `${CONFIG.BASE_URL}/api/books/extend/`;
+CONFIG.API_BOOK_RETURN = `${CONFIG.BASE_URL}/api/books/return/`;
+CONFIG.API_BOOK_RECOMMEND = `${CONFIG.BASE_URL}/api/books/recommend/`;
+CONFIG.API_BOOK_RECOMMEND_CANCEL = `${CONFIG.BASE_URL}/api/books/recommend/cancel/`;
 CONFIG.API_REQUEST = `${CONFIG.BASE_URL}/api/books/request`;
 CONFIG.TEST = `${CONFIG.BASE_URL}/api/books/list`;
-// 리코일 atom, selector 시작
-// 로그인한 회원정보(raw)
+
 export const loginedUserInfoAtom = atom({
-    key: "app/loginedUserInfoAtom", // 이 키는 나중에 디버깅시에 의미가 있음
-    default: null, // 기본값
-    effects_UNSTABLE: [persistAtom] // 이 변수의 값은 로컬 스토리지에 영속적으로 저장, 이렇게 해야 F5 키 눌러도 로그인 유지 가능
+    key: "app/loginedUserInfoAtom",
+    default: null,
+    effects_UNSTABLE: [persistAtom]
 });
-// loginedUserInfoAtom 를 기초로 현재 로그인 했는지 알려주는 변수
+
 export const isLoginedSelector = selector({
     key: "app/isLoginedSelector",
     get: ({ get }) => get(loginedUserInfoAtom) != null

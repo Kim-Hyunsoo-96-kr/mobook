@@ -24,17 +24,6 @@ public class MemberController {
     private final BookService bookService;
 
     /**
-     * 500 : 요청값 에러
-     * 412 : 관리자가 아닌 경우 에러 : 메세지 O
-     * 201 : 성공 : 메세지 O
-     * */
-    @Operation(summary = "회원 가입", description = "입력값으로 회원가입을 요청합니다.")
-    @PostMapping("/signUp")
-    public ResponseEntity join(@RequestBody @Valid MemberSignUpDto memberSignUpDto, Authentication authentication) {
-        Member loginMember = getLoginMember(authentication);
-        return memberService.join(loginMember, memberSignUpDto);
-    }
-    /**
      * 400 : 서비스 에러 : 메세지 O
      * 200 : 성공 : 메세지 O
      * */

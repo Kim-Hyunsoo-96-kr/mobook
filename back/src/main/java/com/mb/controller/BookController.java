@@ -23,27 +23,6 @@ public class BookController {
     private final MemberService memberService;
 
     /**
-     * 500 : 메일 관련 오류 : 메세지 X
-     * 200 : 성공 : 메세지 O
-     * */
-    @Operation(summary = "책 추가", description = "DB에 책을 추가합니다.")
-    @PostMapping("/add")
-    public ResponseEntity addBook(@RequestBody BookAddDto bookAddDto){
-        return bookService.addBook(bookAddDto);
-    }
-
-    /**
-     * 500 : 메일 관련 오류 : 메세지 X
-     * 400 : 서비스 오류 : 메세지 O
-     * 200 : 성공 : 메세지 O
-     * */
-    @Operation(summary = "엑셀 파일로 책 추가", description = "DB에 엑셀 파일에 있는 책을 추가합니다.")
-    @PostMapping("/add/excel")
-    public ResponseEntity addExcel(@RequestParam("excelFile") MultipartFile mf){
-        return bookService.addBookByExcel(mf);
-    }
-
-    /**
      * 200 : 성공 : 메세지 O
      * 500 : 에러 : 메일 관련 오류 : 메세지 X
      * */
