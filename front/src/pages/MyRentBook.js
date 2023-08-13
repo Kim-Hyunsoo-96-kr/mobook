@@ -1,10 +1,18 @@
 import '../App.css';
 import Header from "../comp/Header";
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {axiosInstance, CONFIG, isLoginedSelector, loginedUserInfoAtom, loginedUserInfoSelector} from "../recoil";
+import {
+    axiosInstance,
+    CONFIG,
+    isLoginedSelector,
+    loginedUserInfoAtom,
+    loginedUserInfoSelector,
+    queryClient
+} from "../recoil";
 import {Navigate} from "react-router-dom";
 import axios from "axios";
 import {useQuery} from "react-query";
+import Swal from "sweetalert2";
 
 const MyRentBook = () => {
     const { isLoading, error, data } = useQuery("myRentBook", async () => {
@@ -16,15 +24,53 @@ const MyRentBook = () => {
     if (!isLogined) return <Navigate to="/login" replace />; // 로그인 안했다면 메인화면으로 보냄
 
     const extendPeriod = async (bookNumber) => {
+        try{
             const response = await axiosInstance.post(`${CONFIG.API_BOOK_EXTEND_PERIOD}${bookNumber}`);
-            alert(response.data.message);
+            Swal.fire(
+                response.data.message,
+                '오늘 날짜로부터 2주 뒤로 연장되었습니다.',
+                'success'
+            ).then(() => {
+                queryClient.invalidateQueries("myRentBook");
+            })
+        } catch (e) {
+            if(e.response.status == 400)
+                Swal.fire(
+                    e.response.data.message,
+                    '한번 더 확인해주세요.',
+                    'warning'
+                )
+            else
+                Swal.fire(
+                    '예상치 못한 오류',
+                    error.message,
+                    'warning'
+                )
+        }
     }
     const returnBook = async (bookNumber) => {
         try{
             const response = await axiosInstance.post(`${CONFIG.API_BOOK_RETURN}${bookNumber}`);
-            alert("반납 성공");
+            Swal.fire(
+                response.data.message,
+                '내 책 관리, 내 기록에서 내역을 확인할 수 있습니다.',
+                'success'
+            ).then(() => {
+                queryClient.invalidateQueries("myRentBook");
+            })
         } catch (e) {
-            alert("반납이 불가능한 책 입니다.")
+            if(e.response.status == 400)
+                Swal.fire(
+                    e.response.data.message,
+                    '한번 더 확인해주세요.',
+                    'warning'
+                )
+            else
+                Swal.fire(
+                    '예상치 못한 오류',
+                    error.message,
+                    'warning'
+                )
         }
     }
 
