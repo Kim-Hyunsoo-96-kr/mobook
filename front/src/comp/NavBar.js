@@ -52,9 +52,9 @@ function NavBar(props) {
                                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownBlog">
                                     <li><Link to={"/createAccount"} className="dropdown-item">계정 생성</Link></li>
                                     <li><Link to={"/add"} className="dropdown-item">책 추가</Link></li>
-                                    <li><a className="dropdown-item">전체 대여/반납 기록 보기</a></li>
+                                    <li><Link to={"/adminBookLog"} className="dropdown-item">전체 대여/반납 기록 보기</Link></li>
                                     <li><a className="dropdown-item">현재 대여 중 기록 보기</a></li>
-                                    <li><a className="dropdown-item">책 신청 기록 보기</a></li>
+                                    <li><Link to={"/adminRequestBook"} className="dropdown-item">책 신청 기록 보기</Link></li>
                                 </ul>
                             </li>
                         )}

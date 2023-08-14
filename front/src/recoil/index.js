@@ -107,6 +107,9 @@ CONFIG.API_BOOK_RETURN = `${CONFIG.BASE_URL}/api/books/return/`;
 CONFIG.API_BOOK_RECOMMEND = `${CONFIG.BASE_URL}/api/books/recommend/`;
 CONFIG.API_BOOK_RECOMMEND_CANCEL = `${CONFIG.BASE_URL}/api/books/recommend/cancel/`;
 CONFIG.API_REQUEST = `${CONFIG.BASE_URL}/api/books/request`;
+CONFIG.API_ADMIN_BOOKLOG = `${CONFIG.BASE_URL}/api/admin/bookLog`;
+CONFIG.API_ADMIN_REQUESTBOOKLOG = `${CONFIG.BASE_URL}/api/admin/requestBookLog`;
+CONFIG.API_ADMIN_REQUESTBOOK_COMPELTE = `${CONFIG.BASE_URL}/api/admin/request/complete/`;
 CONFIG.TEST = `${CONFIG.BASE_URL}/api/books/list`;
 
 export const loginedUserInfoAtom = atom({

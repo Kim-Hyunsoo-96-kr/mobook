@@ -27,6 +27,8 @@ import MyRequestBook from "./pages/MyRequestBook";
 import PasswordChange from "./pages/PasswordChange";
 import FindPassword from "./pages/FindPassword";
 import CreateAccount from "./pages/CreateAccount";
+import AdminBookLog from "./pages/AdminBookLog";
+import AdminRequestBook from "./pages/AdminRequestBook";
 
 function App() {
     const [isReady, setIsReady] = useState(false);
@@ -156,6 +158,8 @@ function App() {
               <Route path="/myRequestBook" element={<MyRequestBook />} />
               <Route path="/request" element={<Request />} />
               <Route path="/createAccount" element={<CreateAccount />} />
+              <Route path="/adminBookLog" element={<AdminBookLog />} />
+              <Route path="/adminRequestBook" element={<AdminRequestBook />} />
           </Routes>
           </div>
       </BrowserRouter>

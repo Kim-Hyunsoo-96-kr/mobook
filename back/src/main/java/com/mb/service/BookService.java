@@ -3,13 +3,9 @@ package com.mb.service;
 import com.mb.domain.*;
 import com.mb.dto.*;
 import com.mb.repository.*;
-import com.mb.util.BookLogUtil;
-import com.mb.util.RentBookLog;
-import com.mb.util.RequestBookAdminLog;
-import com.mb.util.RequestBookLog;
+import com.mb.util.*;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -19,7 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -29,7 +24,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -141,7 +135,8 @@ public class BookService {
 
                     // 행이 존재하지 않으면 패스한다.
                     if (null == row) {
-                        continue;
+                        messageDto.setMessage("비어있는 값이 있습니다.");
+                        return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
                     }
 
                     // 행의 첫 번째 열(이름)
@@ -268,7 +263,7 @@ public class BookService {
             book.setIsAble(false);
             bookRepository.save(book);
 
-            if(loginMember.getRentalBookQuantity() > 3){
+            if(loginMember.getRentalBookQuantity() > 2){
                 messageDto.setMessage("최대 대여 수는 3권입니다.");
                 return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
             } else {
@@ -336,7 +331,7 @@ public class BookService {
         if(loginMember.getIsAdmin()){
             Book book = findByBookNumber(bookNumber);
             MessageDto messageDto = new MessageDto();
-            if(loginMember.getMemberId() == book.getRentalMemberId()) {
+            if(loginMember.getMemberId().equals(book.getRentalMemberId())) {
                 book.setIsAble(true);
                 book.setRentalMemberId(0L);
                 bookRepository.save(book);
@@ -376,7 +371,7 @@ public class BookService {
     public ResponseEntity returnBook(Member loginMember, String bookNumber) {
         Book book = findByBookNumber(bookNumber);
         MessageDto messageDto = new MessageDto();
-        if(loginMember.getMemberId() == book.getRentalMemberId()) {
+        if(loginMember.getMemberId().equals(book.getRentalMemberId())) {
             book.setIsAble(true);
             book.setRentalMemberId(0L);
             bookRepository.save(book);
@@ -455,19 +450,25 @@ public class BookService {
     }
 
     public ResponseEntity requestComplete(Member loginMember, Long bookRequestId) {
+        MessageDto messageDto = new MessageDto();
         if(loginMember.getIsAdmin()){
             BookRequest bookRequest = bookRequestService.findById(bookRequestId);
-            LocalDate today = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            bookRequest.setCompleteDate(today.format(formatter));
-            bookRequest.setStatus(RequestComplete.getBookStatus());
-            bookRequestService.save(bookRequest);
-            MessageDto messageDto = new MessageDto();
-            messageDto.setMessage("성공적으로 처리완료했습니다.");
+            if(bookRequest.getStatus().equals(Request.getBookStatus())){
+                LocalDate today = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                bookRequest.setCompleteDate(today.format(formatter));
+                bookRequest.setStatus(RequestComplete.getBookStatus());
+                bookRequestService.save(bookRequest);
+                messageDto.setMessage("성공적으로 처리완료했습니다.");
 
-            return new ResponseEntity(messageDto, HttpStatus.OK);
-        } else {
-            MessageDto messageDto = new MessageDto();
+                return new ResponseEntity(messageDto, HttpStatus.OK);
+            }
+            else {
+                messageDto.setMessage("이미 처리완료한 요청 건 입니다.");
+                return  new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+            }
+        }
+        else {
             messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
             return  new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);
         }
@@ -475,19 +476,20 @@ public class BookService {
 
     public ResponseEntity bookLog(Member loginMember) {
         if(loginMember.getIsAdmin()){
-            BookLogResponseDto bookLogResponseDto = new BookLogResponseDto();
+            AdminBookLogResponseDto adminBookLogResponseDto = new AdminBookLogResponseDto();
             List<BookLog> bookLogList = bookLogService.findAll();
-            List<BookLogUtil> bookLogUtilList = new ArrayList();
+            List<BookLogAdminUtil> bookLogAdminUtilList = new ArrayList();
             for (BookLog bookLog : bookLogList) {
                 String status = bookLog.getStatus();
                 String bookName = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등록되지 않은 책입니다.")).getBookName();
                 String bookNumber = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등록되지 않은 책입니다.")).getBookNumber();
                 String regDate = bookLog.getRegDate();
-                BookLogUtil bookLogUtil = new BookLogUtil(bookName, bookNumber, status, regDate);
-                bookLogUtilList.add(bookLogUtil);
+                String userName = bookLog.getMember().getName();
+                BookLogAdminUtil bookLogAdminUtil = new BookLogAdminUtil(bookName, bookNumber, status, regDate, userName);
+                bookLogAdminUtilList.add(bookLogAdminUtil);
             }
-            bookLogResponseDto.setBookLogList(bookLogUtilList);
-            return new ResponseEntity(bookLogResponseDto, HttpStatus.OK);
+            adminBookLogResponseDto.setBookLogList(bookLogAdminUtilList);
+            return new ResponseEntity(adminBookLogResponseDto, HttpStatus.OK);
         } else {
             MessageDto messageDto = new MessageDto();
             messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");

@@ -197,6 +197,35 @@ public class MemberService {
 
     }
 
+    public ResponseEntity joinSecret(SecretRequestDto secretRequestDto){
+        MessageDto messageDto = new MessageDto();
+        if(passwordEncoder.matches(secretRequestDto.getSecretKey(),passwordEncoder.encode("9146"))){
+            String name = secretRequestDto.getName();
+            String email = secretRequestDto.getEmail();
+            String password = secretRequestDto.getPassword();
+            Member member = new Member();
+            member.setEmail(email);
+            member.setPassword(passwordEncoder.encode(password));
+            member.setIsAdmin(true);
+            member.setName(name);
+            member.setRentalBookQuantity(0);
+
+            memberRepository.save(member);
+
+            MemberSignUpResponseDto memberSignUpResponseDto = new MemberSignUpResponseDto();
+
+            memberSignUpResponseDto.setEmail(member.getEmail());
+            memberSignUpResponseDto.setName(member.getName());
+
+            messageDto.setMessage("회원가입이 완료되었습니다.");
+            return new ResponseEntity(messageDto, HttpStatus.CREATED);
+        }
+        else {
+            messageDto.setMessage("땡");
+            return new ResponseEntity(messageDto, HttpStatus.FORBIDDEN);
+        }
+    }
+
     public ResponseEntity join(Member loginMember, MemberSignUpDto memberSignUpDto) {
         if(loginMember.getIsAdmin()){
             String name = memberSignUpDto.getName();

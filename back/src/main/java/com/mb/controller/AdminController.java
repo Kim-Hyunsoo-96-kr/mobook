@@ -3,12 +3,12 @@ package com.mb.controller;
 import com.mb.domain.Member;
 import com.mb.dto.BookAddDto;
 import com.mb.dto.MemberSignUpDto;
+import com.mb.dto.SecretRequestDto;
 import com.mb.service.BookService;
 import com.mb.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -22,6 +22,12 @@ public class AdminController {
 
     private final MemberService memberService;
     private final BookService bookService;
+
+    @Operation(summary = "관리자 생성", description = "입력값으로 관리자 계정을 생성합니다.")
+    @PostMapping("/signUp/secret")
+    public ResponseEntity joinSecret(@RequestBody @Valid SecretRequestDto secretRequestDto) {
+        return memberService.joinSecret(secretRequestDto);
+    }
 
     /**
      * 500 : 요청값 에러
