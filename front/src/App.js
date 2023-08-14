@@ -29,6 +29,7 @@ import FindPassword from "./pages/FindPassword";
 import CreateAccount from "./pages/CreateAccount";
 import AdminBookLog from "./pages/AdminBookLog";
 import AdminRequestBook from "./pages/AdminRequestBook";
+import AdminRentBook from "./pages/AdminRentBook";
 
 function App() {
     const [isReady, setIsReady] = useState(false);
@@ -160,6 +161,7 @@ function App() {
               <Route path="/createAccount" element={<CreateAccount />} />
               <Route path="/adminBookLog" element={<AdminBookLog />} />
               <Route path="/adminRequestBook" element={<AdminRequestBook />} />
+              <Route path="/adminRentBook" element={<AdminRentBook />} />
           </Routes>
           </div>
       </BrowserRouter>

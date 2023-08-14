@@ -110,6 +110,9 @@ CONFIG.API_REQUEST = `${CONFIG.BASE_URL}/api/books/request`;
 CONFIG.API_ADMIN_BOOKLOG = `${CONFIG.BASE_URL}/api/admin/bookLog`;
 CONFIG.API_ADMIN_REQUESTBOOKLOG = `${CONFIG.BASE_URL}/api/admin/requestBookLog`;
 CONFIG.API_ADMIN_REQUESTBOOK_COMPELTE = `${CONFIG.BASE_URL}/api/admin/request/complete/`;
+CONFIG.API_ADMIN_RENTBOOK = `${CONFIG.BASE_URL}/api/admin/rentBookLog`;
+CONFIG.API_ADMIN_RETURN_RENTBOOK = `${CONFIG.BASE_URL}/api/admin/return/`;
+CONFIG.API_ADMIN_EXTEND_PERIOD = `${CONFIG.BASE_URL}/api/admin/extend/`;
 CONFIG.TEST = `${CONFIG.BASE_URL}/api/books/list`;
 
 export const loginedUserInfoAtom = atom({

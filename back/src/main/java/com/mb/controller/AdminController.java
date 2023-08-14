@@ -127,6 +127,16 @@ public class AdminController {
         return bookService.adminReturnBook(loginMember, bookNumber);
     }
 
+    /**
+     * 200 : 성공 : 메세지 O
+     * 400 : 대여 중인 책이 아닌 경우 : 메세지 O
+     */
+    @PostMapping("/extend/{bookNumber}")
+    public ResponseEntity extendPeriod(@PathVariable String bookNumber, Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+        return bookService.adminExtendPeriod(loginMember, bookNumber);
+    }
+
 
 
     private Member getLoginMember(Authentication authentication) {

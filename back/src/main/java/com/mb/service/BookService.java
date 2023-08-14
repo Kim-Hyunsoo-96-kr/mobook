@@ -331,7 +331,6 @@ public class BookService {
         if(loginMember.getIsAdmin()){
             Book book = findByBookNumber(bookNumber);
             MessageDto messageDto = new MessageDto();
-            if(loginMember.getMemberId().equals(book.getRentalMemberId())) {
                 book.setIsAble(true);
                 book.setRentalMemberId(0L);
                 bookRepository.save(book);
@@ -349,18 +348,13 @@ public class BookService {
                 loginMember.setRentalBookQuantity(rentalBookQuantity);
                 memberRepository.save(loginMember);
 
-                BookLog bookHistoryLog = bookLogRepository.findByMemberAndBookAndStatus(loginMember, book, InRental.getBookStatus()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 로그입니다."));
+                BookLog bookHistoryLog = bookLogRepository.findByBookAndStatus(book, InRental.getBookStatus()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 로그입니다."));
                 bookHistoryLog.setStatus(Rent.getBookStatus());
                 bookHistoryLog.setReturnDate("0");
                 bookLogRepository.save(bookHistoryLog);
 
                 messageDto.setMessage("반납을 완료했습니다.");
                 return new ResponseEntity(messageDto, HttpStatus.OK);
-            }
-            else {
-                messageDto.setMessage("해당 책을 대여하지 않았습니다.");
-                return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
-            }
         } else {
             MessageDto messageDto = new MessageDto();
             messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
@@ -499,17 +493,17 @@ public class BookService {
 
     public ResponseEntity rentBookLog(Member loginMember) {
         if(loginMember.getIsAdmin()){
-            RentBookLogResponseDto rentBookLogResponseDto = new RentBookLogResponseDto();
-            List<RentBookLog> rentBookLogList = new ArrayList();
+            RentBookAdminLogResponseDto rentBookAdminLogResponseDto = new RentBookAdminLogResponseDto();
+            List<RentBookAdminLog> rentBookAdminLogList = new ArrayList();
             List<BookLog> bookInRendtalLogList =  bookLogService.findByStatus(InRental);
             for (BookLog bookLog : bookInRendtalLogList) {
                 Book rentBook = bookLog.getBook();
-                RentBookLog rentBookLog = new RentBookLog(rentBook.getBookNumber(), rentBook.getBookName(),
-                        rentBook.getRecommend(), bookLog.getRegDate(), bookLog.getReturnDate());
-                rentBookLogList.add(rentBookLog);
+                RentBookAdminLog rentBookAdminLog = new RentBookAdminLog(rentBook.getBookNumber(), rentBook.getBookName(),
+                        rentBook.getRecommend(), bookLog.getRegDate(), bookLog.getReturnDate(), bookLog.getMember().getName());
+                rentBookAdminLogList.add(rentBookAdminLog);
             }
-            rentBookLogResponseDto.setRentBook(rentBookLogList);
-            return new ResponseEntity(rentBookLogResponseDto, HttpStatus.OK);
+            rentBookAdminLogResponseDto.setRentBook(rentBookAdminLogList);
+            return new ResponseEntity(rentBookAdminLogResponseDto, HttpStatus.OK);
         } else {
             MessageDto messageDto = new MessageDto();
             messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
@@ -535,6 +529,30 @@ public class BookService {
             return new ResponseEntity(requestBookAdminLogResponseDto, HttpStatus.OK);
         } else {
             MessageDto messageDto = new MessageDto();
+            messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
+            return  new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);
+        }
+    }
+
+    public ResponseEntity adminExtendPeriod(Member loginMember, String bookNumber) {
+        MessageDto messageDto = new MessageDto();
+        if(loginMember.getIsAdmin()){
+            Book book = findByBookNumber(bookNumber);
+            Optional<BookLog> bookLog = bookLogRepository.findByBookAndStatus(book, InRental.getBookStatus());
+            if(!bookLog.isEmpty()){
+                BookLog log = bookLog.get();
+                LocalDate today = LocalDate.now();
+                LocalDate twoWeeksLater = today.plusWeeks(2);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                log.setReturnDate(twoWeeksLater.format(formatter));
+                bookLogRepository.save(log);
+                messageDto.setMessage("대출 기한이 연장되었습니다.");
+                return new ResponseEntity(messageDto, HttpStatus.OK);
+            } else {
+                messageDto.setMessage("대여 중인 책이 아닙니다.");
+                return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+            }
+        } else {
             messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
             return  new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);
         }
