@@ -74,35 +74,7 @@ function App() {
 
                 // 리프레시 토큰 갱신
                 if (needToRefreshRefreshToken_) {
-                    try {
-                        const response = await axios.post(
-                            CONFIG.API_REFRESH_TOKEN,
-                            {
-                                refreshToken: loginedUserInfo.refreshToken
-                            },
-                            {
-                                Accept: "application/json"
-                            }
-                        );
-
-                        setLogin(
-                            setLoginedUserInfo,
-                            response.data.accessToken,
-                            response.data.refreshToken
-                        );
-
-                        config.headers.Authorization = `Bearer ${response.data.access}`;
-
-                        return config;
-                    } catch (e) {
-                        // 여기서 setLogout(setLoginedUserInfo); 이렇게 희안하게 잘 안된다.
-                        // 그래서 아래와 같이 부드러운 방식으로 로그아웃 한다.
-                        Navigate("/logout", { replace: true });
-                        // 이렇게 하면 이후에 실행될 통신이 실행되지 않는다.
-                        // 그리고 그렇게 하는게 맞다.
-                        // 여기까지 왔다는 것은 토큰이 잘못 되었다는 뜻이니까.
-                        return Promise.reject(e);
-                    }
+                    Navigate("/logout", { replace: true });
                 }
 
                 // 엑세스 토큰 갱신

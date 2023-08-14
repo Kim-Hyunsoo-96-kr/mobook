@@ -35,7 +35,7 @@ public class BookController {
 
     /**
      * 200 : 성공 : 메세지 O
-     * 400 : 에러 : 대여 불가능한 경우 : 메세지 O
+     * 400 : 에러 : 대여 불가능한 경우, 3권을 넘겨서 대여하는 경우: 메세지 O
      * */
     @Operation(summary = "책 대여", description = "해당 책을 대여불가 상태로 DB에 저장합니다.")
     @PostMapping("/rent/{bookNumber}")
@@ -84,15 +84,6 @@ public class BookController {
     @GetMapping("/search")
     public ResponseEntity bookSearch(@RequestParam(name = "searchText") String searchText, @RequestParam(name = "page", defaultValue = "1") Integer page, Pageable pageable){
         return bookService.bookSearch(searchText, page, pageable);
-    }
-
-    /**
-     * 200 : 성공 : 메세지 O
-     * 500 : 로그가 없는 경우 : 메세지 X
-     */
-    @PostMapping("/request/complete/{bookRequestId}")
-    public ResponseEntity requestComplete(@PathVariable Long bookRequestId){
-        return bookService.requestComplete(bookRequestId);
     }
 
     /**

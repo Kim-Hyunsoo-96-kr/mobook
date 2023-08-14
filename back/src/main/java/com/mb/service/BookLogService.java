@@ -38,4 +38,9 @@ public class BookLogService {
         List<BookLog> all = bookLogRepository.findAll();
         return all;
     }
+
+    public List<BookLog> findByStatus(BookStatus bookStatus) {
+        List<BookLog> bookLogList =  bookLogRepository.findByStatus(bookStatus.getBookStatus());
+        return bookLogList;
+    }
 }

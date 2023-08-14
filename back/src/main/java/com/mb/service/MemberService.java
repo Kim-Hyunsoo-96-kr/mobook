@@ -207,6 +207,7 @@ public class MemberService {
             member.setPassword(passwordEncoder.encode(password));
             member.setIsAdmin(false);
             member.setName(name);
+            member.setRentalBookQuantity(0);
 
             memberRepository.save(member);
 

@@ -24,4 +24,6 @@ public class Member {
 
     private Boolean isAdmin;
 
+    private Integer rentalBookQuantity;
+
 }
