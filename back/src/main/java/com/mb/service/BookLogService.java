@@ -4,9 +4,12 @@ package com.mb.service;
 import com.mb.domain.Book;
 import com.mb.domain.BookLog;
 import com.mb.domain.Member;
+import com.mb.domain.QBookLog;
 import com.mb.enum_.BookStatus;
 import com.mb.repository.BookLogRepository;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,6 +44,15 @@ public class BookLogService {
 
     public List<BookLog> findByStatus(BookStatus bookStatus) {
         List<BookLog> bookLogList =  bookLogRepository.findByStatus(bookStatus.getBookStatus());
+        return bookLogList;
+    }
+
+    public List<BookLog> findBookLogByMemberAndKeyword(Member loginMember, String searchText, Pageable pageable) {
+        QBookLog qBookLog = QBookLog.bookLog;
+
+        BooleanExpression predicate = qBookLog.member.eq(loginMember)
+                .and(qBookLog.book.bookName.containsIgnoreCase(searchText));
+        List<BookLog> bookLogList = bookLogRepository.findAll(predicate, pageable).getContent();
         return bookLogList;
     }
 }

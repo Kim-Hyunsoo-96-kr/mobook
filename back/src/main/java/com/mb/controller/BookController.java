@@ -82,8 +82,8 @@ public class BookController {
      */
     @Operation(summary = "책 검색", description = "검색값과 일치하는 제목의 책 리스트를 가져옵니다.")
     @GetMapping("/search")
-    public ResponseEntity bookSearch(@RequestParam(name = "searchText") String searchText, @RequestParam(name = "page", defaultValue = "1") Integer page, Pageable pageable){
-        return bookService.bookSearch(searchText, page, pageable);
+    public ResponseEntity bookSearch(@RequestParam(name = "searchText") String searchText, @RequestParam(name = "page", defaultValue = "1") Integer page){
+        return bookService.bookSearch(searchText, page);
     }
 
     /**

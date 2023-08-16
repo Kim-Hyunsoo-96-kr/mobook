@@ -11,6 +11,9 @@ import com.mb.util.RentBookLog;
 import com.mb.util.RequestBookLog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -281,10 +284,11 @@ public class MemberService {
         return new ResponseEntity(messageDto, HttpStatus.OK);
     }
 
-    public ResponseEntity myBook(Member loginMember) {
+    public ResponseEntity myBook(Member loginMember, String searchText, Integer page) {
         MyBookResponseDto myBookResponseDto = new MyBookResponseDto();
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("id").descending());
         try{
-            List<BookLog> bookLogList = bookLogService.findBookLogByMemberId(loginMember);
+            List<BookLog> bookLogList = bookLogService.findBookLogByMemberAndKeyword(loginMember, searchText, pageable.withPage(page));
             List<BookLogUtil> bookLogUtilList = new ArrayList();
             for (BookLog bookLog : bookLogList) {
                 String status = bookLog.getStatus();
@@ -336,9 +340,10 @@ public class MemberService {
         return new ResponseEntity(rentBookLogResponseDto, HttpStatus.OK);
     }
 
-    public ResponseEntity myBookLog(Member loginMember) {
+    public ResponseEntity myBookLog(Member loginMember, String searchText, Integer page) {
         BookLogResponseDto bookLogResponseDto = new BookLogResponseDto();
-        List<BookLog> bookLogList = bookLogService.findBookLogByMemberId(loginMember);
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("id").descending());
+        List<BookLog> bookLogList = bookLogService.findBookLogByMemberAndKeyword(loginMember, searchText, pageable);
         List<BookLogUtil> bookLogUtilList = new ArrayList();
         for (BookLog bookLog : bookLogList) {
             String status = bookLog.getStatus();

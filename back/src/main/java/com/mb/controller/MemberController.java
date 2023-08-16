@@ -56,9 +56,9 @@ public class MemberController {
      * 400 : 서비스 에러 : 메세지 O
      * */
     @GetMapping("/myBook")
-    public ResponseEntity myBook(Authentication authentication){
+    public ResponseEntity myBook(Authentication authentication, @RequestParam(name = "searchText") String searchText, @RequestParam(name = "page", defaultValue = "1") Integer page){
         Member loginMember = getLoginMember(authentication);
-        return memberService.myBook(loginMember);
+        return memberService.myBook(loginMember, searchText, page);
     }
 
     /**
@@ -74,9 +74,9 @@ public class MemberController {
      * 200 : 성공 : 응답 O
      * */
     @GetMapping("/myBookLog")
-    public ResponseEntity myBookLog(Authentication authentication){
+    public ResponseEntity myBookLog(Authentication authentication,  @RequestParam(name = "searchText") String searchText, @RequestParam(name = "page", defaultValue = "1") Integer page){
         Member loginMember = getLoginMember(authentication);
-        return memberService.myBookLog(loginMember);
+        return memberService.myBookLog(loginMember, searchText, page);
     }
 
     /**

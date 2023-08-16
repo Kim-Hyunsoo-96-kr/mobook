@@ -55,7 +55,7 @@ public class BookService {
     }
 
     public Book findById(Long bookId) {
-        Book findBook = bookRepository.findById(bookId).orElseThrow(() -> new IllegalArgumentException("등로되지 않은 책입니다."));
+        Book findBook = bookRepository.findById(bookId).orElseThrow(() -> new IllegalArgumentException("등록되지 않은 책입니다."));
         return findBook;
     }
 
@@ -70,7 +70,7 @@ public class BookService {
     }
 
     public Book findByBookNumber(String bookNumber) {
-        Book findBook = bookRepository.findByBookNumber(bookNumber).orElseThrow(()-> new IllegalArgumentException("등로되지 않은 책입니다."));
+        Book findBook = bookRepository.findByBookNumber(bookNumber).orElseThrow(()-> new IllegalArgumentException("등록되지 않은 책입니다."));
         return findBook;
     }
 
@@ -432,10 +432,10 @@ public class BookService {
         }
     }
 
-    public ResponseEntity bookSearch(String searchText, Integer page, Pageable pageable) {
-        pageable = PageRequest.of(page, 10, Sort.by("bookId").descending());
+    public ResponseEntity bookSearch(String searchText, Integer page) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("bookId").descending());
         List<Book> bookList = getBookListByKeyword(searchText, pageable.withPage(page));
-        Integer totalCnt = getTotalCntBySearchText(searchText) + 1 ;
+        Integer totalCnt = getTotalCntBySearchText(searchText);
 
         BookListResponseDto bookListResponseDto = new BookListResponseDto();
         bookListResponseDto.setBookList(bookList);

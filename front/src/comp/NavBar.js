@@ -39,7 +39,6 @@ function NavBar(props) {
                                     <a className="nav-link dropdown-toggle" id="navbarDropdownBlog" href="#" role="button"
                                        data-bs-toggle="dropdown" aria-expanded="false">{loginedUserInfo.name} 님</a>
                                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownBlog">
-                                    <li><Link to="/myPage" className="dropdown-item">내 정보</Link></li>
                                     <li><Link to="/passwordChange" className="dropdown-item">비밀번호 변경</Link></li>
                                     <li><Link to={"/logout"} class="dropdown-item">로그아웃</Link></li>
                                 </ul>
