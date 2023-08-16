@@ -74,7 +74,7 @@ public class MemberController {
      * 200 : 성공 : 응답 O
      * */
     @GetMapping("/myBookLog")
-    public ResponseEntity myBookLog(Authentication authentication,  @RequestParam(name = "searchText") String searchText, @RequestParam(name = "page", defaultValue = "1") Integer page){
+    public ResponseEntity myBookLog(Authentication authentication, @RequestParam(name = "searchText") String searchText, @RequestParam(name = "page", defaultValue = "1") Integer page){
         Member loginMember = getLoginMember(authentication);
         return memberService.myBookLog(loginMember, searchText, page);
     }

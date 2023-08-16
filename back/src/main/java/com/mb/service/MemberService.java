@@ -344,6 +344,7 @@ public class MemberService {
         BookLogResponseDto bookLogResponseDto = new BookLogResponseDto();
         Pageable pageable = PageRequest.of(page, 10, Sort.by("id").descending());
         List<BookLog> bookLogList = bookLogService.findBookLogByMemberAndKeyword(loginMember, searchText, pageable);
+        Integer totalCnt = bookLogService.getBookLogByMemberAndKeywordCnt(loginMember,searchText);
         List<BookLogUtil> bookLogUtilList = new ArrayList();
         for (BookLog bookLog : bookLogList) {
             String status = bookLog.getStatus();
@@ -354,6 +355,7 @@ public class MemberService {
             bookLogUtilList.add(bookLogUtil);
         }
         bookLogResponseDto.setBookLogList(bookLogUtilList);
+        bookLogResponseDto.setTotalCnt(totalCnt);
         return new ResponseEntity(bookLogResponseDto, HttpStatus.OK);
     }
 

@@ -55,4 +55,13 @@ public class BookLogService {
         List<BookLog> bookLogList = bookLogRepository.findAll(predicate, pageable).getContent();
         return bookLogList;
     }
+
+    public Integer getBookLogByMemberAndKeywordCnt(Member loginMember, String searchText) {
+        QBookLog qBookLog = QBookLog.bookLog;
+
+        BooleanExpression predicate = qBookLog.member.eq(loginMember)
+                .and(qBookLog.book.bookName.containsIgnoreCase(searchText));
+        List<BookLog> bookLogList = (List<BookLog>) bookLogRepository.findAll(predicate);
+        return bookLogList.size();
+    }
 }

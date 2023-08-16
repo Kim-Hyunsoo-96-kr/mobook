@@ -27,7 +27,7 @@ function NavBar(props) {
                                     <a className="nav-link dropdown-toggle" id="navbarDropdownBlog" href="#" role="button"
                                        data-bs-toggle="dropdown" aria-expanded="false">내 책 관리</a>
                                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownBlog">
-                                    <li><Link to="/myBookLog" className="dropdown-item">내 기록</Link></li>
+                                    <li><Link to="/myBookLog?searchText=&page=1" className="dropdown-item">내 기록</Link></li>
                                     <li><Link to="/myRentBook" className="dropdown-item">대여 내역</Link></li>
                                     <li><Link to="/myRecommendBook" className="dropdown-item">추천한 책 내역</Link></li>
                                     <li><Link to="/myRequestBook" className="dropdown-item">요청한 책 내역</Link></li>
