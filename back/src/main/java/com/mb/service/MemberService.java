@@ -38,6 +38,7 @@ public class MemberService {
     private final BookRepository bookRepository;
     private final MailService mailService;
     private final BookRequestRepository bookRequestRepository;
+    private final BookRequestService bookRequestService;
 
     @Value("${jwt.secretKey}")
     public String accessSecretKey;
@@ -343,7 +344,7 @@ public class MemberService {
     public ResponseEntity myBookLog(Member loginMember, String searchText, Integer page) {
         BookLogResponseDto bookLogResponseDto = new BookLogResponseDto();
         Pageable pageable = PageRequest.of(page, 10, Sort.by("id").descending());
-        List<BookLog> bookLogList = bookLogService.findBookLogByMemberAndKeyword(loginMember, searchText, pageable);
+        List<BookLog> bookLogList = bookLogService.findBookLogByMemberAndKeyword(loginMember, searchText, pageable.withPage(page));
         Integer totalCnt = bookLogService.getBookLogByMemberAndKeywordCnt(loginMember,searchText);
         List<BookLogUtil> bookLogUtilList = new ArrayList();
         for (BookLog bookLog : bookLogList) {
@@ -359,16 +360,38 @@ public class MemberService {
         return new ResponseEntity(bookLogResponseDto, HttpStatus.OK);
     }
 
-    public ResponseEntity myRecommendBook(Member loginMember) {
+    public ResponseEntity myRecommendBook(Member loginMember, String searchText, Integer page) {
         RecommendBookLogResponseDto recommendBookLogResponseDto = new RecommendBookLogResponseDto();
-        List<BookRecommend> bookRecommendList = bookRecommendService.findByMember(loginMember);
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("id").descending());
+        List<BookRecommend> bookRecommendList = bookRecommendService.findByMemberAndKeyword(loginMember, searchText, pageable.withPage(page));
+        Integer totalCnt = bookRecommendService.getBookRecommendListByMemberAndKeywordCnt(loginMember,searchText);
         List<Book> recommendBookList = new ArrayList();
         for (BookRecommend bookRecommend : bookRecommendList) {
             Book book = bookRecommend.getBook();
             recommendBookList.add(book);
         }
         recommendBookLogResponseDto.setRecommendBook(recommendBookList);
+        recommendBookLogResponseDto.setTotalCnt(totalCnt);
         return new ResponseEntity(recommendBookLogResponseDto, HttpStatus.OK);
+    }
+
+    public ResponseEntity myRequestBook(Member loginMember, String searchText, Integer page) {
+        RequestBookLogResponseDto requestBookLogResponseDto =  new RequestBookLogResponseDto();
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("id").descending());
+        List<BookRequest> requestBookList =  bookRequestService.findBookRequestListByMemberAndKeyword(loginMember, searchText, pageable.withPage(page));
+        Integer totalCnt = bookRequestService.getBookRequestListByMemberAndKeywordCnt(loginMember,searchText);
+        List<RequestBookLog> requestBookLogList = new ArrayList();
+        for (BookRequest bookRequest : requestBookList) {
+            String bookName = bookRequest.getBookName();
+            String requestDate = bookRequest.getRegDate();
+            String completeDate = bookRequest.getCompleteDate();
+            String status = bookRequest.getStatus();
+            RequestBookLog requestBookLog = new RequestBookLog(bookName, requestDate, completeDate, status);
+            requestBookLogList.add(requestBookLog);
+        }
+        requestBookLogResponseDto.setRequestBookLogList(requestBookLogList);
+        requestBookLogResponseDto.setTotalCnt(totalCnt);
+        return new ResponseEntity(requestBookLogResponseDto, HttpStatus.OK);
     }
 
     public ResponseEntity changePw(Member loginMember, ChangePasswordDto changePasswordDto) {
@@ -384,19 +407,4 @@ public class MemberService {
         }
     }
 
-    public ResponseEntity myRequestBook(Member loginMember) {
-        RequestBookLogResponseDto requestBookLogResponseDto =  new RequestBookLogResponseDto();
-        List<BookRequest> requestBookList =  bookRequestRepository.findByMember(loginMember);
-        List<RequestBookLog> requestBookLogList = new ArrayList();
-        for (BookRequest bookRequest : requestBookList) {
-            String bookName = bookRequest.getBookName();
-            String requestDate = bookRequest.getRegDate();
-            String completeDate = bookRequest.getCompleteDate();
-            String status = bookRequest.getStatus();
-            RequestBookLog requestBookLog = new RequestBookLog(bookName, requestDate, completeDate, status);
-            requestBookLogList.add(requestBookLog);
-        }
-        requestBookLogResponseDto.setRequestBookLogList(requestBookLogList);
-        return new ResponseEntity(requestBookLogResponseDto, HttpStatus.OK);
-    }
 }

@@ -468,10 +468,12 @@ public class BookService {
         }
     }
 
-    public ResponseEntity bookLog(Member loginMember) {
+    public ResponseEntity bookLog(Member loginMember, String searchText, Integer page) {
         if(loginMember.getIsAdmin()){
             AdminBookLogResponseDto adminBookLogResponseDto = new AdminBookLogResponseDto();
-            List<BookLog> bookLogList = bookLogService.findAll();
+            Pageable pageable = PageRequest.of(page, 10, Sort.by("id").descending());
+            List<BookLog> bookLogList = bookLogService.findAllBookLogByKeyword(searchText, pageable.withPage(page));
+            Integer totalCnt = bookLogService.getAllBookLogByKeywordCnt(searchText);
             List<BookLogAdminUtil> bookLogAdminUtilList = new ArrayList();
             for (BookLog bookLog : bookLogList) {
                 String status = bookLog.getStatus();
@@ -483,6 +485,7 @@ public class BookService {
                 bookLogAdminUtilList.add(bookLogAdminUtil);
             }
             adminBookLogResponseDto.setBookLogList(bookLogAdminUtilList);
+            adminBookLogResponseDto.setTotalCnt(totalCnt);
             return new ResponseEntity(adminBookLogResponseDto, HttpStatus.OK);
         } else {
             MessageDto messageDto = new MessageDto();
@@ -491,11 +494,13 @@ public class BookService {
         }
     }
 
-    public ResponseEntity rentBookLog(Member loginMember) {
+    public ResponseEntity rentBookLog(Member loginMember, String searchText, Integer page) {
         if(loginMember.getIsAdmin()){
             RentBookAdminLogResponseDto rentBookAdminLogResponseDto = new RentBookAdminLogResponseDto();
+            Pageable pageable = PageRequest.of(page, 10, Sort.by("id").descending());
             List<RentBookAdminLog> rentBookAdminLogList = new ArrayList();
-            List<BookLog> bookInRendtalLogList =  bookLogService.findByStatus(InRental);
+            List<BookLog> bookInRendtalLogList =  bookLogService.findRentalBookLogByStatusAndKeyword(InRental, searchText, pageable.withPage(page));
+            Integer totalCnt = bookLogService.getRentalBookLogByStatusAndKeywordCnt(InRental, searchText);
             for (BookLog bookLog : bookInRendtalLogList) {
                 Book rentBook = bookLog.getBook();
                 RentBookAdminLog rentBookAdminLog = new RentBookAdminLog(rentBook.getBookNumber(), rentBook.getBookName(),
@@ -503,6 +508,7 @@ public class BookService {
                 rentBookAdminLogList.add(rentBookAdminLog);
             }
             rentBookAdminLogResponseDto.setRentBook(rentBookAdminLogList);
+            rentBookAdminLogResponseDto.setTotalCnt(totalCnt);
             return new ResponseEntity(rentBookAdminLogResponseDto, HttpStatus.OK);
         } else {
             MessageDto messageDto = new MessageDto();
@@ -511,10 +517,12 @@ public class BookService {
         }
     }
 
-    public ResponseEntity requestBookLog(Member loginMember) {
+    public ResponseEntity requestBookLog(Member loginMember, String searchText, Integer page) {
         if(loginMember.getIsAdmin()){
             RequestBookAdminLogResponseDto requestBookAdminLogResponseDto =  new RequestBookAdminLogResponseDto();
-            List<BookRequest> requestBookList =  bookRequestRepository.findAll();
+            Pageable pageable = PageRequest.of(page, 10, Sort.by("id").descending());
+            List<BookRequest> requestBookList =  bookRequestService.findAllBookRequestListAndKeyword(searchText, pageable.withPage(page));
+            Integer totalCnt = bookRequestService.getAllBookRequestListAndKeywordCnt(searchText);
             List<RequestBookAdminLog> requestBookAdminList = new ArrayList();
             for (BookRequest bookRequest : requestBookList) {
                 String bookName = bookRequest.getBookName();
@@ -526,6 +534,7 @@ public class BookService {
                 requestBookAdminList.add(requestBookAdminLog);
             }
             requestBookAdminLogResponseDto.setRequestBookLogList(requestBookAdminList);;
+            requestBookAdminLogResponseDto.setTotalCnt(totalCnt);
             return new ResponseEntity(requestBookAdminLogResponseDto, HttpStatus.OK);
         } else {
             MessageDto messageDto = new MessageDto();

@@ -11,5 +11,6 @@ import java.util.List;
 @Setter
 public class RentBookAdminLogResponseDto {
     private List<RentBookAdminLog> rentBook;
+    private Integer totalCnt;
 }
 

@@ -12,5 +12,8 @@ import java.util.List;
 @Setter
 public class RecommendBookLogResponseDto {
     private List<Book> recommendBook;
+
+    private Integer totalCnt;
+
 }
 

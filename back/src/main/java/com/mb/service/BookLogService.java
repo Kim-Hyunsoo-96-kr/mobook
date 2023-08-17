@@ -1,10 +1,7 @@
 package com.mb.service;
 
 
-import com.mb.domain.Book;
-import com.mb.domain.BookLog;
-import com.mb.domain.Member;
-import com.mb.domain.QBookLog;
+import com.mb.domain.*;
 import com.mb.enum_.BookStatus;
 import com.mb.repository.BookLogRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -60,6 +57,40 @@ public class BookLogService {
         QBookLog qBookLog = QBookLog.bookLog;
 
         BooleanExpression predicate = qBookLog.member.eq(loginMember)
+                .and(qBookLog.book.bookName.containsIgnoreCase(searchText));
+        List<BookLog> bookLogList = (List<BookLog>) bookLogRepository.findAll(predicate);
+        return bookLogList.size();
+    }
+
+    public List<BookLog> findAllBookLogByKeyword(String searchText, Pageable pageable) {
+        QBookLog qBookLog = QBookLog.bookLog;
+
+        BooleanExpression predicate = qBookLog.book.bookName.containsIgnoreCase(searchText);
+        List<BookLog> bookLogList = bookLogRepository.findAll(predicate, pageable).getContent();
+        return bookLogList;
+    }
+
+    public Integer getAllBookLogByKeywordCnt(String searchText) {
+        QBookLog qBookLog = QBookLog.bookLog;
+
+        BooleanExpression predicate = qBookLog.book.bookName.containsIgnoreCase(searchText);
+        List<BookLog> bookLogList = (List<BookLog>) bookLogRepository.findAll(predicate);
+        return bookLogList.size();
+    }
+
+    public List<BookLog> findRentalBookLogByStatusAndKeyword(BookStatus bookStatus, String searchText, Pageable pageable) {
+        QBookLog qBookLog = QBookLog.bookLog;
+
+        BooleanExpression predicate = qBookLog.status.eq(bookStatus.getBookStatus())
+                .and(qBookLog.book.bookName.containsIgnoreCase(searchText));
+        List<BookLog> bookLogList = bookLogRepository.findAll(predicate, pageable).getContent();
+        return bookLogList;
+    }
+
+    public Integer getRentalBookLogByStatusAndKeywordCnt(BookStatus bookStatus, String searchText) {
+        QBookLog qBookLog = QBookLog.bookLog;
+
+        BooleanExpression predicate = qBookLog.status.eq(bookStatus.getBookStatus())
                 .and(qBookLog.book.bookName.containsIgnoreCase(searchText));
         List<BookLog> bookLogList = (List<BookLog>) bookLogRepository.findAll(predicate);
         return bookLogList.size();

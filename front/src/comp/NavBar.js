@@ -29,8 +29,8 @@ function NavBar(props) {
                                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownBlog">
                                     <li><Link to="/myBookLog?searchText=&page=1" className="dropdown-item">내 기록</Link></li>
                                     <li><Link to="/myRentBook" className="dropdown-item">대여 내역</Link></li>
-                                    <li><Link to="/myRecommendBook" className="dropdown-item">추천한 책 내역</Link></li>
-                                    <li><Link to="/myRequestBook" className="dropdown-item">요청한 책 내역</Link></li>
+                                    <li><Link to="/myRecommendBook?searchText=&page=1" className="dropdown-item">추천한 책 내역</Link></li>
+                                    <li><Link to="/myRequestBook?searchText=&page=1" className="dropdown-item">요청한 책 내역</Link></li>
                                 </ul>
                             </li>
                         )}
@@ -51,9 +51,9 @@ function NavBar(props) {
                                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownBlog">
                                     <li><Link to={"/createAccount"} className="dropdown-item">계정 생성</Link></li>
                                     <li><Link to={"/add"} className="dropdown-item">책 추가</Link></li>
-                                    <li><Link to={"/adminBookLog"} className="dropdown-item">전체 대여/반납 기록 보기</Link></li>
-                                    <li><Link to={"/adminRentBook"} className="dropdown-item">현재 대여 중 기록 보기</Link></li>
-                                    <li><Link to={"/adminRequestBook"} className="dropdown-item">책 신청 기록 보기</Link></li>
+                                    <li><Link to={"/adminBookLog?searchText=&page=1"} className="dropdown-item">전체 대여/반납 기록 보기</Link></li>
+                                    <li><Link to={"/adminRentBook?searchText=&page=1"} className="dropdown-item">현재 대여 중 기록 보기</Link></li>
+                                    <li><Link to={"/adminRequestBook?searchText=&page=1"} className="dropdown-item">책 신청 기록 보기</Link></li>
                                 </ul>
                             </li>
                         )}

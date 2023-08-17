@@ -10,5 +10,7 @@ import java.util.List;
 @Setter
 public class RequestBookLogResponseDto {
     private List<RequestBookLog> requestBookLogList;
+
+    private Integer totalCnt;
 }
 

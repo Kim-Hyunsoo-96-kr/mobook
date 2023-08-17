@@ -7,12 +7,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @Tag(name="MemberController", description = "멤버 컨트롤러")
 @Controller
@@ -21,7 +19,6 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
-    private final BookService bookService;
 
     /**
      * 400 : 서비스 에러 : 메세지 O
@@ -83,9 +80,9 @@ public class MemberController {
      * 200 : 성공 : 응답 O
      * */
     @GetMapping("/myRecommendBook")
-    public ResponseEntity myRecommendBookList(Authentication authentication){
+    public ResponseEntity myRecommendBookList(Authentication authentication, @RequestParam(name = "searchText") String searchText, @RequestParam(name = "page", defaultValue = "1") Integer page){
         Member loginMember = getLoginMember(authentication);
-        return memberService.myRecommendBook(loginMember);
+        return memberService.myRecommendBook(loginMember, searchText, page);
     }
 
     /**
@@ -109,30 +106,9 @@ public class MemberController {
      * 200 : 성공 : 응답 O
      * */
     @GetMapping("/myRequestBook")
-    public ResponseEntity myRequestBook(Authentication authentication){
+    public ResponseEntity myRequestBook(Authentication authentication, @RequestParam(name = "searchText") String searchText, @RequestParam(name = "page", defaultValue = "1") Integer page){
         Member loginMember = getLoginMember(authentication);
-        return memberService.myRequestBook(loginMember);
-    }
-
-    @Operation(summary = "마이 페이지(Token 필요)", description = "로그인한 회원의 정보를 조회합니다.")
-    @GetMapping("/myPage")
-    public ResponseEntity myPage(Authentication authentication){
-        Member loginMember = getLoginMember(authentication);
-
-        MyPageResponseDto myPageResponseDto = new MyPageResponseDto();
-
-        List<Book> rentalBookList = bookService.findByRentalMemberId(loginMember.getMemberId());
-        for (Book book : rentalBookList) {
-            System.out.println(book.getBookName());
-            System.out.println(book.getBookId());
-        }
-
-        myPageResponseDto.setName(loginMember.getName());
-        myPageResponseDto.setEmail(loginMember.getEmail());
-        myPageResponseDto.setIsAdmin(loginMember.getIsAdmin());
-        myPageResponseDto.setRentalBookList(rentalBookList);
-
-        return new ResponseEntity(myPageResponseDto, HttpStatus.OK);
+        return memberService.myRequestBook(loginMember, searchText, page);
     }
 
     private Member getLoginMember(Authentication authentication) {

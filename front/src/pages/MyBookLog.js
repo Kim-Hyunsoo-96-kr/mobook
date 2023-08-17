@@ -15,7 +15,6 @@ const MyBookLog = () => {
     const navigate = useNavigate();
     const { isLoading, error, data } = useQuery(["myBook", page, searchText], async () => {
         const response = await axiosInstance.get(`${CONFIG.API_MYBOOKLOG}?page=${page}&searchText=${searchText}`);
-        console.log(response.data.bookLogList.size)
         return response.data;
     });
     const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부

@@ -73,9 +73,9 @@ public class AdminController {
      */
     @Operation(summary = "관리자 : 전체 대여/반납 기록 보기", description = "bookLog의 데이터를 봅니다.")
     @GetMapping("bookLog")
-    public ResponseEntity bookLog(Authentication authentication){
+    public ResponseEntity bookLog(Authentication authentication, @RequestParam(name = "searchText") String searchText, @RequestParam(name = "page", defaultValue = "1") Integer page){
         Member loginMember = getLoginMember(authentication);
-        return bookService.bookLog(loginMember);
+        return bookService.bookLog(loginMember, searchText, page);
     }
 
     /**
@@ -85,9 +85,9 @@ public class AdminController {
      */
     @Operation(summary = "관리자 : 현재 대여 중인 책 내역 보기", description = "bookLog의 데이터 중 대여 중인 리스트를 봅니다.")
     @GetMapping("rentBookLog")
-    public ResponseEntity rentBookLog(Authentication authentication){
+    public ResponseEntity rentBookLog(Authentication authentication, @RequestParam(name = "searchText") String searchText, @RequestParam(name = "page", defaultValue = "1") Integer page){
         Member loginMember = getLoginMember(authentication);
-        return bookService.rentBookLog(loginMember);
+        return bookService.rentBookLog(loginMember, searchText, page);
     }
 
     /**
@@ -97,9 +97,9 @@ public class AdminController {
      */
     @Operation(summary = "관리자 : 신청한 책 내역 보기", description = "bookRequest의 데이터를 봅니다.")
     @GetMapping("requestBookLog")
-    public ResponseEntity requestBookLog(Authentication authentication){
+    public ResponseEntity requestBookLog(Authentication authentication, @RequestParam(name = "searchText") String searchText, @RequestParam(name = "page", defaultValue = "1") Integer page){
         Member loginMember = getLoginMember(authentication);
-        return bookService.requestBookLog(loginMember);
+        return bookService.requestBookLog(loginMember, searchText, page);
     }
 
     /**

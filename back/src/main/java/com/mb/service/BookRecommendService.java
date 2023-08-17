@@ -1,11 +1,11 @@
 package com.mb.service;
 
 
-import com.mb.domain.Book;
-import com.mb.domain.BookRecommend;
-import com.mb.domain.Member;
+import com.mb.domain.*;
 import com.mb.repository.BookRecommendRepository;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,5 +30,23 @@ public class BookRecommendService {
 
     public List<BookRecommend> findByMember(Member member) {
         return bookRecommendRepository.findByMember(member);
+    }
+
+    public List<BookRecommend> findByMemberAndKeyword(Member loginMember, String searchText, Pageable pageable) {
+        QBookRecommend qBookRecommend = QBookRecommend.bookRecommend;
+
+        BooleanExpression predicate = qBookRecommend.member.eq(loginMember)
+                .and(qBookRecommend.book.bookName.containsIgnoreCase(searchText));
+        List<BookRecommend> bookRecommendList = bookRecommendRepository.findAll(predicate, pageable).getContent();
+        return bookRecommendList;
+    }
+
+    public Integer getBookRecommendListByMemberAndKeywordCnt(Member loginMember, String searchText) {
+        QBookRecommend qBookRecommend = QBookRecommend.bookRecommend;
+
+        BooleanExpression predicate = qBookRecommend.member.eq(loginMember)
+                .and(qBookRecommend.book.bookName.containsIgnoreCase(searchText));
+        List<BookRecommend> bookRecommendList = (List<BookRecommend>) bookRecommendRepository.findAll(predicate);
+        return bookRecommendList.size();
     }
 }

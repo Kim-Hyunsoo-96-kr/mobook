@@ -11,5 +11,6 @@ import java.util.List;
 @Setter
 public class AdminBookLogResponseDto {
     private List<BookLogAdminUtil> bookLogList;
+    private Integer totalCnt;
 }
 
