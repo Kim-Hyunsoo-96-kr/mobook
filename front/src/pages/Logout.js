@@ -26,11 +26,11 @@ function Logout() {
                 title: '로그아웃 성공'
             })
         } catch (error) {
-            Swal.fire(
-                '송주환 사원에게 문의해주세요',
-                error.message,
-                'warning'
-            )
+            // Swal.fire(
+            //     '송주환 사원에게 문의해주세요',
+            //     error.message,
+            //     'warning'
+            // )
         }
     }
     getData()

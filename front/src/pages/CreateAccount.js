@@ -67,12 +67,19 @@ const CreateAccount = () => {
                     'success'
                 )
             }
-            if(e.response.status == 412)
+            else if(e.response.status == 412)
                 Swal.fire(
                     '관리자가 아닙니다.',
                     '해당 기능은 관리자만 사용이 가능합니다.',
                     'warning'
                 )
+            else if(e.response.status == 500){
+                Swal.fire(
+                    '예상치 못한 오류',
+                    '<b style="color: red">중복되는 아이디인지 한번 더 확인해주세요.</b> <br/><br/> 이 에러가 반복되면 송주환 사원에게 문의해주세요.',
+                    'warning'
+                )
+            }
             else
                 Swal.fire(
                     '예상치 못한 오류',

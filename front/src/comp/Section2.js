@@ -8,7 +8,7 @@ function Section2() {
                             <div className="fs-4 mb-4 fst-italic">"좋은 책을 읽는 것은 지난 몇 세기에 걸쳐 가장 훌륭한 사람들과 대화 하는 것과 같다."
                             </div>
                             <div className="d-flex align-items-center justify-content-center">
-                                <img className="rounded-circle small me-3" src="img/descartes" alt="descartes"/>
+                                <img className="rounded-circle small me-3" src="img/descartes.png" alt="descartes"/>
                                 <div className="fw-bold">
                                     데카르트
                                 </div>

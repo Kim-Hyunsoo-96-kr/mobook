@@ -49,22 +49,23 @@ const LoginSection = () => {
             })
         }
         catch (e) {
-            if(e.response.status == 400){
-                Swal.fire(
-                    e.response.data.message,
-                    '다시 입력해주세요.',
-                    'warning'
-                )
-            } else if(e.response.status == 500){
-                Swal.fire(
-                    '서버에러 : 요청값 에러',
-                    '다시 입력해주세요.',
-                    'warning'
-                )
-                form.password.focus()
-            } else {
-                alert("내가 예상하지 못한 오류")
-            }
+            // if(e.response.status == 400){
+            //     Swal.fire(
+            //         e.response.data.message,
+            //         '다시 입력해주세요.',
+            //         'warning'
+            //     )
+            // } else if(e.response.status == 500){
+            //     Swal.fire(
+            //         '서버에러 : 요청값 에러',
+            //         '다시 입력해주세요.',
+            //         'warning'
+            //     )
+            //     form.password.focus()
+            // } else {
+            //     alert("내가 예상하지 못한 오류")
+            // }
+            console.log(e)
         }
     };
     return (

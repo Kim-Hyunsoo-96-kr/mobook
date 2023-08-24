@@ -330,6 +330,11 @@ public class BookService {
     public ResponseEntity adminReturnBook(Member loginMember, String bookNumber) {
         if(loginMember.getIsAdmin()){
             Book book = findByBookNumber(bookNumber);
+            Member rentalMember =  memberService.findById(book.getRentalMemberId());
+            Integer rentalBookQuantity = rentalMember.getRentalBookQuantity() - 1;
+            rentalMember.setRentalBookQuantity(rentalBookQuantity);
+            memberRepository.save(rentalMember);
+
             MessageDto messageDto = new MessageDto();
                 book.setIsAble(true);
                 book.setRentalMemberId(0L);
@@ -344,9 +349,7 @@ public class BookService {
                 bookLog.setReturnDate("0");
                 bookLogRepository.save(bookLog);
 
-                Integer rentalBookQuantity = loginMember.getRentalBookQuantity() - 1;
-                loginMember.setRentalBookQuantity(rentalBookQuantity);
-                memberRepository.save(loginMember);
+
 
                 BookLog bookHistoryLog = bookLogRepository.findByBookAndStatus(book, InRental.getBookStatus()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 로그입니다."));
                 bookHistoryLog.setStatus(Rent.getBookStatus());
