@@ -17,6 +17,10 @@ public class Book {
     @Column(unique = true)
     private String bookNumber;
 
+    private String bookLink;
+
+    private String bookImageUrl;
+
     private Integer recommend;
 
     private String regDate;

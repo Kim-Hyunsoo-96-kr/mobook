@@ -113,29 +113,33 @@ const Search = () => {
                                 <table className="table table-hover table-striped">
                                     <thead>
                                     <tr>
-                                        <th className="text-align-center">책 고유번호</th>
-                                        <th>제목</th>
-                                        <th className="text-align-center">추천 수</th>
-                                        <th className="text-align-center">작성일</th>
-                                        <th className="text-align-center">대여가능여부</th>
-                                        <th></th>
+                                        <th className="text-align-center">책 정보</th>
                                         <th></th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                         {data.bookList.map((book)=>(
                                             <tr key={book.bookId}>
-                                                <td className="text-align-center">{book.bookNumber}</td>
-                                                <td>{book.bookName}</td>
-                                                <td className="text-align-center">{book.recommend}</td>
-                                                <td className="text-align-center">{book.regDate}</td>
-                                                <td className="text-align-center">{book.isAble ? "Y" : "N"}</td>
-                                                <td><button className="btn btn-outline-success btn-sm" onClick={() => heartBook(book.bookNumber)}>
-                                                    추천하기
-                                                </button></td>
-                                                <td><button className="btn btn-outline-primary btn-sm" onClick={() => rentBook(book.bookNumber)}>
-                                                    대여신청
-                                                </button></td>
+                                                <td className="text-align-center">
+                                                    <img src={book.bookImageUrl} alt="Book Cover" style={{maxWidth : '180px'}} />
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <p>번호: {book.bookNumber}</p>
+                                                        <p>제목: {book.bookName}</p>
+                                                        <p>입고일: {book.regDate}</p>
+                                                        <p>추천수: {book.recommend}</p>
+                                                        <div style={{display : 'flex', alignItems : 'center'}}>
+                                                            <p><button className="btn btn-outline-success btn-sm" onClick={() => heartBook(book.bookNumber)}>
+                                                                추천하기
+                                                            </button></p>
+                                                            <p style={{marginLeft : '8px'}}><button className="btn btn-outline-primary btn-sm" onClick={() => rentBook(book.bookNumber)}>
+                                                                대여가능
+                                                            </button></p>
+                                                        </div>
+                                                        <p><a href={book.bookLink} target="_blank" rel="noopener noreferrer">자세히 보기</a></p>
+                                                    </div>
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>

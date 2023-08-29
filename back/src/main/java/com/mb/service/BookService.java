@@ -1,5 +1,7 @@
 package com.mb.service;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mb.domain.*;
 import com.mb.dto.*;
 import com.mb.repository.*;
@@ -11,19 +13,24 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -44,6 +51,10 @@ public class BookService {
     private final MemberService memberService;
     private final BookRequestService bookRequestService;
     private final BookLogService bookLogService;
+    @Value("${naver.clientId}")
+    public String naverClientId;
+    @Value("${naver.clientSecret}")
+    public String naverClientSecret;
     public Book saveBook(Book newBook) {
         Book saveBook = bookRepository.save(newBook);
         return saveBook;
@@ -92,6 +103,39 @@ public class BookService {
             newBook.setRegDate(today.format(formatter));
             newBook.setRecommend(0);
             newBook.setRentalMemberId(0L);
+
+            URI uri = UriComponentsBuilder
+                    .fromUriString("https://openapi.naver.com")
+                    .path("/v1/search/book.json")
+                    .queryParam("query", bookAddDto.getBookName())
+                    .queryParam("display", 10)
+                    .queryParam("start", 1)
+                    .queryParam("sort", "sim")
+                    .encode()
+                    .build()
+                    .toUri();
+
+            RequestEntity<Void> req = RequestEntity
+                    .get(uri)
+                    .header("X-Naver-Client-Id", naverClientId)
+                    .header("X-Naver-Client-Secret", naverClientSecret)
+                    .build();
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> resp = restTemplate.exchange(req, String.class);
+
+            ObjectMapper om = new ObjectMapper();
+            NaverResponseDto naverResponseDto = null;
+
+            try{
+                naverResponseDto = om.readValue(resp.getBody(), NaverResponseDto.class);
+                newBook.setBookLink(naverResponseDto.getItems().get(0).getLink());
+                newBook.setBookImageUrl(naverResponseDto.getItems().get(0).getImage());
+            } catch (Exception e){
+                throw new IllegalArgumentException("Json parser 관련 오류");
+            }
+
+
             bookRepository.save(newBook);
 
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
@@ -142,13 +186,53 @@ public class BookService {
                     // 행의 첫 번째 열(이름)
                     XSSFCell cell = row.getCell(0);
                     if (null != cell) {
-                        if(cell.getRawValue() != null) newBook.setBookNumber(cell.getRawValue().split("\\.")[0]);
+                        if(cell.getRawValue() != null){
+                            System.out.println(cell.getRawValue());
+                            newBook.setBookNumber(cell.getRawValue());
+                        }
                     }
+
 
                     // 행의 첫 번째 열(이름)
                     cell = row.getCell(1);
                     if (null != cell) {
-                        if(cell.getStringCellValue() != null) newBook.setBookName(cell.getStringCellValue());
+                        if(cell.getRawValue() != null){
+                            newBook.setBookName(cell.getStringCellValue());
+                            URI uri = UriComponentsBuilder
+                                    .fromUriString("https://openapi.naver.com")
+                                    .path("/v1/search/book.json")
+                                    .queryParam("query", cell.getStringCellValue())
+                                    .queryParam("display", 10)
+                                    .queryParam("start", 1)
+                                    .queryParam("sort", "sim")
+                                    .encode()
+                                    .build()
+                                    .toUri();
+
+                            RequestEntity<Void> req = RequestEntity
+                                    .get(uri)
+                                    .header("X-Naver-Client-Id", naverClientId)
+                                    .header("X-Naver-Client-Secret", naverClientSecret)
+                                    .build();
+                            RestTemplate restTemplate = new RestTemplate();
+                            ResponseEntity<String> resp = restTemplate.exchange(req, String.class);
+
+                            ObjectMapper om = new ObjectMapper();
+                            NaverResponseDto naverResponseDto = null;
+
+                            try{
+                                naverResponseDto = om.readValue(resp.getBody(), NaverResponseDto.class);
+                                if(!naverResponseDto.getItems().isEmpty()){
+                                    newBook.setBookLink(naverResponseDto.getItems().get(0).getLink());
+                                    newBook.setBookImageUrl(naverResponseDto.getItems().get(0).getImage());
+                                } else {
+                                    newBook.setBookImageUrl("https://raw.githubusercontent.com/jootang2/MyS3/master/MOBOOK_black.png");
+                                }
+                            } catch (Exception e){
+                                System.out.println(e);
+                                throw new IllegalArgumentException("Json parser 관련 오류");
+                            }
+                        }
                     }
                     newBook.setIsAble(true);
                     Date today = new Date();
@@ -156,12 +240,14 @@ public class BookService {
                     newBook.setRegDate(formatter.format(today));
                     newBook.setRecommend(0);
                     newBook.setRentalMemberId(0L);
+
                     // 리스트에 담는다.
                     list.add(newBook);
-
+                    Thread.sleep(100); // 0.1초(100ms) 일시 정지
                 }
             } catch (Exception e){
                 messageDto.setMessage("엑셀 관련 오류");
+                System.out.println(e);
                 return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
             }
 
