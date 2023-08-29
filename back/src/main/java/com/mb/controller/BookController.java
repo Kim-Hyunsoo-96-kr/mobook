@@ -1,17 +1,28 @@
 package com.mb.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mb.domain.*;
 import com.mb.dto.*;
 import com.mb.service.*;
+import com.mb.util.NaverBook;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import javax.mail.Message;
+import java.net.URI;
 
 @Tag(name="BookController", description = "책 컨트롤러")
 @Controller
@@ -21,6 +32,40 @@ public class BookController {
 
     private final BookService bookService;
     private final MemberService memberService;
+    @Value("${naver.clientId}")
+    public String naverClientId;
+    @Value("${naver.clientSecret}")
+    public String naverClientSecret;
+
+    @GetMapping("/test")
+    public ResponseEntity test() throws JsonProcessingException {
+        URI uri = UriComponentsBuilder
+                .fromUriString("https://openapi.naver.com")
+                .path("/v1/search/book.json")
+                .queryParam("query", "아토믹 코틀린")
+                .queryParam("display", 10)
+                .queryParam("start", 1)
+                .queryParam("sort", "sim")
+                .encode()
+                .build()
+                .toUri();
+
+        RequestEntity<Void> req = RequestEntity
+                .get(uri)
+                .header("X-Naver-Client-Id", naverClientId)
+                .header("X-Naver-Client-Secret", naverClientSecret)
+                .build();
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> resp = restTemplate.exchange(req, String.class);
+
+        ObjectMapper om = new ObjectMapper();
+        NaverResponseDto naverResponseDto = null;
+
+        naverResponseDto = om.readValue(resp.getBody(), NaverResponseDto.class);
+
+        return new ResponseEntity(naverResponseDto, HttpStatus.OK);
+    }
 
     /**
      * 200 : 성공 : 메세지 O
