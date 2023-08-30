@@ -136,6 +136,40 @@ const Search = () => {
                                                             <p style={{marginLeft : '8px'}}><button className="btn btn-outline-primary btn-sm" onClick={() => rentBook(book.bookNumber)}>
                                                                 대여가능
                                                             </button></p>
+                                                            <p>
+                                                                <div style={{marginLeft : '8px', display : 'flex', alignItems : 'center'}} type="button" className="bi bi-chat-dots btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                                                <div style={{marginLeft : '4px'}}>댓글</div>
+                                                                </div>
+                                                                <div className="modal fade" id="staticBackdrop"
+                                                                     data-bs-backdrop="static" data-bs-keyboard="false"
+                                                                     tabIndex="-1" aria-labelledby="staticBackdropLabel"
+                                                                     aria-hidden="true">
+                                                                    <div className="modal-dialog modal-dialog-centered">
+                                                                        <div className="modal-content">
+                                                                            <div className="modal-header">
+                                                                                <h5 className="modal-title"
+                                                                                    id="staticBackdropLabel">댓글</h5>
+                                                                                <button type="button"
+                                                                                        className="btn-close"
+                                                                                        data-bs-dismiss="modal"
+                                                                                        aria-label="Close"></button>
+                                                                            </div>
+                                                                            <div className="modal-body">
+                                                                                ...
+                                                                            </div>
+                                                                            <div className="modal-footer">
+                                                                                <button type="button"
+                                                                                        className="btn btn-secondary"
+                                                                                        data-bs-dismiss="modal">Close
+                                                                                </button>
+                                                                                <button type="button"
+                                                                                        className="btn btn-primary">Understood
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </p>
                                                         </div>
                                                         <p><a href={book.bookLink} target="_blank" rel="noopener noreferrer">자세히 보기</a></p>
                                                     </div>
