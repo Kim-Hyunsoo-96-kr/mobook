@@ -141,6 +141,13 @@ public class BookController {
         return bookService.extendPeriod(loginMember, bookNumber);
     }
 
+    @Operation(summary = "책 댓글 달기", description = "책에 댓글을 달 수 있습니다.")
+    @PostMapping("/comment/{bookNumber}")
+    public ResponseEntity bookComment(@PathVariable String bookNumber, @RequestBody BookCommentRequestDto bookCommentRequestDto, Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+        return bookService.comment(loginMember, bookNumber, bookCommentRequestDto);
+    }
+
     private Member getLoginMember(Authentication authentication) {
         if(authentication == null){
             return new Member();

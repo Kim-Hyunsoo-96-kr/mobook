@@ -51,6 +51,7 @@ public class BookService {
     private final MemberService memberService;
     private final BookRequestService bookRequestService;
     private final BookLogService bookLogService;
+    private final BookCommentService bookCommentService;
     @Value("${naver.clientId}")
     public String naverClientId;
     @Value("${naver.clientSecret}")
@@ -226,7 +227,7 @@ public class BookService {
                                     newBook.setBookLink(naverResponseDto.getItems().get(0).getLink());
                                     newBook.setBookImageUrl(naverResponseDto.getItems().get(0).getImage());
                                 } else {
-                                    newBook.setBookImageUrl("https://raw.githubusercontent.com/jootang2/MyS3/master/MOBOOK_black.png");
+                                    newBook.setBookImageUrl("https://raw.githubusercontent.com/jootang2/MyS3/master/MOBOOK%201.0.png");
                                 }
                             } catch (Exception e){
                                 System.out.println(e);
@@ -243,7 +244,7 @@ public class BookService {
 
                     // 리스트에 담는다.
                     list.add(newBook);
-                    Thread.sleep(100); // 0.1초(100ms) 일시 정지
+                    Thread.sleep(80); // 0.1초(100ms) 일시 정지
                 }
             } catch (Exception e){
                 messageDto.setMessage("엑셀 관련 오류");
@@ -654,5 +655,23 @@ public class BookService {
             messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
             return  new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);
         }
+    }
+
+    public ResponseEntity comment(Member loginMember, String bookNumber, BookCommentRequestDto bookCommentRequestDto) {
+        MessageDto messageDto = new MessageDto();
+
+        Book book = findByBookNumber(bookNumber);
+        BookComment bookComment = new BookComment();
+        bookComment.setBook(book);
+        bookComment.setMember(loginMember);
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        bookComment.setRegDate(today.format(formatter));
+        bookComment.setComment(bookCommentRequestDto.getComment());
+
+        bookCommentService.save(bookComment);
+
+        messageDto.setMessage("성공적으로 댓글을 작성했습니다.");
+        return new ResponseEntity(messageDto, HttpStatus.OK);
     }
 }
