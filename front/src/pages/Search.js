@@ -147,15 +147,49 @@ const Search = () => {
                                                                     <div className="modal-dialog modal-dialog-centered">
                                                                         <div className="modal-content">
                                                                             <div className="modal-header">
-                                                                                <h5 className="modal-title"
-                                                                                    id="staticBackdropLabel">댓글</h5>
+                                                                                <h6 className="modal-title"
+                                                                                    id="staticBackdropLabel">댓글</h6>
                                                                                 <button type="button"
                                                                                         className="btn-close"
                                                                                         data-bs-dismiss="modal"
                                                                                         aria-label="Close"></button>
                                                                             </div>
                                                                             <div className="modal-body">
-                                                                                ...
+                                                                                <section>
+                                                                                    <div class="card bg-light">
+                                                                                        <div class="card-body">
+                                                                                            <form class="mb-4"><textarea class="form-control" rows="3" placeholder="Join the discussion and leave a comment!"></textarea></form>
+                                                                                            <div class="d-flex mb-4">
+                                                                                                <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
+                                                                                                <div class="ms-3">
+                                                                                                    <div class="fw-bold">Commenter Name</div>
+                                                                                                    If you're going to lead a space frontier, it has to be government; it'll never be private enterprise. Because the space frontier is dangerous, and it's expensive, and it has unquantified risks.
+                                                                                                    <div class="d-flex mt-4">
+                                                                                                        <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
+                                                                                                        <div class="ms-3">
+                                                                                                            <div class="fw-bold">Commenter Name</div>
+                                                                                                            And under those conditions, you cannot establish a capital-market evaluation of that enterprise. You can't get investors.
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="d-flex mt-4">
+                                                                                                        <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
+                                                                                                        <div class="ms-3">
+                                                                                                            <div class="fw-bold">Commenter Name</div>
+                                                                                                            When you put money directly to a problem, it makes a good headline.
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="d-flex">
+                                                                                                <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
+                                                                                                <div class="ms-3">
+                                                                                                    <div class="fw-bold">Commenter Name</div>
+                                                                                                    When I look at the universe and all the ways the universe wants to kill us, I find it hard to reconcile that with statements of beneficence.
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </section>
                                                                             </div>
                                                                             <div className="modal-footer">
                                                                                 <button type="button"
