@@ -1,5 +1,6 @@
 package com.mb.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,10 +17,9 @@ public class BookComment {
 
     private String regDate;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
+    private String memberName;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "book_id")
     private Book book;

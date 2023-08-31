@@ -1,8 +1,11 @@
 package com.mb.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Setter
@@ -28,5 +31,9 @@ public class Book {
     private Boolean isAble;
 
     private Long rentalMemberId;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "book")
+    private List<BookComment> bookCommentList;
 
 }

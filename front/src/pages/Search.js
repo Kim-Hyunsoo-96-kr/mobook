@@ -3,14 +3,19 @@ import {useRecoilValue, useSetRecoilState} from "recoil";
 import {
     axiosInstance,
     CONFIG,
-    isLoginedSelector, queryClient, Toast,
+    isLoginedSelector, queryClient, Toast, Toast2,
 } from "../recoil";
 import {Link, Navigate, useLocation, useNavigate} from "react-router-dom";
 import {useQuery, useQueryClient} from "react-query";
 import Pagination from "react-js-pagination";
 import Swal from "sweetalert2";
+import {useState} from "react";
 
 const Search = () => {
+    const [comment, setComment] = useState('');
+    const handleInputChange = (event) => {
+        setComment(event.target.value);
+    };
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const searchText = queryParams.get("searchText") || "";
@@ -86,6 +91,37 @@ const Search = () => {
                 )
         }
     }
+    const addComment = async (event, bookNumber) => {
+        event.preventDefault();
+
+        const form = event.target;
+
+        form.comment.value = form.comment.value.trim();
+
+        if (form.comment.value.length === 0) {
+            Swal.fire(
+                '댓글을 입력해주세요.',
+                '빈 값 입니다.',
+                'warning'
+            )
+            form.comment.focus();
+            return;
+        }
+        const comment = form.comment.value;
+
+        try{
+            const response = await axiosInstance.post(`${CONFIG.API_BOOK_COMMENT}${bookNumber}`, {comment});
+            Toast.fire({
+                icon: 'success',
+                title: response.data.message
+            })
+            setComment('');
+            queryClient.invalidateQueries(["bookList", page, searchText]);
+        } catch (e) {
+            console.log(e)
+        }
+
+    }
 
     if (isLoading) {
         return <div class="loading-1">로딩중</div>;
@@ -138,7 +174,7 @@ const Search = () => {
                                                             </button></p>
                                                             <p>
                                                                 <div style={{marginLeft : '8px', display : 'flex', alignItems : 'center'}} type="button" className="bi bi-chat-dots btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                                                <div style={{marginLeft : '4px'}}>댓글</div>
+                                                                <div style={{marginLeft : '4px'}}>댓글({book.bookCommentList.length})</div>
                                                                 </div>
                                                                 <div className="modal fade" id="staticBackdrop"
                                                                      data-bs-backdrop="static" data-bs-keyboard="false"
@@ -148,7 +184,7 @@ const Search = () => {
                                                                         <div className="modal-content">
                                                                             <div className="modal-header">
                                                                                 <h6 className="modal-title"
-                                                                                    id="staticBackdropLabel">댓글</h6>
+                                                                                    id="staticBackdropLabel">댓글({book.bookCommentList.length})</h6>
                                                                                 <button type="button"
                                                                                         className="btn-close"
                                                                                         data-bs-dismiss="modal"
@@ -158,48 +194,34 @@ const Search = () => {
                                                                                 <section>
                                                                                     <div class="card bg-light">
                                                                                         <div class="card-body">
-                                                                                            <form class="mb-4"><textarea class="form-control" rows="3" placeholder="Join the discussion and leave a comment!"></textarea></form>
-                                                                                            <div class="d-flex mb-4">
-                                                                                                <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
-                                                                                                <div class="ms-3">
-                                                                                                    <div class="fw-bold">Commenter Name</div>
-                                                                                                    If you're going to lead a space frontier, it has to be government; it'll never be private enterprise. Because the space frontier is dangerous, and it's expensive, and it has unquantified risks.
-                                                                                                    <div class="d-flex mt-4">
-                                                                                                        <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
-                                                                                                        <div class="ms-3">
-                                                                                                            <div class="fw-bold">Commenter Name</div>
-                                                                                                            And under those conditions, you cannot establish a capital-market evaluation of that enterprise. You can't get investors.
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                    <div class="d-flex mt-4">
-                                                                                                        <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
-                                                                                                        <div class="ms-3">
-                                                                                                            <div class="fw-bold">Commenter Name</div>
-                                                                                                            When you put money directly to a problem, it makes a good headline.
-                                                                                                        </div>
-                                                                                                    </div>
+                                                                                            {book.bookCommentList.map((comment)=>(
+                                                                                            <div class="ms-3 mb-4">
+                                                                                                <div class='d-flex'>
+                                                                                                    <div class="fw-bold">{comment.memberName}</div>
+                                                                                                    <div class='ms-3'>{comment.regDate}</div>
                                                                                                 </div>
+                                                                                                {comment.comment}
                                                                                             </div>
-                                                                                            <div class="d-flex">
-                                                                                                <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
-                                                                                                <div class="ms-3">
-                                                                                                    <div class="fw-bold">Commenter Name</div>
-                                                                                                    When I look at the universe and all the ways the universe wants to kill us, I find it hard to reconcile that with statements of beneficence.
-                                                                                                </div>
-                                                                                            </div>
+                                                                                            ))}
                                                                                         </div>
                                                                                     </div>
                                                                                 </section>
                                                                             </div>
-                                                                            <div className="modal-footer">
-                                                                                <button type="button"
-                                                                                        className="btn btn-secondary"
-                                                                                        data-bs-dismiss="modal">Close
-                                                                                </button>
-                                                                                <button type="button"
-                                                                                        className="btn btn-primary">Understood
-                                                                                </button>
-                                                                            </div>
+                                                                            <form className="modal-footer" onSubmit={(event) => addComment(event, book.bookNumber)}>
+                                                                                <textarea
+                                                                                className="form-control mb-2"
+                                                                                name='comment'
+                                                                                rows="3"
+                                                                                value={comment}
+                                                                                onChange={handleInputChange}
+                                                                                placeholder="댓글을 입력해주세요."></textarea>
+                                                                                <div class='float-end'>
+                                                                                    <button type="button"
+                                                                                            className="btn btn-success"
+                                                                                            type='submit'>댓글 등록
+                                                                                    </button>
+                                                                                </div>
+                                                                            </form>
                                                                         </div>
                                                                     </div>
                                                                 </div>

@@ -663,7 +663,7 @@ public class BookService {
         Book book = findByBookNumber(bookNumber);
         BookComment bookComment = new BookComment();
         bookComment.setBook(book);
-        bookComment.setMember(loginMember);
+        bookComment.setMemberName(loginMember.getName());
         LocalDate today = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         bookComment.setRegDate(today.format(formatter));

@@ -103,6 +103,7 @@ CONFIG.API_FIND_PW = `${CONFIG.BASE_URL}/api/members/findPw`;
 CONFIG.API_BOOK_LIST = `${CONFIG.BASE_URL}/api/books/list`;
 CONFIG.API_BOOK_SEARCH = `${CONFIG.BASE_URL}/api/books/search`;
 CONFIG.API_BOOK_RENT = `${CONFIG.BASE_URL}/api/books/rent/`;
+CONFIG.API_BOOK_COMMENT = `${CONFIG.BASE_URL}/api/books/comment/`;
 CONFIG.API_BOOK_EXTEND_PERIOD = `${CONFIG.BASE_URL}/api/books/extend/`;
 CONFIG.API_BOOK_RETURN = `${CONFIG.BASE_URL}/api/books/return/`;
 CONFIG.API_BOOK_RECOMMEND = `${CONFIG.BASE_URL}/api/books/recommend/`;
