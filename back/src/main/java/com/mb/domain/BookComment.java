@@ -17,7 +17,11 @@ public class BookComment {
 
     private String regDate;
 
+    private String editDate;
+
     private String memberName;
+
+    private Long memberId;
 
     @JsonBackReference
     @ManyToOne

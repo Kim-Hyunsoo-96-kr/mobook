@@ -122,6 +122,30 @@ const Search = () => {
         }
 
     }
+    const deleteComment = async (commentId) => {
+        try{
+            const response = await axiosInstance.post(`${CONFIG.API_BOOK_COMMENT_DELETE}${commentId}`);
+            Toast.fire({
+                icon: 'success',
+                title: response.data.message
+            })
+            queryClient.invalidateQueries(["bookList", page, searchText]);
+
+        } catch (e) {
+            if(e.response.status == 400)
+                Swal.fire(
+                    e.response.data.message,
+                    '한번 더 확인해주세요.',
+                    'warning'
+                )
+            else
+                Swal.fire(
+                    '예상치 못한 오류',
+                    error.message,
+                    'warning'
+                )
+        }
+    }
 
     if (isLoading) {
         return <div class="loading-1">로딩중</div>;
@@ -199,6 +223,8 @@ const Search = () => {
                                                                                                 <div class='d-flex'>
                                                                                                     <div class="fw-bold">{comment.memberName}</div>
                                                                                                     <div class='ms-3'>{comment.regDate}</div>
+                                                                                                    <div className="bi bi-pencil-fill ms-3 cursor"></div>
+                                                                                                    <div className="bi bi-trash-fill ms-3 cursor" onClick={() => deleteComment(comment.id)}></div>
                                                                                                 </div>
                                                                                                 {comment.comment}
                                                                                             </div>

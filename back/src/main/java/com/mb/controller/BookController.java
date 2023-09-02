@@ -5,12 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mb.domain.*;
 import com.mb.dto.*;
 import com.mb.service.*;
-import com.mb.util.NaverBook;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +16,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.mail.Message;
 import java.net.URI;
 
 @Tag(name="BookController", description = "책 컨트롤러")
@@ -146,6 +142,20 @@ public class BookController {
     public ResponseEntity bookComment(@PathVariable String bookNumber, @RequestBody BookCommentRequestDto bookCommentRequestDto, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
         return bookService.comment(loginMember, bookNumber, bookCommentRequestDto);
+    }
+
+    @Operation(summary = "책 댓글 수정", description = "책 댓글을 수정합니다.")
+    @PostMapping("/comment/edit/{commentId}")
+    public ResponseEntity editComment(@PathVariable Long commentId, @RequestBody BookCommentRequestDto bookCommentRequestDto, Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+        return bookService.editComment(loginMember, commentId, bookCommentRequestDto);
+    }
+
+    @Operation(summary = "책 댓글 삭제", description = "책 댓글을 삭제합니다.")
+    @PostMapping("/comment/delete/{commentId}")
+    public ResponseEntity deleteComment(@PathVariable Long commentId, Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+        return bookService.deleteComment(loginMember, commentId);
     }
 
     private Member getLoginMember(Authentication authentication) {

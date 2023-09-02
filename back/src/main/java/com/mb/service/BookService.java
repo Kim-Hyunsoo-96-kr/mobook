@@ -1,6 +1,5 @@
 package com.mb.service;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mb.domain.*;
 import com.mb.dto.*;
@@ -33,6 +32,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -664,14 +664,58 @@ public class BookService {
         BookComment bookComment = new BookComment();
         bookComment.setBook(book);
         bookComment.setMemberName(loginMember.getName());
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        bookComment.setMemberId(loginMember.getMemberId());
+        LocalDateTime today = LocalDateTime .now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         bookComment.setRegDate(today.format(formatter));
+        bookComment.setEditDate("1996-07-07 00:00:00");
         bookComment.setComment(bookCommentRequestDto.getComment());
 
         bookCommentService.save(bookComment);
 
         messageDto.setMessage("성공적으로 댓글을 작성했습니다.");
         return new ResponseEntity(messageDto, HttpStatus.OK);
+    }
+    @Transactional
+    public ResponseEntity editComment(Member loginMember, Long commentId, BookCommentRequestDto bookCommentRequestDto) {
+        MessageDto messageDto = new MessageDto();
+        try{
+            BookComment bookComment = bookCommentService.findById(commentId);
+            if(loginMember.getMemberId().equals(bookComment.getMemberId())){
+                bookComment.setComment(bookCommentRequestDto.getComment());
+                LocalDateTime today = LocalDateTime .now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                bookComment.setEditDate(today.format(formatter));
+                bookCommentService.save(bookComment);
+
+                messageDto.setMessage("성공적으로 댓글을 수정했습니다.");
+                return new ResponseEntity(messageDto, HttpStatus.OK);
+            } else {
+                messageDto.setMessage("작성자만 댓글을 수정할 수 있습니다.");
+                return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+            }
+        } catch (IllegalArgumentException e){
+            messageDto.setMessage("찾을 수 없는 댓글입니다.");
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Transactional
+    public ResponseEntity deleteComment(Member loginMember, Long commentId) {
+        MessageDto messageDto = new MessageDto();
+        try{
+            BookComment bookComment = bookCommentService.findById(commentId);
+            if(loginMember.getMemberId().equals(bookComment.getMemberId())){
+                bookCommentService.delete(bookComment);
+                messageDto.setMessage("성공적으로 댓글을 삭제했습니다.");
+                return new ResponseEntity(messageDto, HttpStatus.OK);
+            } else {
+                messageDto.setMessage("작성자만 댓글을 삭제할 수 있습니다.");
+                return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+            }
+        } catch (IllegalArgumentException e){
+            messageDto.setMessage("찾을 수 없는 댓글입니다.");
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        }
     }
 }
