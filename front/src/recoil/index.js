@@ -105,6 +105,7 @@ CONFIG.API_BOOK_SEARCH = `${CONFIG.BASE_URL}/api/books/search`;
 CONFIG.API_BOOK_RENT = `${CONFIG.BASE_URL}/api/books/rent/`;
 CONFIG.API_BOOK_COMMENT = `${CONFIG.BASE_URL}/api/books/comment/`;
 CONFIG.API_BOOK_COMMENT_DELETE = `${CONFIG.BASE_URL}/api/books/comment/delete/`;
+CONFIG.API_BOOK_COMMENT_EDIT = `${CONFIG.BASE_URL}/api/books/comment/edit/`;
 CONFIG.API_BOOK_EXTEND_PERIOD = `${CONFIG.BASE_URL}/api/books/extend/`;
 CONFIG.API_BOOK_RETURN = `${CONFIG.BASE_URL}/api/books/return/`;
 CONFIG.API_BOOK_RECOMMEND = `${CONFIG.BASE_URL}/api/books/recommend/`;

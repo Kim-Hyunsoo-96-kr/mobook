@@ -3,13 +3,14 @@ import {useRecoilValue, useSetRecoilState} from "recoil";
 import {
     axiosInstance,
     CONFIG,
-    isLoginedSelector, queryClient, Toast, Toast2,
+    isLoginedSelector, loginedUserInfoAtom, queryClient, Toast, Toast2,
 } from "../recoil";
 import {Link, Navigate, useLocation, useNavigate} from "react-router-dom";
 import {useQuery, useQueryClient} from "react-query";
 import Pagination from "react-js-pagination";
 import Swal from "sweetalert2";
 import {useState} from "react";
+import CompComment from "../comp/CompComment";
 
 const Search = () => {
     const [comment, setComment] = useState('');
@@ -122,29 +123,43 @@ const Search = () => {
         }
 
     }
-    const deleteComment = async (commentId) => {
-        try{
-            const response = await axiosInstance.post(`${CONFIG.API_BOOK_COMMENT_DELETE}${commentId}`);
-            Toast.fire({
-                icon: 'success',
-                title: response.data.message
-            })
-            queryClient.invalidateQueries(["bookList", page, searchText]);
+    const deleteComment = (commentId) => {
+            Swal.fire({
+                title: '정말로 그렇게 하시겠습니까?',
+                text: "다시 되돌릴 수 없습니다. 신중하세요.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '승인',
+                cancelButtonText: '취소',
+                reverseButtons: true, // 버튼 순서 거꾸로
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await axiosInstance.post(`${CONFIG.API_BOOK_COMMENT_DELETE}${commentId}`);
+                        Toast.fire({
+                            icon: 'success',
+                            title: response.data.message
+                        })
+                        queryClient.invalidateQueries(["bookList", page, searchText]);
 
-        } catch (e) {
-            if(e.response.status == 400)
-                Swal.fire(
-                    e.response.data.message,
-                    '한번 더 확인해주세요.',
-                    'warning'
-                )
-            else
-                Swal.fire(
-                    '예상치 못한 오류',
-                    error.message,
-                    'warning'
-                )
-        }
+                    } catch (e) {
+                        if (e.response.status == 400)
+                            Swal.fire(
+                                e.response.data.message,
+                                '한번 더 확인해주세요.',
+                                'warning'
+                            )
+                        else
+                            Swal.fire(
+                                '예상치 못한 오류',
+                                error.message,
+                                'warning'
+                            )
+                    }
+                }
+            })
     }
 
     if (isLoading) {
@@ -219,15 +234,7 @@ const Search = () => {
                                                                                     <div class="card bg-light">
                                                                                         <div class="card-body">
                                                                                             {book.bookCommentList.map((comment)=>(
-                                                                                            <div class="ms-3 mb-4">
-                                                                                                <div class='d-flex'>
-                                                                                                    <div class="fw-bold">{comment.memberName}</div>
-                                                                                                    <div class='ms-3'>{comment.regDate}</div>
-                                                                                                    <div className="bi bi-pencil-fill ms-3 cursor"></div>
-                                                                                                    <div className="bi bi-trash-fill ms-3 cursor" onClick={() => deleteComment(comment.id)}></div>
-                                                                                                </div>
-                                                                                                {comment.comment}
-                                                                                            </div>
+                                                                                            <CompComment comment={comment} key={comment.id} />
                                                                                             ))}
                                                                                         </div>
                                                                                     </div>
