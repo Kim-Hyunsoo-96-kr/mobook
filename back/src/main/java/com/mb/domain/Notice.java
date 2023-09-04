@@ -14,6 +14,7 @@ public class Notice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long noticeId;
+    private String regDate;
     private String title;
     private String contents;
     @ManyToOne

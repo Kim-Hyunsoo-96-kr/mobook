@@ -1,5 +1,5 @@
 import './App.css';
-import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
+import {BrowserRouter, Navigate, Route, Routes, useNavigate} from "react-router-dom";
 import Main from "./pages/Main";
 import NavBar from "./comp/NavBar";
 import Login from "./pages/Login";
@@ -32,6 +32,7 @@ import AdminRequestBook from "./pages/AdminRequestBook";
 import AdminRentBook from "./pages/AdminRentBook";
 
 function App() {
+    const navigate = useNavigate()
     const [isReady, setIsReady] = useState(false);
     const [loginedUserInfo, setLoginedUserInfo] = useRecoilState(
         loginedUserInfoAtom
@@ -71,10 +72,9 @@ function App() {
 
                     return config;
                 }
-
                 // 리프레시 토큰 갱신
                 if (needToRefreshRefreshToken_) {
-                    Navigate("/logout", { replace: true });
+                    navigate("/logout", { replace: true });
                 }
 
                 // 엑세스 토큰 갱신
