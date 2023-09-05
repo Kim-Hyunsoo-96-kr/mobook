@@ -116,6 +116,17 @@ public class MemberService {
         return receiverList;
     }
 
+    public String[] findAllMember() {
+        List<Member> allMemberList = memberRepository.findAll();
+        List<String> emailList = new ArrayList();
+        for (Member member : allMemberList) {
+            String email = member.getEmail();
+            emailList.add(email);
+        }
+        String[] receiverList = emailList.toArray(new String[0]);
+        return receiverList;
+    }
+
     @Transactional
     public ResponseEntity findPassword(FindPasswordDto findPasswordDto) {
         MessageDto messageDto = new MessageDto();

@@ -17,7 +17,5 @@ public class Notice {
     private String regDate;
     private String title;
     private String contents;
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
+    private Long memberId;
 }
