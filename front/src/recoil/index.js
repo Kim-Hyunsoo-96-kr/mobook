@@ -80,6 +80,7 @@ export const nav = {
     title: "MOBOOK1.0",
     menu: [
         {title: "홈", router: "/"},
+        {title: "공지사항", router: "/notice"},
         {title: "책 검색", router: "/search?searchText=&page=1"},
         {title: "책 요청", router: "/request"},
     ]
@@ -95,6 +96,9 @@ CONFIG.API_REFRESH_TOKEN = `${CONFIG.BASE_URL}/api/members/refreshToken`;
 CONFIG.API_LOGOUT = `${CONFIG.BASE_URL}/api/members/logout`;
 CONFIG.API_MYBOOK = `${CONFIG.BASE_URL}/api/members/myBook`;
 CONFIG.API_MYBOOKLOG = `${CONFIG.BASE_URL}/api/members/myBookLog`;
+CONFIG.API_NOTICE = `${CONFIG.BASE_URL}/api/notice/`;
+CONFIG.API_NOTICEDETAIL = `${CONFIG.BASE_URL}/api/notice/`;
+CONFIG.API_NOTICEADD = `${CONFIG.BASE_URL}/api/notice/add`;
 CONFIG.API_MYRECOMMENDBOOK = `${CONFIG.BASE_URL}/api/members/myRecommendBook`;
 CONFIG.API_MYRENTBOOK = `${CONFIG.BASE_URL}/api/members/myRentBook`;
 CONFIG.API_MYREQUESTBOOK = `${CONFIG.BASE_URL}/api/members/myRequestBook`;

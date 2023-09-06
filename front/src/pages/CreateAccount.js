@@ -14,7 +14,14 @@ const CreateAccount = () => {
     if (!isLogined) return <Navigate to="/login" replace />;
     let isAdmin = null
     if(isLogined) isAdmin = loginedUserInfo.isAdmin
-    if (!isAdmin) return <Navigate to="/" replace />;
+    if(!isAdmin) {
+        Swal.fire(
+            '관리자만 접근할 수 있는 페이지입니다.',
+            '이 에러가 반복되면 송주환 사원에게 문의해주세요.',
+            'warning'
+        )
+        return <Navigate to={"/"}/>;
+    }
 
     const onSubmit = async (event) => {
         event.preventDefault();

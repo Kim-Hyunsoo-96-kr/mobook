@@ -1,9 +1,9 @@
 package com.mb.controller;
 
 import com.mb.domain.Member;
-import com.mb.dto.BookAddDto;
-import com.mb.dto.MemberSignUpDto;
-import com.mb.dto.SecretRequestDto;
+import com.mb.dto.Book.req.BookAddDto;
+import com.mb.dto.Member.req.MemberSignUpDto;
+import com.mb.dto.Util.SecretRequestDto;
 import com.mb.service.BookService;
 import com.mb.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;

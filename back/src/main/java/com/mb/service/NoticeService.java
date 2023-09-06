@@ -1,14 +1,11 @@
 package com.mb.service;
 
-import com.mb.domain.Book;
-import com.mb.domain.BookComment;
 import com.mb.domain.Member;
 import com.mb.domain.Notice;
-import com.mb.dto.BookListResponseDto;
-import com.mb.dto.MessageDto;
-import com.mb.dto.NoticeAddRequestDto;
-import com.mb.dto.NoticeListResponseDto;
-import com.mb.repository.BookCommentRepository;
+import com.mb.dto.Notice.resp.NoticeDetailResponseDto;
+import com.mb.dto.Util.MessageDto;
+import com.mb.dto.Notice.req.NoticeAddRequestDto;
+import com.mb.dto.Notice.resp.NoticeListResponseDto;
 import com.mb.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,8 +32,12 @@ public class NoticeService {
     private final MailService mailService;
     private final MemberService memberService;
     private List<Notice> getListWithPage(Pageable pageable) {
-        List<Notice> noticeList = (List<Notice>) noticeRepository.findAll(pageable);
+        Page<Notice> all = noticeRepository.findAll(pageable);
+        List<Notice> noticeList = all.getContent();
         return noticeList;
+    }
+    private Notice findById(Long noticeId) {
+        return noticeRepository.findById(noticeId).orElseThrow(()->new IllegalArgumentException("찾을 수 없는 공지사항입니다."));
     }
     @Transactional
     public ResponseEntity noticeAdd(NoticeAddRequestDto noticeAddRequestDto, Member loginMember) {
@@ -44,11 +45,13 @@ public class NoticeService {
         if(loginMember.getIsAdmin()){
             Notice notice = new Notice();
             notice.setTitle(noticeAddRequestDto.getTitle());
-            notice.setContents(notice.getContents());
+            notice.setContents(noticeAddRequestDto.getContents());
             LocalDate today = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             notice.setRegDate(today.format(formatter));
+            notice.setEditDate(today.format(formatter));
             notice.setMemberId(loginMember.getMemberId());
+            notice.setMemberName(loginMember.getName());
             noticeRepository.save(notice);
 
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
@@ -73,7 +76,7 @@ public class NoticeService {
     }
 
     public ResponseEntity getNoticeList(Integer page) {
-        Pageable pageable = PageRequest.of(page, 10, Sort.by("bookId").descending());
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("noticeId").descending());
         List<Notice> noticeList = getListWithPage(pageable.withPage(page));
         Integer totalCnt = noticeList.size();
 
@@ -83,4 +86,63 @@ public class NoticeService {
         return new ResponseEntity(noticeListResponseDto, HttpStatus.OK);
     }
 
+    public ResponseEntity noticeEdit(NoticeAddRequestDto noticeAddRequestDto, Member loginMember, Long noticeId) {
+        MessageDto messageDto = new MessageDto();
+        try{
+            Notice notice = findById(noticeId);
+            if(loginMember.getIsAdmin() && loginMember.getMemberId().equals(notice.getMemberId())){
+                notice.setTitle(noticeAddRequestDto.getTitle());
+                notice.setContents(noticeAddRequestDto.getContents());
+                LocalDate today = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                notice.setEditDate(today.format(formatter));
+
+                noticeRepository.save(notice);
+
+                messageDto.setMessage("공지사항 수정 성공");
+                return new ResponseEntity(messageDto, HttpStatus.OK);
+            } else {
+                messageDto.setMessage("해당 공지사항을 등록한 관리자만 수정이 가능합니다.");
+                return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+            }
+
+        } catch (IllegalArgumentException e){
+            messageDto.setMessage(e.getMessage());
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public ResponseEntity noticeDelete(Member loginMember, Long noticeId) {
+        MessageDto messageDto = new MessageDto();
+        try{
+            Notice notice = findById(noticeId);
+            if(loginMember.getIsAdmin() && loginMember.getMemberId().equals(notice.getMemberId())){
+                noticeRepository.delete(notice);
+
+                messageDto.setMessage("공지사항 삭제 성공");
+                return new ResponseEntity(messageDto, HttpStatus.OK);
+            } else {
+                messageDto.setMessage("해당 공지사항을 등록한 관리자만 삭제가 가능합니다.");
+                return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+            }
+        } catch (IllegalArgumentException e){
+            messageDto.setMessage(e.getMessage());
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public ResponseEntity getNoticeDetail(Long noticeId) {
+        MessageDto messageDto = new MessageDto();
+        try{
+            Notice notice = findById(noticeId);
+            NoticeDetailResponseDto noticeDetailResponseDto = new NoticeDetailResponseDto();
+            noticeDetailResponseDto.setNotice(notice);
+            return new ResponseEntity(noticeDetailResponseDto, HttpStatus.OK);
+        } catch (IllegalArgumentException e){
+            messageDto.setMessage(e.getMessage());
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        }
+
+
+    }
 }

@@ -25,6 +25,7 @@ const AdminRequestBook = () => {
         const response = await axiosInstance.get(`${CONFIG.API_ADMIN_REQUESTBOOKLOG}?page=${page}&searchText=${searchText}`);
         return response.data;
     });
+
     const handlePageChange = (page) => {
         navigate(`/adminRequestBook?searchText=${searchText}&page=${page}`);
     };
@@ -66,8 +67,18 @@ const AdminRequestBook = () => {
         }
     }
     const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
+    const loginedUserInfo = useRecoilValue(loginedUserInfoSelector);
     if (!isLogined) return <Navigate to="/login" replace />; // 로그인 안했다면 메인화면으로 보냄
-
+    let isAdmin = null
+    if(isLogined) isAdmin = loginedUserInfo.isAdmin
+    if(!isAdmin) {
+        Swal.fire(
+            '관리자만 접근할 수 있는 페이지입니다.',
+            '이 에러가 반복되면 송주환 사원에게 문의해주세요.',
+            'warning'
+        )
+        return <Navigate to={"/"}/>;
+    }
     if (isLoading) {
         return <div class="loading-1">로딩중</div>;
     }

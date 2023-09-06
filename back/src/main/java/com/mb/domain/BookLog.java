@@ -22,9 +22,8 @@ public class BookLog {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(cascade =  CascadeType.REMOVE)
     @JoinColumn(name = "book_id")
     private Book book;
-
 
 }

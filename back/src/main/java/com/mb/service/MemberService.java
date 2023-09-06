@@ -1,7 +1,20 @@
 package com.mb.service;
 
 import com.mb.domain.*;
-import com.mb.dto.*;
+import com.mb.dto.Book.req.RefreshTokenDto;
+import com.mb.dto.Book.resp.BookLogResponseDto;
+import com.mb.dto.Book.resp.BookRecommendLogResponseDto;
+import com.mb.dto.Book.resp.BookRentLogResponseDto;
+import com.mb.dto.Book.resp.BookRequestLogResponseDto;
+import com.mb.dto.Member.req.ChangePasswordDto;
+import com.mb.dto.Member.req.FindPasswordDto;
+import com.mb.dto.Member.req.MemberLoginDto;
+import com.mb.dto.Member.req.MemberSignUpDto;
+import com.mb.dto.Member.resp.MemberLoginResponseDto;
+import com.mb.dto.Member.resp.MemberSignUpResponseDto;
+import com.mb.dto.Member.resp.MyBookResponseDto;
+import com.mb.dto.Util.MessageDto;
+import com.mb.dto.Util.SecretRequestDto;
 import com.mb.repository.BookRepository;
 import com.mb.repository.BookRequestRepository;
 import com.mb.repository.MemberRepository;
@@ -339,7 +352,7 @@ public class MemberService {
     }
 
     public ResponseEntity myRentBook(Member loginMember) {
-        RentBookLogResponseDto rentBookLogResponseDto = new RentBookLogResponseDto();
+        BookRentLogResponseDto bookRentLogResponseDto = new BookRentLogResponseDto();
         List<RentBookLog> rentBookLogList = new ArrayList();
         List<BookLog> bookInRendtalLogList =  bookLogService.findByMemberAndStatus(loginMember, InRental);
         for (BookLog bookLog : bookInRendtalLogList) {
@@ -348,8 +361,8 @@ public class MemberService {
                     rentBook.getRecommend(), bookLog.getRegDate(), bookLog.getReturnDate());
             rentBookLogList.add(rentBookLog);
         }
-        rentBookLogResponseDto.setRentBook(rentBookLogList);
-        return new ResponseEntity(rentBookLogResponseDto, HttpStatus.OK);
+        bookRentLogResponseDto.setRentBook(rentBookLogList);
+        return new ResponseEntity(bookRentLogResponseDto, HttpStatus.OK);
     }
 
     public ResponseEntity myBookLog(Member loginMember, String searchText, Integer page) {
@@ -372,7 +385,7 @@ public class MemberService {
     }
 
     public ResponseEntity myRecommendBook(Member loginMember, String searchText, Integer page) {
-        RecommendBookLogResponseDto recommendBookLogResponseDto = new RecommendBookLogResponseDto();
+        BookRecommendLogResponseDto bookRecommendLogResponseDto = new BookRecommendLogResponseDto();
         Pageable pageable = PageRequest.of(page, 10, Sort.by("id").descending());
         List<BookRecommend> bookRecommendList = bookRecommendService.findByMemberAndKeyword(loginMember, searchText, pageable.withPage(page));
         Integer totalCnt = bookRecommendService.getBookRecommendListByMemberAndKeywordCnt(loginMember,searchText);
@@ -381,13 +394,13 @@ public class MemberService {
             Book book = bookRecommend.getBook();
             recommendBookList.add(book);
         }
-        recommendBookLogResponseDto.setRecommendBook(recommendBookList);
-        recommendBookLogResponseDto.setTotalCnt(totalCnt);
-        return new ResponseEntity(recommendBookLogResponseDto, HttpStatus.OK);
+        bookRecommendLogResponseDto.setRecommendBook(recommendBookList);
+        bookRecommendLogResponseDto.setTotalCnt(totalCnt);
+        return new ResponseEntity(bookRecommendLogResponseDto, HttpStatus.OK);
     }
 
     public ResponseEntity myRequestBook(Member loginMember, String searchText, Integer page) {
-        RequestBookLogResponseDto requestBookLogResponseDto =  new RequestBookLogResponseDto();
+        BookRequestLogResponseDto bookRequestLogResponseDto =  new BookRequestLogResponseDto();
         Pageable pageable = PageRequest.of(page, 10, Sort.by("id").descending());
         List<BookRequest> requestBookList =  bookRequestService.findBookRequestListByMemberAndKeyword(loginMember, searchText, pageable.withPage(page));
         Integer totalCnt = bookRequestService.getBookRequestListByMemberAndKeywordCnt(loginMember,searchText);
@@ -400,9 +413,9 @@ public class MemberService {
             RequestBookLog requestBookLog = new RequestBookLog(bookName, requestDate, completeDate, status);
             requestBookLogList.add(requestBookLog);
         }
-        requestBookLogResponseDto.setRequestBookLogList(requestBookLogList);
-        requestBookLogResponseDto.setTotalCnt(totalCnt);
-        return new ResponseEntity(requestBookLogResponseDto, HttpStatus.OK);
+        bookRequestLogResponseDto.setRequestBookLogList(requestBookLogList);
+        bookRequestLogResponseDto.setTotalCnt(totalCnt);
+        return new ResponseEntity(bookRequestLogResponseDto, HttpStatus.OK);
     }
 
     public ResponseEntity changePw(Member loginMember, ChangePasswordDto changePasswordDto) {

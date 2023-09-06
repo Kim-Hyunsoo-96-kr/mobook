@@ -2,7 +2,16 @@ package com.mb.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mb.domain.*;
-import com.mb.dto.*;
+import com.mb.dto.Admin.resp.AdminBookLogResponseDto;
+import com.mb.dto.Admin.resp.AdminRentBookLogResponseDto;
+import com.mb.dto.Admin.resp.AdminRequestBookLogResponseDto;
+import com.mb.dto.Book.req.BookAddDto;
+import com.mb.dto.Book.req.BookRequestDto;
+import com.mb.dto.Book.req.BookCommentRequestDto;
+import com.mb.dto.Book.resp.BookListResponseDto;
+import com.mb.dto.Book.resp.BookRequestLogResponseDto;
+import com.mb.dto.Util.MessageDto;
+import com.mb.dto.Util.NaverResponseDto;
 import com.mb.repository.*;
 import com.mb.util.*;
 import jakarta.mail.MessagingException;
@@ -487,10 +496,10 @@ public class BookService {
         }
     }
 
-    public RequestBookLogResponseDto findMyRequesyBookList(Member member) {
+    public BookRequestLogResponseDto findMyRequesyBookList(Member member) {
         List<BookRequest> requestBookList =  bookRequestRepository.findByMember(member);
         List<RequestBookLog> requestBookLogList = new ArrayList();
-        RequestBookLogResponseDto requestBookLogResponseDto = new RequestBookLogResponseDto();
+        BookRequestLogResponseDto bookRequestLogResponseDto = new BookRequestLogResponseDto();
         for (BookRequest bookRequest : requestBookList) {
             String bookName = bookRequest.getBookName();
             String requestDate = bookRequest.getRegDate();
@@ -499,8 +508,8 @@ public class BookService {
             RequestBookLog requestBookLog = new RequestBookLog(bookName, requestDate, completeDate, status);
             requestBookLogList.add(requestBookLog);
         }
-        requestBookLogResponseDto.setRequestBookLogList(requestBookLogList);
-        return requestBookLogResponseDto;
+        bookRequestLogResponseDto.setRequestBookLogList(requestBookLogList);
+        return bookRequestLogResponseDto;
     }
 
     public ResponseEntity extendPeriod(Member loginMember, String bookNumber) {
@@ -586,7 +595,7 @@ public class BookService {
 
     public ResponseEntity rentBookLog(Member loginMember, String searchText, Integer page) {
         if(loginMember.getIsAdmin()){
-            RentBookAdminLogResponseDto rentBookAdminLogResponseDto = new RentBookAdminLogResponseDto();
+            AdminRentBookLogResponseDto adminRentBookLogResponseDto = new AdminRentBookLogResponseDto();
             Pageable pageable = PageRequest.of(page, 10, Sort.by("id").descending());
             List<RentBookAdminLog> rentBookAdminLogList = new ArrayList();
             List<BookLog> bookInRendtalLogList =  bookLogService.findRentalBookLogByStatusAndKeyword(InRental, searchText, pageable.withPage(page));
@@ -597,9 +606,9 @@ public class BookService {
                         rentBook.getRecommend(), bookLog.getRegDate(), bookLog.getReturnDate(), bookLog.getMember().getName());
                 rentBookAdminLogList.add(rentBookAdminLog);
             }
-            rentBookAdminLogResponseDto.setRentBook(rentBookAdminLogList);
-            rentBookAdminLogResponseDto.setTotalCnt(totalCnt);
-            return new ResponseEntity(rentBookAdminLogResponseDto, HttpStatus.OK);
+            adminRentBookLogResponseDto.setRentBook(rentBookAdminLogList);
+            adminRentBookLogResponseDto.setTotalCnt(totalCnt);
+            return new ResponseEntity(adminRentBookLogResponseDto, HttpStatus.OK);
         } else {
             MessageDto messageDto = new MessageDto();
             messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
@@ -609,7 +618,7 @@ public class BookService {
 
     public ResponseEntity requestBookLog(Member loginMember, String searchText, Integer page) {
         if(loginMember.getIsAdmin()){
-            RequestBookAdminLogResponseDto requestBookAdminLogResponseDto =  new RequestBookAdminLogResponseDto();
+            AdminRequestBookLogResponseDto adminRequestBookLogResponseDto =  new AdminRequestBookLogResponseDto();
             Pageable pageable = PageRequest.of(page, 10, Sort.by("id").descending());
             List<BookRequest> requestBookList =  bookRequestService.findAllBookRequestListAndKeyword(searchText, pageable.withPage(page));
             Integer totalCnt = bookRequestService.getAllBookRequestListAndKeywordCnt(searchText);
@@ -623,9 +632,9 @@ public class BookService {
                 RequestBookAdminLog requestBookAdminLog = new RequestBookAdminLog(bookName,  requestDate, completeDate, status, userName);
                 requestBookAdminList.add(requestBookAdminLog);
             }
-            requestBookAdminLogResponseDto.setRequestBookLogList(requestBookAdminList);;
-            requestBookAdminLogResponseDto.setTotalCnt(totalCnt);
-            return new ResponseEntity(requestBookAdminLogResponseDto, HttpStatus.OK);
+            adminRequestBookLogResponseDto.setRequestBookLogList(requestBookAdminList);;
+            adminRequestBookLogResponseDto.setTotalCnt(totalCnt);
+            return new ResponseEntity(adminRequestBookLogResponseDto, HttpStatus.OK);
         } else {
             MessageDto messageDto = new MessageDto();
             messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");

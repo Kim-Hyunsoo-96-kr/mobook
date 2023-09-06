@@ -30,9 +30,13 @@ import CreateAccount from "./pages/CreateAccount";
 import AdminBookLog from "./pages/AdminBookLog";
 import AdminRequestBook from "./pages/AdminRequestBook";
 import AdminRentBook from "./pages/AdminRentBook";
+import Notice from "./pages/Notice";
+import ToastUI from "./pages/NoticeAdd";
+import NoticeAdd from "./pages/NoticeAdd";
+import NoticeDetail from "./pages/NoticeDetail";
 
 function App() {
-    const navigate = useNavigate()
+    // const navigate = useNavigate()
     const [isReady, setIsReady] = useState(false);
     const [loginedUserInfo, setLoginedUserInfo] = useRecoilState(
         loginedUserInfoAtom
@@ -74,7 +78,7 @@ function App() {
                 }
                 // 리프레시 토큰 갱신
                 if (needToRefreshRefreshToken_) {
-                    navigate("/logout", { replace: true });
+                    Navigate("/logout", { replace: true });
                 }
 
                 // 엑세스 토큰 갱신
@@ -159,6 +163,9 @@ function App() {
               <Route path="/adminBookLog" element={<AdminBookLog />} />
               <Route path="/adminRequestBook" element={<AdminRequestBook />} />
               <Route path="/adminRentBook" element={<AdminRentBook />} />
+              <Route path="/notice" element={<Notice />} />
+              <Route path="/noticeAdd" element={<NoticeAdd />} />
+              <Route path="/noticeDetail/:noticeId" element={<NoticeDetail />} />
           </Routes>
           </div>
       </BrowserRouter>

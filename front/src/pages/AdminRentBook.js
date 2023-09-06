@@ -26,6 +26,17 @@ const AdminRentBook = () => {
         return response.data;
     });
     const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
+    const loginedUserInfo = useRecoilValue(loginedUserInfoSelector);
+    let isAdmin = null
+    if(isLogined) isAdmin = loginedUserInfo.isAdmin
+    if(!isAdmin) {
+        Swal.fire(
+            '관리자만 접근할 수 있는 페이지입니다.',
+            '이 에러가 반복되면 송주환 사원에게 문의해주세요.',
+            'warning'
+        )
+        return <Navigate to={"/"}/>;
+    }
     const handlePageChange = (page) => {
         navigate(`/adminRentBook?searchText=${searchText}&page=${page}`);
     };
