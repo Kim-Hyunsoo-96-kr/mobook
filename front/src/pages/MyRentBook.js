@@ -109,7 +109,7 @@ const MyRentBook = () => {
                                     <tr>
                                         <th className="text-align-center">번호</th>
                                         <th>제목</th>
-                                        <th className="text-align-center">추천 수</th>
+                                        <th className="text-align-center">찜 수</th>
                                         <th className="text-align-center">대여일</th>
                                         <th className="text-align-center">반납예정일</th>
                                         <th></th>

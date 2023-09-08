@@ -17,7 +17,7 @@ import {
     loginedUserInfoAtom,
     nav, needToRefreshAccessToken,
     needToRefreshRefreshToken,
-    setLogin
+    setLogin, setLogout
 } from "./recoil";
 import {useEffect, useState} from "react";
 import {useRecoilState, useRecoilValue} from "recoil";
@@ -67,6 +67,10 @@ function App() {
                 const needToRefreshAccessToken_ = needToRefreshAccessToken(
                     loginedUserInfo.accessToken
                 );
+
+                console.log(`needToRefreshAccessToken_ : ${needToRefreshAccessToken_}`)
+                console.log(`needToRefreshRefreshToken_ : ${needToRefreshRefreshToken_}`)
+
                 // 엑세스 토큰과 리프레시 토큰이 둘다 유효하다면, 헤더에 엑세스 토큰 추가 하여 리턴
                 if (
                     needToRefreshAccessToken_ == false &&
@@ -78,7 +82,19 @@ function App() {
                 }
                 // 리프레시 토큰 갱신
                 if (needToRefreshRefreshToken_) {
-                    Navigate("/logout", { replace: true });
+                    console.log("리프레시 토큰이 만료됨 : 로그아웃 - 시작")
+                    const response = await axios.post(CONFIG.API_LOGOUT,
+                        {
+                            refreshToken: loginedUserInfo.refreshToken
+                        },
+                        {
+                            headers : {
+                                Authorization: `Bearer ${loginedUserInfo.accessToken}`
+                            }
+                        });
+
+                    setLogout(setLoginedUserInfo)
+                    console.log("리프레시 토큰이 만료됨 : 로그아웃 - 완료")
                 }
 
                 // 엑세스 토큰 갱신

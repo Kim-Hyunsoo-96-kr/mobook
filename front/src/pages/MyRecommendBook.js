@@ -128,14 +128,14 @@ const MyRecommendBook = () => {
                         <div class="card">
                             <div class="card-body p-5">
                                 <div class="mb-3">
-                                    <span class="text-muted fs-4">추천한 책</span>
+                                    <span class="text-muted fs-4">찜한 책</span>
                                 </div>
                                 <table className="table table-hover table-striped">
                                     <thead>
                                     <tr>
                                         <th className="text-align-center">번호</th>
                                         <th>제목</th>
-                                        <th className="text-align-center">추천 수</th>
+                                        <th className="text-align-center">찜 수</th>
                                         <th className="text-align-center">대여가능여부</th>
                                         <th></th>
                                         <th></th>
@@ -148,7 +148,7 @@ const MyRecommendBook = () => {
                                             <td>{book.bookName}</td>
                                             <td className="text-align-center">{book.recommend}</td>
                                             <td className="text-align-center">{book.isAble ? "Y" : "N"}</td>
-                                            <td><button className="btn btn-outline-success btn-sm" onClick={() => recommendCancel(book.bookNumber)}>추천 취소하기</button></td>
+                                            <td><button className="btn btn-outline-success btn-sm" onClick={() => recommendCancel(book.bookNumber)}>찜 취소하기</button></td>
                                             <td><button className="btn btn-outline-primary btn-sm" onClick={() => rentBook(book.bookNumber)}>대여신청</button></td>
                                         </tr>
                                     ))}

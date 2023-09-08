@@ -72,7 +72,7 @@ const Search = () => {
             const response = await axiosInstance.post(`${CONFIG.API_BOOK_RECOMMEND}${bookNumber}`);
             Swal.fire(
                 response.data.message,
-                '내 책 관리에서 추천한 책 내역을 볼 수 있습니다.',
+                '내 책 관리에서 찜한 책 내역을 볼 수 있습니다.',
                 'success'
             ).then(() => {
                 queryClient.invalidateQueries(["bookList", page, searchText]);
@@ -125,13 +125,13 @@ const Search = () => {
     }
     const deleteComment = (commentId) => {
             Swal.fire({
-                title: '정말로 그렇게 하시겠습니까?',
-                text: "다시 되돌릴 수 없습니다. 신중하세요.",
+                title: '댓글을 삭제하시겠습니까?',
+                text: "삭제한 댓글은 돌아오지 않습니다.",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: '승인',
+                confirmButtonText: '삭제',
                 cancelButtonText: '취소',
                 reverseButtons: true, // 버튼 순서 거꾸로
             }).then(async (result) => {
@@ -203,10 +203,10 @@ const Search = () => {
                                                         <p>번호: {book.bookNumber}</p>
                                                         <p>제목: {book.bookName}</p>
                                                         <p>입고일: {book.regDate}</p>
-                                                        <p>추천수: {book.recommend}</p>
+                                                        <p>찜 수: {book.recommend}</p>
                                                         <div style={{display : 'flex', alignItems : 'center'}}>
                                                             <p><button className="btn btn-outline-success btn-sm" onClick={() => heartBook(book.bookNumber)}>
-                                                                추천하기
+                                                                찜하기
                                                             </button></p>
                                                             <p style={{marginLeft : '8px'}}><button className="btn btn-outline-primary btn-sm" onClick={() => rentBook(book.bookNumber)}>
                                                                 대여가능

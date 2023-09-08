@@ -29,7 +29,7 @@ function NavBar(props) {
                                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownBlog">
                                     <li><Link to="/myBookLog?searchText=&page=1" className="dropdown-item">내 기록</Link></li>
                                     <li><Link to="/myRentBook" className="dropdown-item">대여 내역</Link></li>
-                                    <li><Link to="/myRecommendBook?searchText=&page=1" className="dropdown-item">추천한 책 내역</Link></li>
+                                    <li><Link to="/myRecommendBook?searchText=&page=1" className="dropdown-item">찜한 책 내역</Link></li>
                                     <li><Link to="/myRequestBook?searchText=&page=1" className="dropdown-item">요청한 책 내역</Link></li>
                                 </ul>
                             </li>
