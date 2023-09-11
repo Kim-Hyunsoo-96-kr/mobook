@@ -48,25 +48,29 @@ const MyBookLog = () => {
                 <div class="text-center mb-5">
                     <h1 class="fw-bolder">내 기록</h1>
                 </div>
-                <div className="search">
-                    <form className="d-flex" onSubmit={submitSearch}>
-                        <input className="form-control me-2" name="searchText" type="search" placeholder="책 제목 검색" aria-label="Search"/>
-                        <button className="btn btn-outline-success" type="submit">Search</button>
-                    </form>
-                </div>
+                {data.totalCnt > 0 &&
+                    <div className="search">
+                        <form className="d-flex" onSubmit={submitSearch}>
+                            <input className="form-control me-2" name="searchText" type="search" placeholder="책 제목 검색" aria-label="Search"/>
+                            <button className="btn btn-outline-success" type="submit">Search</button>
+                        </form>
+                    </div>
+                }
                 <div class="gx-5 justify-content-center">
                     <div class="col-lg-12 col-xl-12">
                         <div class="card mb-5">
                             <div class="card-body p-5">
                                 <div class="mb-3">
-                                    <span class="text-muted fs-4">나의 기록</span>
+                                    <span class="text-muted fs-4">내 기록</span>
                                 </div>
-                                <table className="table table-hover table-striped">
+                                {data.totalCnt > 0 &&
+                                <div>
+                                    <table className="table table-hover table-striped">
                                     <thead>
                                     <tr>
-                                        <th className="text-align-center">번호</th>
-                                        <th>제목</th>
-                                        <th className="text-align-center">활동</th>
+                                        <th className="text-align-center">책 정보</th>
+                                        <td></td>
+                                        <th className="text-align-center">상태</th>
                                         <th className="text-align-center">등록일</th>
                                         <th></th>
                                     </tr>
@@ -74,8 +78,16 @@ const MyBookLog = () => {
                                     <tbody>
                                         {data.bookLogList.map((log)=>(
                                             <tr>
-                                                <td className="text-align-center">{log.bookNumber}</td>
-                                                <td>{log.bookName}</td>
+                                                <td className="text-align-center">
+                                                    <img src={log.bookImageUrl} alt="Book Cover" style={{maxWidth : '180px'}} />
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <p>번호: {log.bookNumber}</p>
+                                                        <p>제목: {log.bookName}</p>
+                                                        <p><a href={log.bookLink} target="_blank" rel="noopener noreferrer">자세히 보기</a></p>
+                                                    </div>
+                                                </td>
                                                 <td className="text-align-center">{log.bookStatus}</td>
                                                 <td className="text-align-center">{log.regDate}</td>
                                                 <td></td>
@@ -84,7 +96,7 @@ const MyBookLog = () => {
                                         ))}
                                     </tbody>
                                 </table>
-                                <div className="p">
+                                    <div className="p">
                                     <Pagination
                                         activePage={page+1}
                                         itemsCountPerPage={10}
@@ -93,6 +105,13 @@ const MyBookLog = () => {
                                         onChange={handlePageChange}>
                                     </Pagination>
                                 </div>
+                                </div>
+                                }
+                                {data.totalCnt > 0 ||
+                                    <div>
+                                        저장된 내 기록이 없습니다.
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

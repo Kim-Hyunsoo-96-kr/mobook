@@ -94,7 +94,6 @@ CONFIG.API_UPLOAD_EXCEL = `${CONFIG.BASE_URL}/api/admin/add/excel`;
 CONFIG.API_LOGIN = `${CONFIG.BASE_URL}/api/members/login`;
 CONFIG.API_REFRESH_TOKEN = `${CONFIG.BASE_URL}/api/members/refreshToken`;
 CONFIG.API_LOGOUT = `${CONFIG.BASE_URL}/api/members/logout`;
-CONFIG.API_MYBOOK = `${CONFIG.BASE_URL}/api/members/myBook`;
 CONFIG.API_MYBOOKLOG = `${CONFIG.BASE_URL}/api/members/myBookLog`;
 CONFIG.API_NOTICE = `${CONFIG.BASE_URL}/api/notice/`;
 CONFIG.API_NOTICEDETAIL = `${CONFIG.BASE_URL}/api/notice/`;

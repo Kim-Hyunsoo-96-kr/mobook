@@ -51,15 +51,6 @@ public class MemberController {
         return memberService.logout(refreshTokenDto);
     }
 
-    /**
-     * 200 : 성공 : 응답 O
-     * 400 : 서비스 에러 : 메세지 O
-     * */
-    @GetMapping("/myBook")
-    public ResponseEntity myBook(Authentication authentication, @RequestParam(name = "searchText") String searchText, @RequestParam(name = "page", defaultValue = "1") Integer page){
-        Member loginMember = getLoginMember(authentication);
-        return memberService.myBook(loginMember, searchText, page);
-    }
 
     /**
      * 200 : 성공 : 응답 O

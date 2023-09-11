@@ -309,59 +309,19 @@ public class MemberService {
         return new ResponseEntity(messageDto, HttpStatus.OK);
     }
 
-    public ResponseEntity myBook(Member loginMember, String searchText, Integer page) {
-        MyBookResponseDto myBookResponseDto = new MyBookResponseDto();
-        Pageable pageable = PageRequest.of(page, 10, Sort.by("id").descending());
-        try{
-            List<BookLog> bookLogList = bookLogService.findBookLogByMemberAndKeyword(loginMember, searchText, pageable.withPage(page));
-            List<BookLogUtil> bookLogUtilList = new ArrayList();
-            for (BookLog bookLog : bookLogList) {
-                String status = bookLog.getStatus();
-                String bookName = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등로되지 않은 책입니다.")).getBookName();
-                String bookNumber = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등로되지 않은 책입니다.")).getBookNumber();
-                String regDate = bookLog.getRegDate();
-                BookLogUtil bookLogUtil = new BookLogUtil(bookName, bookNumber, status, regDate);
-                bookLogUtilList.add(bookLogUtil);
-            }
-
-            List<RentBookLog> rentBookLogList = new ArrayList();
-            List<BookLog> bookInRendtalLogList =  bookLogService.findByMemberAndStatus(loginMember, InRental);
-            for (BookLog bookLog : bookInRendtalLogList) {
-                Book rentBook = bookLog.getBook();
-                RentBookLog rentBookLog = new RentBookLog(rentBook.getBookNumber(), rentBook.getBookName(),
-                        rentBook.getRecommend(), bookLog.getRegDate(), bookLog.getReturnDate());
-                rentBookLogList.add(rentBookLog);
-            }
-
-            List<BookRecommend> bookRecommendList = bookRecommendService.findByMember(loginMember);
-            List<Book> likeBookList = new ArrayList();
-            for (BookRecommend bookRecommend : bookRecommendList) {
-                Book book = bookRecommend.getBook();
-                likeBookList.add(book);
-            }
-            myBookResponseDto.setBookLogList(bookLogUtilList);
-            myBookResponseDto.setRentBook(rentBookLogList);
-            myBookResponseDto.setRecommendBook(likeBookList);
-
-            return new ResponseEntity(myBookResponseDto, HttpStatus.OK);
-        } catch (IllegalArgumentException e){
-            MessageDto messageDto = new MessageDto();
-            messageDto.setMessage(e.getMessage());
-            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
-        }
-    }
-
     public ResponseEntity myRentBook(Member loginMember) {
         BookRentLogResponseDto bookRentLogResponseDto = new BookRentLogResponseDto();
         List<RentBookLog> rentBookLogList = new ArrayList();
         List<BookLog> bookInRendtalLogList =  bookLogService.findByMemberAndStatus(loginMember, InRental);
+        Integer totalCnt = bookInRendtalLogList.size();
         for (BookLog bookLog : bookInRendtalLogList) {
             Book rentBook = bookLog.getBook();
-            RentBookLog rentBookLog = new RentBookLog(rentBook.getBookNumber(), rentBook.getBookName(),
-                    rentBook.getRecommend(), bookLog.getRegDate(), bookLog.getReturnDate());
+            RentBookLog rentBookLog = new RentBookLog(rentBook.getBookNumber(), rentBook.getBookLink(),
+                    rentBook.getBookImageUrl(), rentBook.getBookName(),rentBook.getRecommend(), bookLog.getRegDate(), bookLog.getReturnDate());
             rentBookLogList.add(rentBookLog);
         }
         bookRentLogResponseDto.setRentBook(rentBookLogList);
+        bookRentLogResponseDto.setTotalCnt(totalCnt);
         return new ResponseEntity(bookRentLogResponseDto, HttpStatus.OK);
     }
 
@@ -373,10 +333,13 @@ public class MemberService {
         List<BookLogUtil> bookLogUtilList = new ArrayList();
         for (BookLog bookLog : bookLogList) {
             String status = bookLog.getStatus();
-            String bookName = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등록되지 않은 책입니다.")).getBookName();
-            String bookNumber = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등록되지 않은 책입니다.")).getBookNumber();
+            Book book = bookRepository.findById(bookLog.getBook().getBookId()).orElseThrow(() -> new IllegalArgumentException("등로되지 않은 책입니다."));
+            String bookName = book.getBookName();
+            String bookLink = book.getBookLink();
+            String bookNumber = book.getBookNumber();
+            String bookImageUrl = book.getBookImageUrl();
             String regDate = bookLog.getRegDate();
-            BookLogUtil bookLogUtil = new BookLogUtil(bookName, bookNumber, status, regDate);
+            BookLogUtil bookLogUtil = new BookLogUtil(bookName, bookLink, bookImageUrl, bookNumber, status, regDate);
             bookLogUtilList.add(bookLogUtil);
         }
         bookLogResponseDto.setBookLogList(bookLogUtilList);

@@ -95,7 +95,7 @@ const MyRentBook = () => {
         <section class="bg-light py-5">
             <div class="container px-5 my-5">
                 <div class="text-center mb-5">
-                    <h1 class="fw-bolder">내 책 관리</h1>
+                    <h1 class="fw-bolder">대여 내역</h1>
                 </div>
                 <div class="gx-5 justify-content-center">
                     <div class="col-lg-12 col-xl-12">
@@ -104,12 +104,13 @@ const MyRentBook = () => {
                                 <div class="mb-3">
                                     <span class="text-muted fs-4">대여중인 책</span>
                                 </div>
-                                <table className="table table-hover table-striped">
+                                {data.totalCnt > 0 &&
+                                <div>
+                                    <table className="table table-hover table-striped">
                                     <thead>
                                     <tr>
-                                        <th className="text-align-center">번호</th>
-                                        <th>제목</th>
-                                        <th className="text-align-center">찜 수</th>
+                                        <th className="text-align-center">책 정보</th>
+                                        <th></th>
                                         <th className="text-align-center">대여일</th>
                                         <th className="text-align-center">반납예정일</th>
                                         <th></th>
@@ -119,9 +120,16 @@ const MyRentBook = () => {
                                     <tbody>
                                     {data.rentBook.map((book)=>(
                                         <tr>
-                                            <td className="text-align-center">{book.bookNumber}</td>
-                                            <td>{book.bookName}</td>
-                                            <td className="text-align-center">{book.recommend}</td>
+                                            <td className="text-align-center">
+                                                <img src={book.bookImageUrl} alt="Book Cover" style={{maxWidth : '180px'}} />
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <p>번호: {book.bookNumber}</p>
+                                                    <p>제목: {book.bookName}</p>
+                                                    <p><a href={book.bookLink} target="_blank" rel="noopener noreferrer">자세히 보기</a></p>
+                                                </div>
+                                            </td>
                                             <td className="text-align-center">{book.rentDate}</td>
                                             <td className="text-align-center">{book.returnDate}</td>
                                             <td><button className="btn btn-outline-primary btn-sm" onClick={() => extendPeriod(book.bookNumber)}>
@@ -134,6 +142,13 @@ const MyRentBook = () => {
                                     ))}
                                     </tbody>
                                 </table>
+                                </div>
+                                }
+                                {data.totalCnt > 0 ||
+                                    <div>
+                                        대여내역이 없습니다.
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
