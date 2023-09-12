@@ -203,14 +203,17 @@ const Search = () => {
                                                         <p>번호: {book.bookNumber}</p>
                                                         <p>제목: {book.bookName}</p>
                                                         <p>입고일: {book.regDate}</p>
+                                                        <p>대여 가능 여부: {book.isAble ? "가능" : "불가능"}</p>
                                                         <p>찜 수: {book.recommend}</p>
                                                         <div style={{display : 'flex', alignItems : 'center'}}>
                                                             <p><button className="btn btn-outline-success btn-sm" onClick={() => heartBook(book.bookNumber)}>
                                                                 찜하기
                                                             </button></p>
+                                                            {book.isAble &&
                                                             <p style={{marginLeft : '8px'}}><button className="btn btn-outline-primary btn-sm" onClick={() => rentBook(book.bookNumber)}>
                                                                 대여가능
                                                             </button></p>
+                                                            }
                                                             <p>
                                                                 <div style={{marginLeft : '8px', display : 'flex', alignItems : 'center'}} type="button" className="bi bi-chat-dots btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                                                                 <div style={{marginLeft : '4px'}}>댓글({book.bookCommentList.length})</div>

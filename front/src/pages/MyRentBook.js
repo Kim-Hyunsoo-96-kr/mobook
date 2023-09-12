@@ -132,10 +132,10 @@ const MyRentBook = () => {
                                             </td>
                                             <td className="text-align-center">{book.rentDate}</td>
                                             <td className="text-align-center">{book.returnDate}</td>
-                                            <td><button className="btn btn-outline-primary btn-sm" onClick={() => extendPeriod(book.bookNumber)}>
+                                            <td className="text-align-center"><button className="btn btn-outline-primary btn-sm" onClick={() => extendPeriod(book.bookNumber)}>
                                                 반납기한 연장하기
                                             </button></td>
-                                            <td><button className="btn btn-outline-success btn-sm" onClick={() => returnBook(book.bookNumber)}>
+                                            <td className="text-align-center"><button className="btn btn-outline-success btn-sm" onClick={() => returnBook(book.bookNumber)}>
                                                 반납하기
                                             </button></td>
                                         </tr>

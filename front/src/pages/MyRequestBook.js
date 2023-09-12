@@ -49,12 +49,14 @@ const MyRequestBook = () => {
                 <div class="text-center mb-5">
                     <h1 class="fw-bolder">요청한 책 관리</h1>
                 </div>
-                <div className="search">
-                    <form className="d-flex" onSubmit={submitSearch}>
-                        <input className="form-control me-2" name="searchText" type="search" placeholder="책 제목 검색" aria-label="Search"/>
-                        <button className="btn btn-outline-success" type="submit">Search</button>
-                    </form>
-                </div>
+                {data.totalCnt > 0 &&
+                    <div className="search">
+                        <form className="d-flex" onSubmit={submitSearch}>
+                            <input className="form-control me-2" name="searchText" type="search" placeholder="책 제목 검색" aria-label="Search"/>
+                            <button className="btn btn-outline-success" type="submit">Search</button>
+                        </form>
+                    </div>
+                }
                 <div class="gx-5 justify-content-center">
                     <div class="col-lg-12 col-xl-12">
                         <div class="card mb-5">
@@ -62,37 +64,48 @@ const MyRequestBook = () => {
                                 <div class="mb-3">
                                     <span class="text-muted fs-4">요청한 책</span>
                                 </div>
-                                <table className="table table-hover table-striped">
-                                    <thead>
-                                    <tr>
-                                        <th className="text-align-center">번호</th>
-                                        <th>제목</th>
-                                        <th className="text-align-center">요청일</th>
-                                        <th className="text-align-center">처리 완료일</th>
-                                        <th className="text-align-center">상태</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {data.requestBookLogList.map((book, index)=>(
-                                        <tr key={index}>
-                                            <td className="text-align-center">{index + 1}</td>
-                                            <td>{book.bookName}</td>
-                                            <td className="text-align-center">{book.requestDate}</td>
-                                            <td className="text-align-center">{book.completeDate}</td>
-                                            <td className="text-align-center">{book.status}</td>
+                                {data.totalCnt > 0 &&
+                                    <div>
+                                        <table className="table table-hover table-striped">
+                                        <thead>
+                                        <tr>
+                                            <th className="text-align-center">번호</th>
+                                            <th>제목</th>
+                                            <th>요청 링크</th>
+                                            <th className="text-align-center">요청일</th>
+                                            <th className="text-align-center">처리 완료일</th>
+                                            <th className="text-align-center">상태</th>
                                         </tr>
-                                    ))}
-                                    </tbody>
-                                </table>
-                                <div className="p">
-                                    <Pagination
-                                        activePage={page+1}
-                                        itemsCountPerPage={10}
-                                        totalItemsCount={data.totalCnt}
-                                        pageRangeDisplayed={5}
-                                        onChange={handlePageChange}>
-                                    </Pagination>
-                                </div>
+                                        </thead>
+                                        <tbody>
+                                        {data.requestBookLogList.map((book, index)=>(
+                                            <tr key={index}>
+                                                <td className="text-align-center">{index + 1}</td>
+                                                <td>{book.bookName}</td>
+                                                <td>{book.bookLink}</td>
+                                                <td className="text-align-center">{book.requestDate}</td>
+                                                <td className="text-align-center">{book.completeDate}</td>
+                                                <td className="text-align-center">{book.status}</td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
+                                        <div className="p">
+                                        <Pagination
+                                            activePage={page+1}
+                                            itemsCountPerPage={10}
+                                            totalItemsCount={data.totalCnt}
+                                            pageRangeDisplayed={5}
+                                            onChange={handlePageChange}>
+                                        </Pagination>
+                                    </div>
+                                    </div>
+                                }
+                                {data.totalCnt > 0 ||
+                                    <div>
+                                        요청 내역이 없습니다.
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

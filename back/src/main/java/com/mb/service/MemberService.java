@@ -370,10 +370,11 @@ public class MemberService {
         List<RequestBookLog> requestBookLogList = new ArrayList();
         for (BookRequest bookRequest : requestBookList) {
             String bookName = bookRequest.getBookName();
+            String bookLink = bookRequest.getBookLink();
             String requestDate = bookRequest.getRegDate();
             String completeDate = bookRequest.getCompleteDate();
             String status = bookRequest.getStatus();
-            RequestBookLog requestBookLog = new RequestBookLog(bookName, requestDate, completeDate, status);
+            RequestBookLog requestBookLog = new RequestBookLog(bookName, bookLink, requestDate, completeDate, status);
             requestBookLogList.add(requestBookLog);
         }
         bookRequestLogResponseDto.setRequestBookLogList(requestBookLogList);

@@ -17,6 +17,7 @@ const Request = () => {
         const form = event.target;
 
         form.bookName.value = form.bookName.value.trim();
+        form.bookLink.value = form.bookLink.value.trim();
 
         if (form.bookName.value.length === 0) {
             Swal.fire(
@@ -28,16 +29,25 @@ const Request = () => {
             return;
         }
 
+        if (form.bookLink.value.length === 0) {
+            Swal.fire(
+                '책 구매링크를 입력해주세요.',
+                '책 구매링크는 필수입니다.',
+                'warning'
+            )
+            form.bookLink.focus();
+            return;
+        }
+
         const bookName = form.bookName.value;
-        const bookPublisher = form.bookPublisher.value;
-        const bookWriter = form.bookWriter.value;
+        const bookLink = form.bookLink.value;
 
         try{
             Toast2.fire({
                 icon: 'info',
                 title: '작업 중...'
             });
-            const response = await axiosInstance.post(CONFIG.API_REQUEST, {bookName, bookPublisher, bookWriter});
+            const response = await axiosInstance.post(CONFIG.API_REQUEST, {bookName, bookLink});
             navigate("/", {replace: true});
             Toast.fire({
                 icon: 'success',
@@ -72,12 +82,8 @@ const Request = () => {
                                           <label>책 제목</label>
                                       </div>
                                       <div className="form-floating mb-3">
-                                          <input className="form-control" name='bookPublisher'/>
-                                          <label>출판사</label>
-                                      </div>
-                                      <div className="form-floating mb-3">
-                                          <input className="form-control" name='bookWriter'/>
-                                          <label>책 저자</label>
+                                          <input className="form-control" name='bookLink'/>
+                                          <label>책 구매 링크</label>
                                       </div>
                                       <div className="d-grid">
                                           <button className="btn btn-primary btn-lg" id="submitButton"

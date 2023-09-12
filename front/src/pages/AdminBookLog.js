@@ -58,6 +58,7 @@ const AdminBookLog = () => {
                 <div class="text-center mb-5">
                     <h1 class="fw-bolder">전체 대여/반납 기록</h1>
                 </div>
+
                 <div className="search">
                     <form className="d-flex" onSubmit={submitSearch}>
                         <input className="form-control me-2" name="searchText" type="search" placeholder="책 제목 검색" aria-label="Search"/>

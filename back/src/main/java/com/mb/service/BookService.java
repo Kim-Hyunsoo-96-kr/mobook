@@ -297,8 +297,7 @@ public class BookService {
         BookRequest bookRequest = new BookRequest();
 
         bookRequest.setBookName(bookRequestDto.getBookName());
-        bookRequest.setBookWriter(bookRequestDto.getBookWriter());
-        bookRequest.setBookPublisher(bookRequestDto.getBookPublisher());
+        bookRequest.setBookLink(bookRequestDto.getBookLink());
         bookRequest.setStatus(Request.getBookStatus());
         LocalDate today = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -494,22 +493,6 @@ public class BookService {
             messageDto.setMessage("해당 책을 대여하지 않았습니다.");
             return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         }
-    }
-
-    public BookRequestLogResponseDto findMyRequesyBookList(Member member) {
-        List<BookRequest> requestBookList =  bookRequestRepository.findByMember(member);
-        List<RequestBookLog> requestBookLogList = new ArrayList();
-        BookRequestLogResponseDto bookRequestLogResponseDto = new BookRequestLogResponseDto();
-        for (BookRequest bookRequest : requestBookList) {
-            String bookName = bookRequest.getBookName();
-            String requestDate = bookRequest.getRegDate();
-            String completeDate = bookRequest.getCompleteDate();
-            String status = bookRequest.getStatus();
-            RequestBookLog requestBookLog = new RequestBookLog(bookName, requestDate, completeDate, status);
-            requestBookLogList.add(requestBookLog);
-        }
-        bookRequestLogResponseDto.setRequestBookLogList(requestBookLogList);
-        return bookRequestLogResponseDto;
     }
 
     public ResponseEntity extendPeriod(Member loginMember, String bookNumber) {
