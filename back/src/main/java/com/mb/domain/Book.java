@@ -32,6 +32,10 @@ public class Book {
 
     private Long rentalMemberId;
 
+    private Boolean isDeleted;
+
+    private String editDate;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "book")
     private List<BookComment> bookCommentList;

@@ -67,6 +67,18 @@ public class AdminController {
     }
 
     /**
+     * 400 : DB 에러 메세지 O
+     * 200 : 성공 : 응답 O
+     * 412 : 관리자가 아닌 경우 에러 : 메세지 O
+     */
+    @Operation(summary = "책 삭제", description = "책을 삭제 상태로 변경합니다.")
+    @PostMapping("/delete/{bookId}")
+    public ResponseEntity addBook(@PathVariable Long bookId, Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+        return bookService.deleteBook(bookId, loginMember);
+    }
+
+    /**
      * 500 : DB 에러
      * 200 : 성공 : 응답 O
      * 412 : 관리자가 아닌 경우 에러 : 메세지 O

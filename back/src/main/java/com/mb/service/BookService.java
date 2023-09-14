@@ -111,8 +111,10 @@ public class BookService {
             LocalDate today = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             newBook.setRegDate(today.format(formatter));
+            newBook.setEditDate(today.format(formatter));
             newBook.setRecommend(0);
             newBook.setRentalMemberId(0L);
+            newBook.setIsDeleted(false);
 
             URI uri = UriComponentsBuilder
                     .fromUriString("https://openapi.naver.com")
@@ -248,8 +250,10 @@ public class BookService {
                     Date today = new Date();
                     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                     newBook.setRegDate(formatter.format(today));
+                    newBook.setEditDate(formatter.format(today));
                     newBook.setRecommend(0);
                     newBook.setRentalMemberId(0L);
+                    newBook.setIsDeleted(false);
 
                     // 리스트에 담는다.
                     list.add(newBook);
@@ -707,6 +711,29 @@ public class BookService {
             }
         } catch (IllegalArgumentException e){
             messageDto.setMessage("찾을 수 없는 댓글입니다.");
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public ResponseEntity deleteBook(Long bookId, Member loginMember) {
+        MessageDto messageDto = new MessageDto();
+        try {
+            if (loginMember.getIsAdmin()) {
+                Book book = findById(bookId);
+                book.setIsDeleted(true);
+                LocalDate today = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                book.setEditDate(today.format(formatter));
+                saveBook(book);
+
+                messageDto.setMessage("성공적으로 책을 삭제했습니다.");
+                return new ResponseEntity(messageDto, HttpStatus.OK);
+            } else {
+                messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
+                return new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);
+            }
+        } catch (IllegalArgumentException e){
+            messageDto.setMessage(e.getMessage());
             return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         }
     }
