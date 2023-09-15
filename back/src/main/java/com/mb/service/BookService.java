@@ -737,4 +737,28 @@ public class BookService {
             return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         }
     }
+
+    public ResponseEntity editBook(Long bookId, BookAddDto bookAddDto, Member loginMember) {
+        MessageDto messageDto = new MessageDto();
+        try{
+            if(loginMember.getIsAdmin()){
+                Book book = findById(bookId);
+                book.setBookNumber(bookAddDto.getBookNumber());
+                book.setBookName(bookAddDto.getBookName());
+                LocalDate today = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                book.setEditDate(today.format(formatter));
+                saveBook(book);
+
+                messageDto.setMessage("성공적으로 책을 수정했습니다.");
+                return new ResponseEntity(messageDto, HttpStatus.OK);
+            } else {
+                messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
+                return new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);
+            }
+        } catch (Exception e){
+            messageDto.setMessage(e.getMessage());
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        }
+    }
 }
