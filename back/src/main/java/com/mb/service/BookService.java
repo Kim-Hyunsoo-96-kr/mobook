@@ -401,10 +401,10 @@ public class BookService {
             newBookRecommend.setMember(loginMember);
             newBookRecommend.setBook(book);
             bookRecommendRepository.save(newBookRecommend);
-            messageDto.setMessage("선택하신 책을 추천했습니다.");
+            messageDto.setMessage("선택하신 책을 찜했습니다.");
             return new ResponseEntity(messageDto, HttpStatus.OK);
         } else {
-            messageDto.setMessage("이미 추천한 책입니다.");
+            messageDto.setMessage("이미 찜한 책입니다.");
             return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         }
     }
@@ -414,14 +414,14 @@ public class BookService {
         MessageDto messageDto = new MessageDto();
         Optional<BookRecommend> bookRecommend = bookRecommendRepository.findByMemberAndBook(loginMember, book);
         if(bookRecommend == null){
-            messageDto.setMessage("추천한 책이 아닙니다.");
+            messageDto.setMessage("찜한 책이 아닙니다.");
             return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         } else {
             Integer recommendCount = book.getRecommend() - 1;
             book.setRecommend(recommendCount);
             bookRepository.save(book);
             bookRecommendRepository.delete(bookRecommend.orElseThrow(()-> new IllegalArgumentException("존재하지 않는 데이터입니다.")));
-            messageDto.setMessage("추천을 취소했습니다.");
+            messageDto.setMessage("찜을 취소했습니다.");
             return new ResponseEntity(messageDto, HttpStatus.OK);
         }
     }

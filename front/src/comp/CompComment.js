@@ -75,13 +75,13 @@ function CompComment({comment}) {
     }
     const deleteComment = (commentId) => {
         Swal.fire({
-            title: '정말로 그렇게 하시겠습니까?',
-            text: "다시 되돌릴 수 없습니다. 신중하세요.",
+            title: '댓글을 삭제하시겠습니까?',
+            text: "삭제한 댓글은 돌아오지 않습니다.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: '승인',
+            confirmButtonText: '삭제',
             cancelButtonText: '취소',
             reverseButtons: true, // 버튼 순서 거꾸로
         }).then(async (result) => {

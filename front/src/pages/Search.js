@@ -3,7 +3,7 @@ import {useRecoilValue, useSetRecoilState} from "recoil";
 import {
     axiosInstance,
     CONFIG,
-    isLoginedSelector, loginedUserInfoAtom, queryClient, Toast, Toast2,
+    isLoginedSelector, loginedUserInfoAtom, loginedUserInfoSelector, queryClient, Toast, Toast2,
 } from "../recoil";
 import {Link, Navigate, useLocation, useNavigate} from "react-router-dom";
 import {useQuery, useQueryClient} from "react-query";
@@ -27,7 +27,10 @@ const Search = () => {
         return response.data;
     });
     const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
+    const loginedUserInfo = useRecoilValue(loginedUserInfoSelector);
     if (!isLogined) return <Navigate to="/login" replace />; // 로그인 안했다면 메인화면으로 보냄
+    let isAdmin = null
+    if(isLogined) isAdmin = loginedUserInfo.isAdmin
     const handlePageChange = (page) => {
         navigate(`/search?searchText=${searchText}&page=${page}`);
     };
@@ -66,6 +69,44 @@ const Search = () => {
                     'warning'
                 )
         }
+    }
+    const deleteBook = (bookNumber) => {
+        Swal.fire({
+            title: '책을 삭제하시겠습니까?',
+            text: "삭제한 책은 다시 복구할 수 있습니다.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '삭제',
+            cancelButtonText: '취소',
+            reverseButtons: true, // 버튼 순서 거꾸로
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await axiosInstance.post(`${CONFIG.API_BOOK_DELETE}${bookNumber}`);
+                    Toast.fire({
+                        icon: 'success',
+                        title: response.data.message
+                    })
+                    queryClient.invalidateQueries(["bookList", page, searchText]);
+
+                } catch (e) {
+                    if (e.response.status == 400 || e.response.status == 412)
+                        Swal.fire(
+                            e.response.data.message,
+                            '한번 더 확인해주세요.',
+                            'warning'
+                        )
+                    else
+                        Swal.fire(
+                            '예상치 못한 오류',
+                            e.message,
+                            'warning'
+                        )
+                }
+            }
+        })
     }
     const heartBook = async (bookNumber) => {
         try{
@@ -218,6 +259,7 @@ const Search = () => {
                                                                 <div style={{marginLeft : '8px', display : 'flex', alignItems : 'center'}} type="button" className="bi bi-chat-dots btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                                                                 <div style={{marginLeft : '4px'}}>댓글({book.bookCommentList.length})</div>
                                                                 </div>
+
                                                                 <div className="modal fade" id="staticBackdrop"
                                                                      data-bs-backdrop="static" data-bs-keyboard="false"
                                                                      tabIndex="-1" aria-labelledby="staticBackdropLabel"
@@ -262,6 +304,16 @@ const Search = () => {
                                                                     </div>
                                                                 </div>
                                                             </p>
+                                                            {isAdmin &&
+                                                                <p style={{marginLeft : '8px'}}><button className="btn btn-outline-warning btn-sm" onClick={() => rentBook(book.bookNumber)}>
+                                                                    책 수정
+                                                                </button></p>
+                                                            }
+                                                            {isAdmin &&
+                                                                <p style={{marginLeft : '8px'}}><button className="btn btn-outline-danger btn-sm" onClick={() => deleteBook(book.bookNumber)}>
+                                                                    책 삭제
+                                                                </button></p>
+                                                            }
                                                         </div>
                                                         <p><a href={book.bookLink} target="_blank" rel="noopener noreferrer">자세히 보기</a></p>
                                                     </div>

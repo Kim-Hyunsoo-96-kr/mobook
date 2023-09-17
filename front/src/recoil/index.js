@@ -106,6 +106,7 @@ CONFIG.API_FIND_PW = `${CONFIG.BASE_URL}/api/members/findPw`;
 CONFIG.API_BOOK_LIST = `${CONFIG.BASE_URL}/api/books/list`;
 CONFIG.API_BOOK_SEARCH = `${CONFIG.BASE_URL}/api/books/search`;
 CONFIG.API_BOOK_RENT = `${CONFIG.BASE_URL}/api/books/rent/`;
+CONFIG.API_BOOK_DELETE = `${CONFIG.BASE_URL}/api/admin/delete/book/`;
 CONFIG.API_BOOK_COMMENT = `${CONFIG.BASE_URL}/api/books/comment/`;
 CONFIG.API_BOOK_COMMENT_DELETE = `${CONFIG.BASE_URL}/api/books/comment/delete/`;
 CONFIG.API_BOOK_COMMENT_EDIT = `${CONFIG.BASE_URL}/api/books/comment/edit/`;

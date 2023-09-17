@@ -86,11 +86,6 @@ function App() {
                     const response = await axios.post(CONFIG.API_LOGOUT,
                         {
                             refreshToken: loginedUserInfo.refreshToken
-                        },
-                        {
-                            headers : {
-                                Authorization: `Bearer ${loginedUserInfo.accessToken}`
-                            }
                         });
 
                     setLogout(setLoginedUserInfo)

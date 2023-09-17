@@ -72,7 +72,7 @@ public class AdminController {
      * 412 : 관리자가 아닌 경우 에러 : 메세지 O
      */
     @Operation(summary = "책 삭제", description = "책을 삭제 상태로 변경합니다.")
-    @PostMapping("/delete/{bookId}")
+    @PostMapping("/delete/book/{bookId}")
     public ResponseEntity addBook(@PathVariable Long bookId, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
         return bookService.deleteBook(bookId, loginMember);
@@ -83,8 +83,8 @@ public class AdminController {
      * 200 : 성공 : 응답 O
      * 412 : 관리자가 아닌 경우 에러 : 메세지 O
      */
-    @Operation(summary = "책 삭제", description = "책을 삭제 상태로 변경합니다.")
-    @PostMapping("/edit/{bookId}")
+    @Operation(summary = "책 수정", description = "책의 제목과 번호를 수정합니다.")
+    @PostMapping("/edit/book/{bookId}")
     public ResponseEntity editBook(@PathVariable Long bookId, @RequestBody BookAddDto bookAddDto ,Authentication authentication){
         Member loginMember = getLoginMember(authentication);
         return bookService.editBook(bookId, bookAddDto, loginMember);
