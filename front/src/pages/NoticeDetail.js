@@ -1,12 +1,20 @@
 import '../App.css';
 import Header from "../comp/Header";
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {axiosInstance, CONFIG, isLoginedSelector, loginedUserInfoAtom, loginedUserInfoSelector} from "../recoil";
+import {
+    axiosInstance,
+    CONFIG,
+    isLoginedSelector,
+    loginedUserInfoAtom,
+    loginedUserInfoSelector,
+    queryClient, Toast
+} from "../recoil";
 import {Link, Navigate, useLocation, useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 import {useQuery} from "react-query";
 import Pagination from "react-js-pagination";
 import MDEditor from '@uiw/react-md-editor';
+import Swal from "sweetalert2";
 
 
 const NoticeDetail = () => {
@@ -18,6 +26,49 @@ const NoticeDetail = () => {
         const response = await axiosInstance.get(`${CONFIG.API_NOTICE}${noticeId}`);
         return response.data;
     });
+    const editNotice = () => {
+
+    }
+    const deleteNotice = () => {
+        Swal.fire({
+            title: '공지사항을 삭제하시겠습니까?',
+            text: "삭제한 공지사항은 돌아오지 않습니다.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '삭제',
+            cancelButtonText: '취소',
+            reverseButtons: true, // 버튼 순서 거꾸로
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await axiosInstance.post(`${CONFIG.API_NOTICE_DELETE}${noticeId}`);
+                    Toast.fire({
+                        icon: 'success',
+                        title: response.data.message
+                    })
+                    navigate("/notice", { replace: true });
+
+
+                } catch (e) {
+                    if (e.response.status == 400)
+                        Swal.fire(
+                            e.response.data.message,
+                            '한번 더 확인해주세요.',
+                            'warning'
+                        )
+                    else
+                        Swal.fire(
+                            '예상치 못한 오류',
+                            e.message,
+                            'warning'
+                        )
+                }
+            }
+        })
+    }
+
     if (!isLogined) return <Navigate to="/login" replace />; // 로그인 안했다면 메인화면으로 보냄
     let isAdmin = null
     if(isLogined) isAdmin = loginedUserInfo.isAdmin
@@ -28,7 +79,6 @@ const NoticeDetail = () => {
     if (error) {
         return <div class="error-1">{error.message}</div>;
     }
-
 
     return (
         <section class="bg-light py-5">
@@ -52,6 +102,12 @@ const NoticeDetail = () => {
                             </div>
                         </div>
                     </div>
+                    <div className="float-end mb-5">
+                        <button className="btn btn-outline-info btn-sm" onClick={() => editNotice(data.notice.noticeId)}>수정</button>
+                        <button className="btn btn-outline-danger btn-sm mx-3" onClick={() => deleteNotice()}>삭제</button>
+                        <Link to={'/notice'} className="btn btn-outline-secondary btn-sm">목록으로</Link>
+                    </div>
+
                 </div>
             </div>
         </section>

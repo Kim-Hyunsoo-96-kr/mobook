@@ -164,44 +164,6 @@ const Search = () => {
         }
 
     }
-    const deleteComment = (commentId) => {
-            Swal.fire({
-                title: '댓글을 삭제하시겠습니까?',
-                text: "삭제한 댓글은 돌아오지 않습니다.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: '삭제',
-                cancelButtonText: '취소',
-                reverseButtons: true, // 버튼 순서 거꾸로
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    try {
-                        const response = await axiosInstance.post(`${CONFIG.API_BOOK_COMMENT_DELETE}${commentId}`);
-                        Toast.fire({
-                            icon: 'success',
-                            title: response.data.message
-                        })
-                        queryClient.invalidateQueries(["bookList", page, searchText]);
-
-                    } catch (e) {
-                        if (e.response.status == 400)
-                            Swal.fire(
-                                e.response.data.message,
-                                '한번 더 확인해주세요.',
-                                'warning'
-                            )
-                        else
-                            Swal.fire(
-                                '예상치 못한 오류',
-                                error.message,
-                                'warning'
-                            )
-                    }
-                }
-            })
-    }
 
     if (isLoading) {
         return <div class="loading-1">로딩중</div>;
@@ -241,6 +203,9 @@ const Search = () => {
                                                 </td>
                                                 <td>
                                                     <div>
+                                                        {book.isDeleted &&
+                                                            <p>****삭제된 책 입니다****</p>
+                                                        }
                                                         <p>번호: {book.bookNumber}</p>
                                                         <p>제목: {book.bookName}</p>
                                                         <p>입고일: {book.regDate}</p>
@@ -252,7 +217,7 @@ const Search = () => {
                                                             </button></p>
                                                             {book.isAble &&
                                                             <p style={{marginLeft : '8px'}}><button className="btn btn-outline-primary btn-sm" onClick={() => rentBook(book.bookNumber)}>
-                                                                대여가능
+                                                                대여하기
                                                             </button></p>
                                                             }
                                                             <p>
@@ -304,11 +269,11 @@ const Search = () => {
                                                                     </div>
                                                                 </div>
                                                             </p>
-                                                            {isAdmin &&
+                                                          {/*  {isAdmin &&
                                                                 <p style={{marginLeft : '8px'}}><button className="btn btn-outline-warning btn-sm" onClick={() => rentBook(book.bookNumber)}>
                                                                     책 수정
                                                                 </button></p>
-                                                            }
+                                                            }*/}
                                                             {isAdmin &&
                                                                 <p style={{marginLeft : '8px'}}><button className="btn btn-outline-danger btn-sm" onClick={() => deleteBook(book.bookNumber)}>
                                                                     책 삭제

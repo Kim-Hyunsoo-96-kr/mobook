@@ -357,35 +357,40 @@ public class BookService {
     public ResponseEntity rentBook(Member loginMember, String bookNumber) {
         MessageDto messageDto = new MessageDto();
         Book book = findByBookNumber(bookNumber);
-        if (book.getIsAble()) {
-            book.setRentalMemberId(loginMember.getMemberId());
-            book.setIsAble(false);
-            bookRepository.save(book);
-
-            if(loginMember.getRentalBookQuantity() > 2){
-                messageDto.setMessage("최대 대여 수는 3권입니다.");
-                return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
-            } else {
-                Integer rentalBookQuantity = loginMember.getRentalBookQuantity() + 1;
-                loginMember.setRentalBookQuantity(rentalBookQuantity);
-                memberRepository.save(loginMember);
-            }
-
-            BookLog bookLog = new BookLog();
-            bookLog.setBook(book);
-            bookLog.setMember(loginMember);
-            bookLog.setStatus(InRental.getBookStatus());
-            LocalDate today = LocalDate.now();
-            LocalDate twoWeeksLater = today.plusWeeks(2);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            bookLog.setRegDate(today.format(formatter));
-            bookLog.setReturnDate(twoWeeksLater.format(formatter));
-            bookLogRepository.save(bookLog);
-            messageDto.setMessage("성공적으로 대여했습니다.");
-            return new ResponseEntity(messageDto, HttpStatus.OK);
-        } else {
-            messageDto.setMessage("대여할 수 없는 책 입니다.");
+        if(book.getIsDeleted()){
+            messageDto.setMessage("삭제된 책 입니다.");
             return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        } else {
+            if (book.getIsAble()) {
+                book.setRentalMemberId(loginMember.getMemberId());
+                book.setIsAble(false);
+                bookRepository.save(book);
+
+                if(loginMember.getRentalBookQuantity() > 2){
+                    messageDto.setMessage("최대 대여 수는 3권입니다.");
+                    return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+                } else {
+                    Integer rentalBookQuantity = loginMember.getRentalBookQuantity() + 1;
+                    loginMember.setRentalBookQuantity(rentalBookQuantity);
+                    memberRepository.save(loginMember);
+                }
+
+                BookLog bookLog = new BookLog();
+                bookLog.setBook(book);
+                bookLog.setMember(loginMember);
+                bookLog.setStatus(InRental.getBookStatus());
+                LocalDate today = LocalDate.now();
+                LocalDate twoWeeksLater = today.plusWeeks(2);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                bookLog.setRegDate(today.format(formatter));
+                bookLog.setReturnDate(twoWeeksLater.format(formatter));
+                bookLogRepository.save(bookLog);
+                messageDto.setMessage("성공적으로 대여했습니다.");
+                return new ResponseEntity(messageDto, HttpStatus.OK);
+            } else {
+                messageDto.setMessage("대여할 수 없는 책 입니다.");
+                return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+            }
         }
     }
 
@@ -720,14 +725,19 @@ public class BookService {
         try {
             if (loginMember.getIsAdmin()) {
                 Book book = findById(bookId);
-                book.setIsDeleted(true);
-                LocalDate today = LocalDate.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                book.setEditDate(today.format(formatter));
-                saveBook(book);
+                if(book.getIsDeleted()){
+                    messageDto.setMessage("이미 삭제처리된 책입니다.");
+                    return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+                } else {
+                    book.setIsDeleted(true);
+                    LocalDate today = LocalDate.now();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                    book.setEditDate(today.format(formatter));
+                    saveBook(book);
 
-                messageDto.setMessage("성공적으로 책을 삭제했습니다.");
-                return new ResponseEntity(messageDto, HttpStatus.OK);
+                    messageDto.setMessage("성공적으로 책을 삭제했습니다.");
+                    return new ResponseEntity(messageDto, HttpStatus.OK);
+                }
             } else {
                 messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
                 return new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);

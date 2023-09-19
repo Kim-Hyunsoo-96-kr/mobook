@@ -34,6 +34,7 @@ import Notice from "./pages/Notice";
 import ToastUI from "./pages/NoticeAdd";
 import NoticeAdd from "./pages/NoticeAdd";
 import NoticeDetail from "./pages/NoticeDetail";
+import NoticeEdit from "./pages/NoticeEdit";
 
 function App() {
     // const navigate = useNavigate()
@@ -177,6 +178,7 @@ function App() {
               <Route path="/notice" element={<Notice />} />
               <Route path="/noticeAdd" element={<NoticeAdd />} />
               <Route path="/noticeDetail/:noticeId" element={<NoticeDetail />} />
+              <Route path="/noticeEdit/:noticeId" element={<NoticeEdit />} />
           </Routes>
           </div>
       </BrowserRouter>
