@@ -82,7 +82,7 @@ const MyRequestBook = () => {
                                             <tr key={index}>
                                                 <td className="text-align-center">{index + 1}</td>
                                                 <td>{book.bookName}</td>
-                                                <td>{book.bookLink}</td>
+                                                <td><a href={book.bookLink} target="_blank">자세히 보기</a></td>
                                                 <td className="text-align-center">{book.requestDate}</td>
                                                 <td className="text-align-center">{book.completeDate}</td>
                                                 <td className="text-align-center">{book.status}</td>

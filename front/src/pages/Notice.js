@@ -63,7 +63,7 @@ const Notice = () => {
                                             <tr>
                                                 <td className="text-align-center">{notice.noticeId}</td>
                                                 <td>
-                                                    <Link to={`/noticeDetail/${notice.noticeId}`}>{notice.title}</Link>
+                                                    <Link to={`/notice/detail/${notice.noticeId}`}>{notice.title}</Link>
                                                 </td>
                                                 <td className="text-align-center">{notice.editDate}</td>
                                                 <td></td>

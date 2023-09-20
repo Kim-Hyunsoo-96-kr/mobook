@@ -27,7 +27,7 @@ const NoticeDetail = () => {
         return response.data;
     });
     const editNotice = () => {
-
+        navigate(`/notice/edit/${noticeId}`)
     }
     const deleteNotice = () => {
         Swal.fire({

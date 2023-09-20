@@ -177,8 +177,8 @@ function App() {
               <Route path="/adminRentBook" element={<AdminRentBook />} />
               <Route path="/notice" element={<Notice />} />
               <Route path="/noticeAdd" element={<NoticeAdd />} />
-              <Route path="/noticeDetail/:noticeId" element={<NoticeDetail />} />
-              <Route path="/noticeEdit/:noticeId" element={<NoticeEdit />} />
+              <Route path="/notice/detail/:noticeId" element={<NoticeDetail />} />
+              <Route path="/notice/edit/:noticeId" element={<NoticeEdit />} />
           </Routes>
           </div>
       </BrowserRouter>

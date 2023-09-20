@@ -124,7 +124,6 @@ CONFIG.API_ADMIN_RENTBOOK = `${CONFIG.BASE_URL}/api/admin/rentBookLog`;
 CONFIG.API_ADMIN_RETURN_RENTBOOK = `${CONFIG.BASE_URL}/api/admin/return/`;
 CONFIG.API_ADMIN_EXTEND_PERIOD = `${CONFIG.BASE_URL}/api/admin/extend/`;
 CONFIG.TEST = `${CONFIG.BASE_URL}/api/books/list`;
-
 export const loginedUserInfoAtom = atom({
     key: "app/loginedUserInfoAtom",
     default: null,
