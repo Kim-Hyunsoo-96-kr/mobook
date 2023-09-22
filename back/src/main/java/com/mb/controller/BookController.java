@@ -11,9 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -35,34 +33,37 @@ public class BookController {
     @Value("${naver.clientSecret}")
     public String naverClientSecret;
 
-    @GetMapping("/test")
-    public ResponseEntity test() throws JsonProcessingException {
+    @PostMapping("/test")
+    public ResponseEntity test() {
         URI uri = UriComponentsBuilder
-                .fromUriString("https://openapi.naver.com")
-                .path("/v1/search/book.json")
-                .queryParam("query", "아토믹 코틀린")
-                .queryParam("display", 10)
-                .queryParam("start", 1)
-                .queryParam("sort", "sim")
+                .fromUriString("https://chat.googleapis.com/v1/spaces")
+                .path("/AAAAJhhs36g/messages")
+                .queryParam("key", "AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI")
+                .queryParam("token", "E-Ir_PhGnNxpqd6ePNwE60Basjfq3_D6NFxwqlbzt8E")
                 .encode()
                 .build()
                 .toUri();
+        // 요청 본문 작성 (JSON 형식)
+        String requestBody = "{\"text\": \"Hello, World!\"}";
 
-        RequestEntity<Void> req = RequestEntity
-                .get(uri)
-                .header("X-Naver-Client-Id", naverClientId)
-                .header("X-Naver-Client-Secret", naverClientSecret)
-                .build();
+        RequestEntity<String> req = RequestEntity
+                .post(uri)
+                .header("Content-Type", "application/json")
+                .body(requestBody);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> resp = restTemplate.exchange(req, String.class);
+        // 요청 보내기
+        ResponseEntity<String> response = restTemplate.exchange(req, String.class);
 
-        ObjectMapper om = new ObjectMapper();
-        NaverResponseDto naverResponseDto = null;
+        // 응답 확인
+        if (response.getStatusCode().is2xxSuccessful()) {
+            String responseBody = response.getBody();
+            System.out.println("응답 내용: " + responseBody);
+        } else {
+            System.out.println("응답 오류: " + response.getStatusCode());
+        }
 
-        naverResponseDto = om.readValue(resp.getBody(), NaverResponseDto.class);
-
-        return new ResponseEntity(naverResponseDto, HttpStatus.OK);
+        return new ResponseEntity(response, response.getStatusCode());
     }
 
     /**
