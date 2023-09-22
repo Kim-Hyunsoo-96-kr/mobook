@@ -61,6 +61,7 @@ public class BookService {
     private final BookRequestService bookRequestService;
     private final BookLogService bookLogService;
     private final BookCommentService bookCommentService;
+    private final WebHookService webHookService;
     @Value("${naver.clientId}")
     public String naverClientId;
     @Value("${naver.clientSecret}")
@@ -153,14 +154,9 @@ public class BookService {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
                 @Override
                 public void afterCommit() {
-                    String[] receiveArray = memberService.findAllMemberMailReceiveArray();
-                    Map<String, Object> model = new HashMap<>();
-                    model.put("newBook", newBook);
-                    try {
-                        mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.0]책 추가 안내", "bookAddTemplate.html", model);
-                    } catch (MessagingException | IOException e) {
-                        throw new IllegalArgumentException("메시지 발송 관련 오류");
-                    }
+                    WebHook webHook = webHookService.findById(1L);
+                    String body = WebHookUtil.bookAddHook();
+                    webHookService.sendHookForAll(webHook, body);
                 }
             });
             messageDto.setMessage("책 추가 성공!");
