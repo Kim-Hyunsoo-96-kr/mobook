@@ -17,7 +17,7 @@ public class WebHookService {
 
     private final WebHookRepository webHookRepository;
 
-    public void sendHook(String hookUrl, String key, String token, String body){
+    public void send(String hookUrl, String key, String token, String body){
         URI uri = UriComponentsBuilder
                 .fromUriString("https://chat.googleapis.com/v1/spaces")
                 .path("/" + hookUrl + "/messages")
@@ -51,7 +51,11 @@ public class WebHookService {
         return webHookRepository.findById(webHookId).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 webHook 정보 입니다."));
     }
 
-    public void sendHookForAll(WebHook webHook, String body) {
-        sendHook(webHook.getHookUrl(), webHook.getWebHookKey(), webHook.getWebHookToken(), body);
+    public void sendWebHook(WebHook webHook, String body) {
+        send(webHook.getHookUrl(), webHook.getWebHookKey(), webHook.getWebHookToken(), body);
+    }
+
+    public WebHook findByEmail(String email) {
+        return webHookRepository.findByEmail(email).orElseThrow(()-> new IllegalArgumentException("email과 일치하는 webHook 정보가 없습니다."));
     }
 }

@@ -2,11 +2,13 @@ package com.mb.service;
 
 import com.mb.domain.Member;
 import com.mb.domain.Notice;
+import com.mb.domain.WebHook;
 import com.mb.dto.Notice.resp.NoticeDetailResponseDto;
 import com.mb.dto.Util.MessageDto;
 import com.mb.dto.Notice.req.NoticeAddRequestDto;
 import com.mb.dto.Notice.resp.NoticeListResponseDto;
 import com.mb.repository.NoticeRepository;
+import com.mb.util.WebHookUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,9 +23,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +31,7 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final MailService mailService;
     private final MemberService memberService;
+    private final WebHookService webHookService;
     private List<Notice> getListWithPage(Pageable pageable) {
         Page<Notice> all = noticeRepository.findAll(pageable);
         List<Notice> noticeList = all.getContent();
@@ -57,12 +58,12 @@ public class NoticeService {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
                 @Override
                 public void afterCommit() {
-                    String[] receiveArray =  memberService.findAllMember();
-                    Map<String, Object> model = new HashMap<>();
-                    try {
-                        mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.1]공지사항 등록", "NoticeAddTemplate.html", model);
-                    }  catch (Exception e) {
-                        throw new IllegalArgumentException("메일 발송 관련 오류");
+                    WebHook webHook = webHookService.findById(1L);
+                    String body = WebHookUtil.noticeAddHook(notice.getNoticeId());
+                    try{
+                        webHookService.sendWebHook(webHook, body);
+                    } catch (Exception e){
+                        throw new IllegalArgumentException("WEBHOOK ERROR");
                     }
                 }
             });

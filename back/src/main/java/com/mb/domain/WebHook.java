@@ -15,7 +15,7 @@ public class WebHook {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long webHookId;
 
-    private String memberEmail;
+    private String email;
 
     private String isAdmin;
 

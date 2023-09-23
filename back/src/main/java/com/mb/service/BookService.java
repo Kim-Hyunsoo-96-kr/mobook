@@ -9,12 +9,10 @@ import com.mb.dto.Book.req.BookAddDto;
 import com.mb.dto.Book.req.BookRequestDto;
 import com.mb.dto.Book.req.BookCommentRequestDto;
 import com.mb.dto.Book.resp.BookListResponseDto;
-import com.mb.dto.Book.resp.BookRequestLogResponseDto;
 import com.mb.dto.Util.MessageDto;
 import com.mb.dto.Util.NaverResponseDto;
 import com.mb.repository.*;
 import com.mb.util.*;
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -37,7 +35,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -156,7 +153,7 @@ public class BookService {
                 public void afterCommit() {
                     WebHook webHook = webHookService.findById(1L);
                     String body = WebHookUtil.bookAddHook(1);
-                    webHookService.sendHookForAll(webHook, body);
+                    webHookService.sendWebHook(webHook, body);
                 }
             });
             messageDto.setMessage("책 추가 성공!");
@@ -272,7 +269,7 @@ public class BookService {
                         WebHook webHook = webHookService.findById(1L);
                         String body = WebHookUtil.bookAddHook(list.size());
                         try{
-                            webHookService.sendHookForAll(webHook, body);
+                            webHookService.sendWebHook(webHook, body);
                         } catch (Exception e){
                             throw new IllegalArgumentException("WEBHOOK ERROR");
                         }
@@ -311,7 +308,7 @@ public class BookService {
                 WebHook webHook = webHookService.findById(1L);
                 String body = WebHookUtil.bookRequestHook(loginMember.getName(), bookRequestDto.getBookName(), bookRequestDto.getBookLink());
                 try{
-                    webHookService.sendHookForAll(webHook, body);
+                    webHookService.sendWebHook(webHook, body);
                 } catch (Exception e){
                     throw new IllegalArgumentException("WEBHOOK ERROR");
                 }
@@ -331,18 +328,15 @@ public class BookService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate returnDate = today.plusDays(3);
         List<BookLog> bookLogList = bookLogRepository.findByReturnDate(returnDate.format(formatter));
-        List<String> emailList = new ArrayList();
         for (BookLog bookLog : bookLogList) {
             String email = bookLog.getMember().getEmail();
-            emailList.add(email);
-        }
-        String[] receiverArray = emailList.toArray(new String[0]);
-        Map<String, Object> model = new HashMap<>();
-        model.put("bookLogList", bookLogList);
-        try {
-            mailService.sendHtmlEmail(receiverArray, "[MOBOOK1.0]책 반납 일정 안내", "bookReturnTemplate.html", model);
-        }  catch (Exception e) {
-            throw new IllegalArgumentException("메일 발송 관련 오류");
+            WebHook webHook = webHookService.findByEmail(email);
+            String body = WebHookUtil.bookReturnHookBefore3Days(bookLog.getMember().getName(), bookLog.getBook().getBookName());
+            try{
+                webHookService.sendWebHook(webHook, body);
+            } catch (Exception e){
+                throw new IllegalArgumentException("WEBHOOK ERROR");
+            }
         }
     }
 
