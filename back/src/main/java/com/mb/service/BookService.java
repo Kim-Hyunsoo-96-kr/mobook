@@ -155,7 +155,7 @@ public class BookService {
                 @Override
                 public void afterCommit() {
                     WebHook webHook = webHookService.findById(1L);
-                    String body = WebHookUtil.bookAddHook();
+                    String body = WebHookUtil.bookAddHook(1);
                     webHookService.sendHookForAll(webHook, body);
                 }
             });
@@ -269,13 +269,12 @@ public class BookService {
                 TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
                     @Override
                     public void afterCommit() {
-                        String[] receiveArray =  memberService.findAllMemberMailReceiveArray();
-                        Map<String, Object> model = new HashMap<>();
-                        model.put("newBookList", list);
-                        try {
-                            mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.0]책 추가 안내", "bookAddExcelTemplate.html", model);
-                        }  catch (MessagingException | IOException e) {
-                            throw new IllegalArgumentException("메일 발송 관련 오류");
+                        WebHook webHook = webHookService.findById(1L);
+                        String body = WebHookUtil.bookAddHook(list.size());
+                        try{
+                            webHookService.sendHookForAll(webHook, body);
+                        } catch (Exception e){
+                            throw new IllegalArgumentException("WEBHOOK ERROR");
                         }
                     }
                 });
@@ -309,14 +308,12 @@ public class BookService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
             @Override
             public void afterCommit() {
-                String[] receiveArray =  memberService.findAllAdminMailReceiveArray();
-                Map<String, Object> model = new HashMap<>();
-                model.put("member", loginMember);
-                model.put("bookRequest", bookRequest);
-                try {
-                    mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.0]책 신청 안내", "bookRequestTemplate.html", model);
-                }  catch (Exception e) {
-                    throw new IllegalArgumentException("메일 발송 관련 오류");
+                WebHook webHook = webHookService.findById(1L);
+                String body = WebHookUtil.bookRequestHook(loginMember.getName(), bookRequestDto.getBookName(), bookRequestDto.getBookLink());
+                try{
+                    webHookService.sendHookForAll(webHook, body);
+                } catch (Exception e){
+                    throw new IllegalArgumentException("WEBHOOK ERROR");
                 }
             }
         });
