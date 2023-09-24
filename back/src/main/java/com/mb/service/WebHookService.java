@@ -58,4 +58,8 @@ public class WebHookService {
     public WebHook findByEmail(String email) {
         return webHookRepository.findByEmail(email).orElseThrow(()-> new IllegalArgumentException("email과 일치하는 webHook 정보가 없습니다."));
     }
+
+    public WebHook findByIsAdmin(Boolean isAdmin) {
+        return webHookRepository.findByIsAdmin(isAdmin).orElseThrow(()-> new IllegalArgumentException("webHook관련 오류입니다."));
+    }
 }

@@ -372,6 +372,25 @@ public class BookService {
                 bookLog.setRegDate(today.format(formatter));
                 bookLog.setReturnDate(twoWeeksLater.format(formatter));
                 bookLogRepository.save(bookLog);
+
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                    @Override
+                    public void afterCommit() {
+                        WebHook webHook = webHookService.findByEmail(loginMember.getEmail());
+                        String body = WebHookUtil.bookRentHook(loginMember.getName(), book.getBookName());
+                        try{
+                            webHookService.sendWebHook(webHook, body);
+                            List<Member> allMember = memberService.findAll();
+                            for (Member member : allMember) {
+                                WebHook adminWebHook = webHookService.findByIsAdmin(member.getIsAdmin());
+                                webHookService.sendWebHook(adminWebHook, body);
+                            }
+                        } catch (Exception e){
+                            throw new IllegalArgumentException("WEBHOOK ERROR");
+                        }
+                    }
+                });
+
                 messageDto.setMessage("성공적으로 대여했습니다.");
                 return new ResponseEntity(messageDto, HttpStatus.OK);
             } else {

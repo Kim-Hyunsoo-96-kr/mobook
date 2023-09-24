@@ -12,7 +12,6 @@ import com.mb.dto.Member.req.MemberLoginDto;
 import com.mb.dto.Member.req.MemberSignUpDto;
 import com.mb.dto.Member.resp.MemberLoginResponseDto;
 import com.mb.dto.Member.resp.MemberSignUpResponseDto;
-import com.mb.dto.Member.resp.MyBookResponseDto;
 import com.mb.dto.Util.MessageDto;
 import com.mb.dto.Util.SecretRequestDto;
 import com.mb.repository.BookRepository;
@@ -395,4 +394,7 @@ public class MemberService {
         }
     }
 
+    public List<Member> findAll() {
+        return memberRepository.findAll();
+    }
 }

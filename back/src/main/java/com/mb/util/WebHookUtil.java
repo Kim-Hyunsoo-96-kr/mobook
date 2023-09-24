@@ -178,4 +178,47 @@ public class WebHookUtil {
 
         return body;
     }
+
+    public static String bookRentHook(String name, String bookName) {
+        String body = "{\n" +
+                "      \"cardsV2\": [{\n" +
+                "        \"cardId\": \"createCardMessage\",\n" +
+                "        \"card\": {\n" +
+                "          \"header\": {\n" +
+                "            \"title\": \"대여 신청 알림\",\n" +
+                "            \"subtitle\": \"수신자 : "+ name +", 관리자\",\n" +
+                "            \"imageUrl\": \"http://mobook.mobility42.io/img/bookRentIcon.png\",\n" +
+                "            \"imageType\": \"SQUARE\"\n" +
+                "          },\n" +
+                "          \"sections\": [\n" +
+                "            {\n" +
+                "              \"widgets\": [\n" +
+                "                  {\n" +
+                "                       \"textParagraph\": {\n" +
+                "                            \"text\": \"<b>"+ bookName +"</b> 를 성공적으로 대여하셨습니다.\\n\\n반납 예정일은 <b>2주 후</b> 입니다.\"\n" +
+                "                        }\n" +
+                "                  },\n" +
+                "                {\n" +
+                "                  \"buttonList\": {\n" +
+                "                    \"buttons\": [\n" +
+                "                      {\n" +
+                "                        \"text\": \"웹으로 이동\",\n" +
+                "                        \"onClick\": {\n" +
+                "                          \"openLink\": {\n" +
+                "                            \"url\": \"http://mobook.mobility42.io\"\n" +
+                "                          }\n" +
+                "                        }\n" +
+                "                      }\n" +
+                "                    ]\n" +
+                "                  }\n" +
+                "                }\n" +
+                "              ]\n" +
+                "            }\n" +
+                "          ]\n" +
+                "        }\n" +
+                "      }]\n" +
+                "    }";
+        return body;
+
+    }
 }

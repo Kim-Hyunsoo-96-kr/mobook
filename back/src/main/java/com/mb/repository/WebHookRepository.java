@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface WebHookRepository extends JpaRepository<WebHook, Long> {
     Optional<WebHook> findByEmail(String email);
+
+    Optional<WebHook> findByIsAdmin(Boolean isAdmin);
 }
