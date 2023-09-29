@@ -16,7 +16,7 @@ public class BookRecommend {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne(cascade =  CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "book_id")
     private Book book;
 }

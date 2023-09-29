@@ -62,6 +62,14 @@ const Search = () => {
                 '한번 더 확인해주세요.',
                 'warning'
                 )
+            else if(e.response.status == 500){
+                console.log(e)
+                Swal.fire(
+                    '웹훅 오류',
+                    '대여 목록을 확인해주세요.<br> 송주환 사원에게 문의해주세요.',
+                    'warning'
+                )
+            }
             else
                 Swal.fire(
                     '예상치 못한 오류',

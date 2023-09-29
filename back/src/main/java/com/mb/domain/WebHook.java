@@ -17,7 +17,7 @@ public class WebHook {
 
     private String email;
 
-    private String isAdmin;
+    private boolean isAdmin;
 
     private String hookUrl;
 

@@ -63,7 +63,7 @@ public class NoticeService {
                     try{
                         webHookService.sendWebHook(webHook, body);
                     } catch (Exception e){
-                        throw new IllegalArgumentException("WEBHOOK ERROR");
+                        System.out.println(e.getMessage());
                     }
                 }
             });
