@@ -11,6 +11,7 @@ import Pagination from "react-js-pagination";
 import Swal from "sweetalert2";
 import {useState} from "react";
 import CompComment from "../comp/CompComment";
+import CompCommentModal from "../comp/CompCommentModal";
 
 const Search = () => {
     const [comment, setComment] = useState('');
@@ -142,6 +143,8 @@ const Search = () => {
         }
     }
     const addComment = async (event, bookNumber) => {
+        console.log(`bookNumber : ${bookNumber}`)
+
         event.preventDefault();
 
         const form = event.target;
@@ -228,60 +231,7 @@ const Search = () => {
                                                                 대여하기
                                                             </button></p>
                                                             }
-                                                            <p>
-                                                                <div style={{marginLeft : '8px', display : 'flex', alignItems : 'center'}} type="button" className="bi bi-chat-dots btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                                                <div style={{marginLeft : '4px'}}>댓글({book.bookCommentList.length})</div>
-                                                                </div>
-
-                                                                <div className="modal fade" id="staticBackdrop"
-                                                                     data-bs-backdrop="static" data-bs-keyboard="false"
-                                                                     tabIndex="-1" aria-labelledby="staticBackdropLabel"
-                                                                     aria-hidden="true">
-                                                                    <div className="modal-dialog modal-dialog-centered">
-                                                                        <div className="modal-content">
-                                                                            <div className="modal-header">
-                                                                                <h6 className="modal-title"
-                                                                                    id="staticBackdropLabel">댓글({book.bookCommentList.length})</h6>
-                                                                                <button type="button"
-                                                                                        className="btn-close"
-                                                                                        data-bs-dismiss="modal"
-                                                                                        aria-label="Close"></button>
-                                                                            </div>
-                                                                            <div className="modal-body">
-                                                                                <section>
-                                                                                    <div class="card bg-light">
-                                                                                        <div class="card-body">
-                                                                                            {book.bookCommentList.map((comment)=>(
-                                                                                            <CompComment comment={comment} key={comment.id} />
-                                                                                            ))}
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </section>
-                                                                            </div>
-                                                                            <form className="modal-footer" onSubmit={(event) => addComment(event, book.bookNumber)}>
-                                                                                <textarea
-                                                                                className="form-control mb-2"
-                                                                                name='comment'
-                                                                                rows="3"
-                                                                                value={comment}
-                                                                                onChange={handleInputChange}
-                                                                                placeholder="댓글을 입력해주세요."></textarea>
-                                                                                <div class='float-end'>
-                                                                                    <button type="button"
-                                                                                            className="btn btn-success"
-                                                                                            type='submit'>댓글 등록
-                                                                                    </button>
-                                                                                </div>
-                                                                            </form>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </p>
-                                                          {/*  {isAdmin &&
-                                                                <p style={{marginLeft : '8px'}}><button className="btn btn-outline-warning btn-sm" onClick={() => rentBook(book.bookNumber)}>
-                                                                    책 수정
-                                                                </button></p>
-                                                            }*/}
+                                                            <CompCommentModal book={book} key={book.id} />
                                                             {isAdmin &&
                                                                 <p style={{marginLeft : '8px'}}><button className="btn btn-outline-danger btn-sm" onClick={() => deleteBook(book.bookNumber)}>
                                                                     책 삭제

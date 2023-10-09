@@ -18,6 +18,7 @@ const PasswordChange = () => {
 
         form.oldPassword.value = form.oldPassword.value.trim();
         form.newPassword.value = form.newPassword.value.trim();
+        form.checkNewPassword.value = form.checkNewPassword.value.trim();
 
         if (form.oldPassword.value.length === 0) {
             Swal.fire(
@@ -39,11 +40,21 @@ const PasswordChange = () => {
             return;
         }
 
+        if (form.checkNewPassword.value.length === 0) {
+            Swal.fire(
+                '새로운 비밀번호 확인을 입력해주세요',
+                '새로운 비밀번호 확인은 필수입니다.',
+                'warning'
+            )
+            form.checkNewPassword.focus();
+            return;
+        }
         const oldPassword = form.oldPassword.value;
         const newPassword = form.newPassword.value;
+        const checkNewPassword = form.checkNewPassword.value;
 
         try{
-            const response = await axiosInstance.post(CONFIG.API_CHANGE_PW, {oldPassword, newPassword});
+            const response = await axiosInstance.post(CONFIG.API_CHANGE_PW, {oldPassword, newPassword, checkNewPassword});
             navigate("/", {replace: true});
             Toast.fire({
                 icon: 'success',
@@ -75,12 +86,16 @@ const PasswordChange = () => {
                             <div className="col-lg-8 col-xl-6">
                                 <form onSubmit={onSubmit}>
                                     <div className="form-floating mb-3">
-                                        <input className="form-control" name='oldPassword'/>
+                                        <input className="form-control" name='oldPassword' type='password'/>
                                         <label>기존 비밀번호</label>
                                     </div>
                                     <div className="form-floating mb-3">
-                                        <input className="form-control" name='newPassword'/>
+                                        <input className="form-control" name='newPassword' type='password'/>
                                         <label>새로운 비밀번호</label>
+                                    </div>
+                                    <div className="form-floating mb-3">
+                                        <input className="form-control" name='checkNewPassword' type='password'/>
+                                        <label>새로운 비밀번호 확인</label>
                                     </div>
                                     <div className="d-grid">
                                         <button className="btn btn-primary btn-lg" id="submitButton" type="submit" >변경하기</button>

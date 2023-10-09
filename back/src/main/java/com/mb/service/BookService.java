@@ -407,20 +407,25 @@ public class BookService {
     public ResponseEntity recommendBook(Member loginMember, String bookNumber) {
         Book book = findByBookNumber(bookNumber);
         MessageDto messageDto = new MessageDto();
-        Optional<BookRecommend> bookRecommend = bookRecommendRepository.findByMemberAndBook(loginMember, book);
-        if(bookRecommend.isEmpty()){
-            Integer recommendCount = book.getRecommend() + 1;
-            book.setRecommend(recommendCount);
-            bookRepository.save(book);
-            BookRecommend newBookRecommend = new BookRecommend();
-            newBookRecommend.setMember(loginMember);
-            newBookRecommend.setBook(book);
-            bookRecommendRepository.save(newBookRecommend);
-            messageDto.setMessage("선택하신 책을 찜했습니다.");
-            return new ResponseEntity(messageDto, HttpStatus.OK);
-        } else {
-            messageDto.setMessage("이미 찜한 책입니다.");
+        if(book.getIsDeleted()){
+            messageDto.setMessage("삭제된 책 입니다.");
             return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        } else {
+            Optional<BookRecommend> bookRecommend = bookRecommendRepository.findByMemberAndBook(loginMember, book);
+            if(bookRecommend.isEmpty()){
+                Integer recommendCount = book.getRecommend() + 1;
+                book.setRecommend(recommendCount);
+                bookRepository.save(book);
+                BookRecommend newBookRecommend = new BookRecommend();
+                newBookRecommend.setMember(loginMember);
+                newBookRecommend.setBook(book);
+                bookRecommendRepository.save(newBookRecommend);
+                messageDto.setMessage("선택하신 책을 찜했습니다.");
+                return new ResponseEntity(messageDto, HttpStatus.OK);
+            } else {
+                messageDto.setMessage("이미 찜한 책입니다.");
+                return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+            }
         }
     }
 

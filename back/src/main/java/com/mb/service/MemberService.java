@@ -93,19 +93,6 @@ public class MemberService {
         return findMember;
     }
 
-    @Transactional
-    public MessageDto changePassword(ChangePasswordDto changePasswordDto, Member loginMember) {
-        MessageDto messageDto = new MessageDto();
-        if(passwordEncoder.matches(changePasswordDto.getOldPassword(), loginMember.getPassword())){
-            loginMember.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
-            memberRepository.save(loginMember);
-            messageDto.setMessage("비밀번호를 변경했습니다.");
-        } else{
-            messageDto.setMessage("기존 비밀번호와 일치하지 않습니다.");
-        }
-        return messageDto;
-    }
-
     public String[] findAllMemberMailReceiveArray() {
         List<Member> allMemberList = memberRepository.findAll();
         List<String> emailList = new ArrayList();
@@ -384,10 +371,15 @@ public class MemberService {
     public ResponseEntity changePw(Member loginMember, ChangePasswordDto changePasswordDto) {
         MessageDto messageDto = new MessageDto();
         if(passwordEncoder.matches(changePasswordDto.getOldPassword(), loginMember.getPassword())){
-            loginMember.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
-            memberRepository.save(loginMember);
-            messageDto.setMessage("비밀번호를 변경했습니다.");
-            return new ResponseEntity(messageDto, HttpStatus.OK);
+            if(changePasswordDto.getNewPassword() == changePasswordDto.getCheckNewPassword()){
+                loginMember.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
+                memberRepository.save(loginMember);
+                messageDto.setMessage("비밀번호를 변경했습니다.");
+                return new ResponseEntity(messageDto, HttpStatus.OK);
+            } else {
+                messageDto.setMessage("새로운 비밀번호를 다시 확인해주세요.");
+                return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+            }
         } else{
             messageDto.setMessage("기존 비밀번호와 일치하지 않습니다.");
             return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
