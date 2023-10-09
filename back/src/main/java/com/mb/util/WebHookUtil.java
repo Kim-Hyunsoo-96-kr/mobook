@@ -10,7 +10,7 @@ public class WebHookUtil {
                 "            'title': '책 추가 알림',\n" +
                 "            'subtitle': '수신자 : 모두',\n" +
                 "            'imageUrl': 'http://mobook.mobility42.io/img/bookAddIcon.png',\n" +
-                "            'imageType': 'CIRCLE'\n" +
+                "            'imageType': 'SQUARE'\n" +
                 "          },\n" +
                 "          'sections': [\n" +
                 "            {\n" +
@@ -52,7 +52,7 @@ public class WebHookUtil {
                 "            \"title\": \"책 요청 알림\",\n" +
                 "            \"subtitle\": \"수신자 : 모두\",\n" +
                 "            \"imageUrl\": \"http://mobook.mobility42.io/img/bookRequestIcon.png\",\n" +
-                "            \"imageType\": \"CIRCLE\"\n" +
+                "            \"imageType\": \"SQUARE\"\n" +
                 "          },\n" +
                 "          \"sections\": [\n" +
                 "            {\n" +
