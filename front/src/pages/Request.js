@@ -48,36 +48,6 @@ const Request = () => {
                 title: '작업 중...'
             });
             const response = await axiosInstance.post(CONFIG.API_REQUEST, {bookName, bookLink});
-            const data = {
-                cardsV2: [
-                    {
-                        cardId: "unique-card-id",
-                        card: {
-                            header: {
-                                title: bookName,
-                                subtitle: "송주환",
-                            },
-                            sections: [
-                                {
-                                    widgets: [
-                                        {
-                                        },
-                                    ],
-                                },
-                            ],
-                        },
-                    },
-                ],
-            };
-            try{
-                const spaceWebHook = await axios.post(CONFIG.WEBHOOK,
-                    data,
-                    {headers: {
-                            'Content-Type': 'application/json; charset=UTF-8',
-                        }})
-            } catch (e) {
-                console.log(e)
-            }
             navigate("/", {replace: true});
             Toast.fire({
                 icon: 'success',

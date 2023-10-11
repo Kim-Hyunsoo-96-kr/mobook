@@ -10,7 +10,6 @@ function Test() {
     const [page, setPage] = useState(1);
     const handlePageChange = (page) => {
         setPage(page);
-        console.log(page)
     };
     const { isLoading, error, data } = useQuery("bookList", async () => {
         // productList 는 캐싱키, 참고로 지금은 캐시 사용 안함

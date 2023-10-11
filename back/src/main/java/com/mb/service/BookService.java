@@ -380,18 +380,14 @@ public class BookService {
                 TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
                     @Override
                     public void afterCommit() {
+                    try{
                         WebHook webHook = webHookService.findByEmail(loginMember.getEmail());
                         String body = WebHookUtil.bookRentHook(loginMember.getName(), book.getBookName());
-                        try{
-                            webHookService.sendWebHook(webHook, body);
-                            List<Member> allMember = memberService.findAll();
-                            for (Member member : allMember) {
-                                WebHook adminWebHook = webHookService.findByIsAdmin(member.getIsAdmin());
-                                webHookService.sendWebHook(adminWebHook, body);
-                            }
-                        } catch (Exception e){
-                            throw new IllegalArgumentException("WEBHOOK ERROR");
-                        }
+                        webHookService.sendWebHook(webHook, body);
+                        //todo 관리자한테만 보내기
+                    } catch (Exception e){
+                        throw new IllegalArgumentException("WEBHOOK ERROR");
+                    }
                     }
                 });
 

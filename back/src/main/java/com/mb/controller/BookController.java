@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mb.domain.*;
 import com.mb.dto.Book.req.BookCommentRequestDto;
 import com.mb.dto.Book.req.BookRequestDto;
+import com.mb.dto.Util.MessageDto;
 import com.mb.dto.Util.NaverResponseDto;
 import com.mb.service.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,35 +36,11 @@ public class BookController {
 
     @PostMapping("/test")
     public ResponseEntity test() {
-        URI uri = UriComponentsBuilder
-                .fromUriString("https://chat.googleapis.com/v1/spaces")
-                .path("/AAAAJhhs36g/messages")
-                .queryParam("key", "AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI")
-                .queryParam("token", "E-Ir_PhGnNxpqd6ePNwE60Basjfq3_D6NFxwqlbzt8E")
-                .encode()
-                .build()
-                .toUri();
-        // 요청 본문 작성 (JSON 형식)
-        String requestBody = "{\"text\": \"Hello, World!\"}";
+        MessageDto messageDto = new MessageDto();
+        messageDto.setMessage("test");
 
-        RequestEntity<String> req = RequestEntity
-                .post(uri)
-                .header("Content-Type", "application/json")
-                .body(requestBody);
 
-        RestTemplate restTemplate = new RestTemplate();
-        // 요청 보내기
-        ResponseEntity<String> response = restTemplate.exchange(req, String.class);
-
-        // 응답 확인
-        if (response.getStatusCode().is2xxSuccessful()) {
-            String responseBody = response.getBody();
-            System.out.println("응답 내용: " + responseBody);
-        } else {
-            System.out.println("응답 오류: " + response.getStatusCode());
-        }
-
-        return new ResponseEntity(response, response.getStatusCode());
+        return new ResponseEntity(messageDto, HttpStatus.OK);
     }
 
     /**

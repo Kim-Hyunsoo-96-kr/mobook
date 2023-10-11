@@ -13,9 +13,7 @@ function CompCommentModal({book}) {
     const handleInputChange = (event) => {
         setComment(event.target.value);
     };
-    console.log(book.bookNumber, book.bookId)
     const addComment = async (event, bookNumber) => {
-        console.log(`bookNumber : ${bookNumber}`)
 
         event.preventDefault();
 

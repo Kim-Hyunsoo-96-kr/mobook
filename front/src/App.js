@@ -69,8 +69,6 @@ function App() {
                     loginedUserInfo.accessToken
                 );
 
-                console.log(`needToRefreshAccessToken_ : ${needToRefreshAccessToken_}`)
-                console.log(`needToRefreshRefreshToken_ : ${needToRefreshRefreshToken_}`)
 
                 // 엑세스 토큰과 리프레시 토큰이 둘다 유효하다면, 헤더에 엑세스 토큰 추가 하여 리턴
                 if (
@@ -83,14 +81,12 @@ function App() {
                 }
                 // 리프레시 토큰 갱신
                 if (needToRefreshRefreshToken_) {
-                    console.log("리프레시 토큰이 만료됨 : 로그아웃 - 시작")
                     const response = await axios.post(CONFIG.API_LOGOUT,
                         {
                             refreshToken: loginedUserInfo.refreshToken
                         });
 
                     setLogout(setLoginedUserInfo)
-                    console.log("리프레시 토큰이 만료됨 : 로그아웃 - 완료")
                 }
 
                 // 엑세스 토큰 갱신

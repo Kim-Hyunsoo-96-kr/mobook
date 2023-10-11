@@ -38,3 +38,7 @@ out/
 
 ### yml ###
 *.yml
+
+## ssl ###
+*.pfx
+*.jks

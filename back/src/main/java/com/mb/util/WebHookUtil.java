@@ -186,7 +186,7 @@ public class WebHookUtil {
                 "        \"card\": {\n" +
                 "          \"header\": {\n" +
                 "            \"title\": \"대여 신청 알림\",\n" +
-                "            \"subtitle\": \"수신자 : "+ name +", 관리자\",\n" +
+                "            \"subtitle\": \"수신자 : "+ name + "\",\n" +
                 "            \"imageUrl\": \"http://mobook.mobility42.io/img/bookRentIcon.png\",\n" +
                 "            \"imageType\": \"SQUARE\"\n" +
                 "          },\n" +

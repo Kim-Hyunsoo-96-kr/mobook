@@ -24,7 +24,6 @@ function CompComment({comment}) {
         isWriter = loginedUserInfo.memberId === comment.memberId
     }
     const handleEditClick = () => {
-        console.log("누름")
         setIsEditing(!isEditing); // 토글 기능
     };
 

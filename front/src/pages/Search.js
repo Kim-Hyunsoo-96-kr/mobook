@@ -48,6 +48,10 @@ const Search = () => {
     };
     const rentBook = async (bookNumber) => {
         try{
+            Toast2.fire({
+                icon: 'info',
+                title: '작업 중...'
+            });
             const response = await axiosInstance.post(`${CONFIG.API_BOOK_RENT}${bookNumber}`);
             Swal.fire(
                 response.data.message,
@@ -64,7 +68,6 @@ const Search = () => {
                 'warning'
                 )
             else if(e.response.status == 500){
-                console.log(e)
                 Swal.fire(
                     '웹훅 오류',
                     '대여 목록을 확인해주세요.<br> 송주환 사원에게 문의해주세요.',
@@ -143,7 +146,6 @@ const Search = () => {
         }
     }
     const addComment = async (event, bookNumber) => {
-        console.log(`bookNumber : ${bookNumber}`)
 
         event.preventDefault();
 
