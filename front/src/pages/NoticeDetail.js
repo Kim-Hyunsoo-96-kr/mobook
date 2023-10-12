@@ -22,6 +22,7 @@ const NoticeDetail = () => {
     const navigate = useNavigate();
     const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
     const loginedUserInfo = useRecoilValue(loginedUserInfoSelector);
+
     const { isLoading, error, data } = useQuery(["noticeDetail"], async () => {
         const response = await axiosInstance.get(`${CONFIG.API_NOTICE}${noticeId}`);
         return response.data;
@@ -103,8 +104,14 @@ const NoticeDetail = () => {
                         </div>
                     </div>
                     <div className="float-end mb-5">
-                        <button className="btn btn-outline-info btn-sm" onClick={() => editNotice(data.notice.noticeId)}>수정</button>
-                        <button className="btn btn-outline-danger btn-sm mx-3" onClick={() => deleteNotice()}>삭제</button>
+                        {
+                            isAdmin &&
+                            <button className="btn btn-outline-info btn-sm" onClick={() => editNotice(data.notice.noticeId)}>수정</button>
+                        }
+                        {
+                            isAdmin &&
+                            <button className="btn btn-outline-danger btn-sm mx-3" onClick={() => deleteNotice()}>삭제</button>
+                        }
                         <Link to={'/notice'} className="btn btn-outline-secondary btn-sm">목록으로</Link>
                     </div>
 
