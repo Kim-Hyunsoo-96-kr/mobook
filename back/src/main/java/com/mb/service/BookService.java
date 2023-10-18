@@ -9,6 +9,7 @@ import com.mb.dto.Book.req.BookAddDto;
 import com.mb.dto.Book.req.BookRequestDto;
 import com.mb.dto.Book.req.BookCommentRequestDto;
 import com.mb.dto.Book.resp.BookListResponseDto;
+import com.mb.dto.Book.resp.RecentBookListTop5Dto;
 import com.mb.dto.Util.MessageDto;
 import com.mb.dto.Util.NaverResponseDto;
 import com.mb.repository.*;
@@ -778,6 +779,19 @@ public class BookService {
                 return new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);
             }
         } catch (Exception e){
+            messageDto.setMessage(e.getMessage());
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public ResponseEntity getRecentBookList() {
+        RecentBookListTop5Dto recentBookListTop5Dto = new RecentBookListTop5Dto();
+        try{
+            List<Book> recentBookList = bookRepository.findTop5ByOrderByBookIdDesc();
+            recentBookListTop5Dto.setBookList(recentBookList);
+            return new ResponseEntity(recentBookListTop5Dto, HttpStatus.OK);
+        } catch (Exception e){
+            MessageDto messageDto = new MessageDto();
             messageDto.setMessage(e.getMessage());
             return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         }

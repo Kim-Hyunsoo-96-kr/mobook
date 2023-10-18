@@ -108,6 +108,15 @@ public class BookController {
     }
 
     /**
+     * 200 : 성공 : 메세지 X, 응답 O
+     */
+    @Operation(summary = "최신 등록 책", description = "최신 등록 책 5개를 가져옵니다.")
+    @GetMapping("/recentBookList")
+    public ResponseEntity recentBookList(){
+        return bookService.getRecentBookList();
+    }
+
+    /**
      * 200 : 성공 : 메세지 O
      * 400 : 대여 중인 책이 아닌 경우 : 메세지 O
      */

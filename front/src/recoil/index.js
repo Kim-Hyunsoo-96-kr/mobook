@@ -86,8 +86,8 @@ export const nav = {
     ]
 }
 export const CONFIG = {};
-// CONFIG.BASE_URL = "http://localhost:8080"; //로컬
-CONFIG.BASE_URL = "http://mobook.mobility42.io:9607"; //실서버
+CONFIG.BASE_URL = "http://localhost:8080"; //로컬
+// CONFIG.BASE_URL = "http://mobook.mobility42.io:9607"; //실서버
 CONFIG.API_CREATE_ACCOUNT = `${CONFIG.BASE_URL}/api/admin/signUp`;
 CONFIG.API_ADD_BOOK = `${CONFIG.BASE_URL}/api/admin/add`;
 CONFIG.API_UPLOAD_EXCEL = `${CONFIG.BASE_URL}/api/admin/add/excel`;
@@ -100,6 +100,7 @@ CONFIG.API_NOTICEDETAIL = `${CONFIG.BASE_URL}/api/notice/`;
 CONFIG.API_NOTICEADD = `${CONFIG.BASE_URL}/api/notice/add`;
 CONFIG.API_NOTICE_DELETE = `${CONFIG.BASE_URL}/api/notice/delete/`;
 CONFIG.API_NOTICE_EDIT = `${CONFIG.BASE_URL}/api/notice/edit/`;
+CONFIG.API_RECENTBOOKTOP5 = `${CONFIG.BASE_URL}/api/books/recentBookList`;
 CONFIG.API_MYRECOMMENDBOOK = `${CONFIG.BASE_URL}/api/members/myRecommendBook`;
 CONFIG.API_MYRENTBOOK = `${CONFIG.BASE_URL}/api/members/myRentBook`;
 CONFIG.API_MYREQUESTBOOK = `${CONFIG.BASE_URL}/api/members/myRequestBook`;
