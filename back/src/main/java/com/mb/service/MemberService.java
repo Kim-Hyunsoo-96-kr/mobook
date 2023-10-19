@@ -371,7 +371,7 @@ public class MemberService {
     public ResponseEntity changePw(Member loginMember, ChangePasswordDto changePasswordDto) {
         MessageDto messageDto = new MessageDto();
         if(passwordEncoder.matches(changePasswordDto.getOldPassword(), loginMember.getPassword())){
-            if(changePasswordDto.getNewPassword() == changePasswordDto.getCheckNewPassword()){
+            if(changePasswordDto.getNewPassword().equals(changePasswordDto.getCheckNewPassword())){
                 loginMember.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
                 memberRepository.save(loginMember);
                 messageDto.setMessage("비밀번호를 변경했습니다.");

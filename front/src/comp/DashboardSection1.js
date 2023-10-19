@@ -26,58 +26,84 @@ const  DashboardSection1 = () => {
         return <div>로딩중...</div>;
     }
     return (
-        <section className="py-5 bg-light">
+        <section>
+            <div className="py-5 bg-light">
             <div className="container px-5 my-5">
                 <div className="row row-cols-1 row-cols-md-3 mb-3 text-center">
-                        <div className="col">
-                            <div className="card mb-4 rounded-3 shadow-sm">
-                                <div className="card-header py-3">
-                                    <h4 className="my-0 fw-normal">최신 등록 책</h4>
+                    <div className="accordion" id="accordionPanelsStayOpenExample">
+                        <div className="accordion-item">
+                            <h2 className="accordion-header" id="panelsStayOpen-headingOne">
+                                <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="false" aria-controls="panelsStayOpen-collapseOne">
+                                    최근 추가된 책
+                                </button>
+                            </h2>
+                            <div id="panelsStayOpen-collapseOne" className="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
+                                <div className="accordion-body">
+                                    <div className="col">
+                                        <div className="card mb-4 rounded-3 shadow-sm">
+                                            <div className="card-body">
+                                                <ul className="list-unstyled mt-3 mb-4 text-left">
+                                                    {recentBookList.bookList.map((book, index)=>(
+                                                        <li className="ellipsis">{index+1}.  {book.bookName}</li>
+                                                    ))}
+                                                </ul>
+                                                <button type="button" className="w-100 btn btn-outline-primary">책 목록으로 가기</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="card-body">
-                                <ul className="list-unstyled mt-3 mb-4">
-                                    {recentBookList.bookList.map((book)=>(
-                                        <li>{book.bookName}</li>
-                                    ))}
-                                </ul>
-                            <button type="button" className="w-100 btn btn-outline-primary">책 목록으로 가기</button>
                         </div>
                     </div>
-                </div>
-                        <div className="col">
-                            <div className="card mb-4 rounded-3 shadow-sm">
-                                <div className="card-header py-3">
-                                    <h4 className="my-0 fw-normal">인기 책</h4>
-                        </div>
-                                <div className="card-body">
-                                    <ul className="list-unstyled mt-3 mb-4">
-                                        <li>인기 책 - 1</li>
-                                        <li>인기 책 - 2</li>
-                                        <li>인기 책 - 3</li>
-                                        <li>인기 책 - 4</li>
-                            </ul>
-                            <button type="button" className="w-100 btn btn-lg btn-primary">Get started</button>
+
+                    <div className="col">
+                        <div className="accordion" id="accordionPanelsStayOpenExample">
+                            <div className="accordion-item">
+                                <h2 className="accordion-header" id="panelsStayOpen-headingTwo">
+                                    <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                                        최근 추가된 책
+                                    </button>
+                                </h2>
+                                <div id="panelsStayOpen-collapseTwo" className="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingTwo">
+                                    <div className="accordion-body">
+                                        <div className="col">
+                                            <div className="card mb-4 rounded-3 shadow-sm">
+                                                <div className="card-body">
+                                                    <ul className="list-unstyled mt-3 mb-4 text-left">
+                                                        {recentBookList.bookList.map((book, index)=>(
+                                                            <li className="ellipsis">{index+1}.  {book.bookName}</li>
+                                                        ))}
+                                                    </ul>
+                                                    <button type="button" className="w-100 btn btn-outline-primary">책 목록으로 가기</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                        <div className="col">
-                            <div className="card mb-4 rounded-3 shadow-sm border-primary">
-                                <div className="card-header py-3 text-bg-primary border-primary">
-                                    <h4 className="my-0 fw-normal">대여 현황</h4>
-                        </div>
-                        <div class="card-body">
-                            <ul class="list-unstyled mt-3 mb-4">
-                                <li>대여 현황 - 1</li>
-                                <li>대여 현황 - 2</li>
-                                <li>대여 현황 - 3</li>
-                                <li>대여 현황 - 4</li>
-                            </ul>
-                            <button type="button" class="w-100 btn btn-lg btn-primary">Contact us</button>
+
+                    <div className="col">
+                        <div className="accordion" id="accordionPanelsStayOpenExample">
+                            <div className="accordion-item">
+                                <h2 className="accordion-header" id="panelsStayOpen-headingThree">
+                                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                                        대여 현황
+                                    </button>
+                                </h2>
+                                <div id="panelsStayOpen-collapseThree" className="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
+                                    <div class="accordion-body">
+                                        <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            </div>
+
+        </div>
         </section>
     );
 }

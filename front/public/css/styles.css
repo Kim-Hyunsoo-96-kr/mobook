@@ -10937,3 +10937,18 @@ html {
 .margin-left8{
   margin-left: 8px;
 }
+
+.text-left{
+  text-align: left !important;
+}
+
+.ellipsis{
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.width80per{
+  width: 80%;
+}
