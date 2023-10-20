@@ -36,6 +36,8 @@ public class Book {
 
     private String editDate;
 
+    private Integer popularity;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "book")
     private List<BookComment> bookCommentList;

@@ -116,6 +116,12 @@ public class BookController {
         return bookService.getRecentBookList();
     }
 
+    @Operation(summary = "대시보드", description = "대시보드에서 보여줄 리스트들을 가져옵니다.")
+    @GetMapping("/dashboard")
+    public ResponseEntity dashboard(){
+        return bookService.getDashboardList();
+    }
+
     /**
      * 200 : 성공 : 메세지 O
      * 400 : 대여 중인 책이 아닌 경우 : 메세지 O

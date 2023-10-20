@@ -9,11 +9,13 @@ import com.mb.dto.Book.req.BookAddDto;
 import com.mb.dto.Book.req.BookRequestDto;
 import com.mb.dto.Book.req.BookCommentRequestDto;
 import com.mb.dto.Book.resp.BookListResponseDto;
+import com.mb.dto.Book.resp.DashboardResponseDto;
 import com.mb.dto.Book.resp.RecentBookListTop5Dto;
 import com.mb.dto.Util.MessageDto;
 import com.mb.dto.Util.NaverResponseDto;
 import com.mb.repository.*;
 import com.mb.util.*;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -36,6 +38,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.*;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -112,6 +115,7 @@ public class BookService {
             newBook.setRegDate(today.format(formatter));
             newBook.setEditDate(today.format(formatter));
             newBook.setRecommend(0);
+            newBook.setPopularity(0);
             newBook.setRentalMemberId(0L);
             newBook.setIsDeleted(false);
 
@@ -250,6 +254,7 @@ public class BookService {
                     newBook.setRegDate(formatter.format(today));
                     newBook.setEditDate(formatter.format(today));
                     newBook.setRecommend(0);
+                    newBook.setPopularity(0);
                     newBook.setRentalMemberId(0L);
                     newBook.setIsDeleted(false);
 
@@ -354,6 +359,8 @@ public class BookService {
             return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         } else {
             if (book.getIsAble()) {
+                Integer popularity = book.getPopularity() + 1;
+                book.setPopularity(popularity);
                 book.setRentalMemberId(loginMember.getMemberId());
                 book.setIsAble(false);
                 bookRepository.save(book);
@@ -411,6 +418,8 @@ public class BookService {
             Optional<BookRecommend> bookRecommend = bookRecommendRepository.findByMemberAndBook(loginMember, book);
             if(bookRecommend.isEmpty()){
                 Integer recommendCount = book.getRecommend() + 1;
+                Integer popularity = book.getPopularity() + 1;
+                book.setPopularity(popularity);
                 book.setRecommend(recommendCount);
                 bookRepository.save(book);
                 BookRecommend newBookRecommend = new BookRecommend();
@@ -795,5 +804,58 @@ public class BookService {
             messageDto.setMessage(e.getMessage());
             return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    public ResponseEntity getDashboardList() {
+        DashboardResponseDto dashboardResponseDto = new DashboardResponseDto();
+
+        try{
+            List<Book> recentBookList = bookRepository.findTop5ByOrderByBookIdDesc();
+            List<Book> popularBookList = bookRepository.findTop5ByOrderByPopularityDesc();
+            List<BookLog> bookLogList = bookLogService.findByStatus(InRental);
+            List<RentBookAdminLog> rentBookLogList = new ArrayList();
+            for (BookLog bookLog : bookLogList) {
+                Book rentBook = bookLog.getBook();
+                RentBookAdminLog rentBookAdminLog = new RentBookAdminLog(rentBook.getBookNumber(), rentBook.getBookName(),
+                        rentBook.getRecommend(), bookLog.getRegDate(), bookLog.getReturnDate(), bookLog.getMember().getName());
+                rentBookLogList.add(rentBookAdminLog);
+            }
+            dashboardResponseDto.setRecentBookList(recentBookList);
+            dashboardResponseDto.setPopularBookList(popularBookList);
+            dashboardResponseDto.setRentBookList(rentBookLogList);
+            return new ResponseEntity(dashboardResponseDto, HttpStatus.OK);
+        } catch (Exception e){
+            MessageDto messageDto = new MessageDto();
+            messageDto.setMessage(e.getMessage());
+            return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+    public ResponseEntity downloadBookAddExcel(HttpServletResponse response) {
+        MessageDto messageDto = new MessageDto();
+            try{
+                String fileName = "bookAddExample.xlsx"; // 파일 이름만 지정
+
+                // 클래스패스 내의 리소스를 가져오기 위해 ClassLoader 사용
+                ClassLoader classLoader = getClass().getClassLoader();
+                InputStream inputStream = classLoader.getResourceAsStream(fileName);
+
+                if (inputStream == null) {
+                    throw new FileNotFoundException("파일을 찾을 수 없습니다: " + fileName);
+                }
+                response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+                OutputStream out = response.getOutputStream();
+
+                int read;
+                byte[] buffer = new byte[1024];
+                while ((read = inputStream.read(buffer)) != -1) {
+                    out.write(buffer, 0, read);
+                }
+                return new ResponseEntity(messageDto, HttpStatus.OK);
+            } catch (Exception e){
+                messageDto.setMessage(e.getMessage());
+                return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
+            }
     }
 }

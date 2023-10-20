@@ -13,7 +13,7 @@ function Header() {
                             <h1 class="display-6 fw-bolder text-white mb-2">10월 추천 도서 : 핵심 코틀린 프로그래밍</h1>
                             <p class="lead fw-normal text-white-50 mb-4 mt-5">추천 도서는 매월 1일 바뀝니다.<br/>추천 수, 대여 수 등을 기준으로 관리자가 선정합니다.</p>
                             <div class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start">
-                                <Link to="/search" class="btn btn-primary btn-lg px-4 me-sm-3 mt-5" href="#features">다른 책 보러가기</Link>
+                                {/*<Link to="/search" class="btn btn-primary btn-lg px-4 me-sm-3 mt-5" href="#features">다른 책 보러가기</Link>*/}
                                 {isLogined ||(
                                     <Link to="/login" class="btn btn-outline-light btn-lg px-4 mt-5" href="#!">로그인</Link>
                                 )}

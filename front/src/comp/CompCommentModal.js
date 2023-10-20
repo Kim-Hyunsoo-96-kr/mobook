@@ -6,13 +6,22 @@ import {
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import CompComment from "./CompComment";
 import Swal from "sweetalert2";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 function CompCommentModal({book}) {
     const [comment, setComment] = useState('');
     const handleInputChange = (event) => {
         setComment(event.target.value);
     };
+    useEffect(() => {
+        const inputElement = document.getElementById(`commentInput${book.bookNumber}`);
+        console.log(inputElement)
+        if (inputElement && !inputElement.hasFocus) {
+            console.log("focus")
+            inputElement.focus();
+            inputElement.hasFocus = true;
+        }
+    }, [book]);
     const addComment = async (event, bookNumber) => {
 
         event.preventDefault();
@@ -84,6 +93,7 @@ function CompCommentModal({book}) {
                 </div>
                 <form className="modal-footer" onSubmit={(event) => addComment(event, book.bookNumber)}>
                     <textarea
+                        id={`commentInput${book.bookNumber}`}
                         className="form-control mb-2"
                         name='comment'
                         rows="3"

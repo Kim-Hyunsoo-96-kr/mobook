@@ -192,10 +192,21 @@ const Search = () => {
                 <div className="text-center mb-5">
                     <h1 className="fw-bolder">책 목록</h1>
                 </div>
+
                 <div className="search">
                     <form className="d-flex" onSubmit={submitSearch}>
+                        <div className="input-group">
+                            <label className="input-group-text" htmlFor="inputGroupSelect01">Option</label>
+                            <select className="form-select me-2" id="inputGroupSelect01">
+                                <option value="1">제목</option>
+                                <option value="2">책 번호</option>
+                                <option value="3">저자</option>
+                                <option value="4">설명</option>
+                                <option value="5">All</option>
+                            </select>
+                        </div>
                         <input className="form-control me-2" name="searchText" type="search" placeholder="책 제목 검색" aria-label="Search"/>
-                            <button className="btn btn-outline-success" type="submit">Search</button>
+                        <button className="btn btn-outline-success" type="submit">Search</button>
                     </form>
                 </div>
                     <div className="container-fluid px-4">

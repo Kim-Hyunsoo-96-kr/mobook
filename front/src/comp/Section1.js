@@ -20,7 +20,7 @@ function Section1() {
                     <div className="col mb-5 mb-5 mb-sm-0">
                         <div className="text-center">
                             <Link to="/search"><img className="img-fluid mb-4 px-4 cursor" src="img/bookList.png" alt="..."/></Link>
-                            <h5 className="fw-bolder">책 검색</h5>
+                            <h5 className="fw-bolder">책 목록</h5>
                         </div>
                     </div>
                     <div className="col mb-5">

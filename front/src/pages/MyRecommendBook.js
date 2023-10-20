@@ -81,7 +81,7 @@ const MyRecommendBook = () => {
             const response = await axiosInstance.post(`${CONFIG.API_BOOK_RECOMMEND_CANCEL}${bookNumber}`);
             Swal.fire(
                 response.data.message,
-                '책 검색 페이지에서 추천할 수 있습니다.',
+                '책 목록 페이지에서 추천할 수 있습니다.',
                 'success'
             ).then(() => {
                 queryClient.invalidateQueries(["myRecommendBook"]);

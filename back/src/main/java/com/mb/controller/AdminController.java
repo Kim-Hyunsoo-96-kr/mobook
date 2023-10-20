@@ -8,6 +8,7 @@ import com.mb.service.BookService;
 import com.mb.service.MemberService;
 import com.mb.service.WebHookService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -160,6 +161,11 @@ public class AdminController {
     public ResponseEntity extendPeriod(@PathVariable String bookNumber, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
         return bookService.adminExtendPeriod(loginMember, bookNumber);
+    }
+
+    @GetMapping("/download/bookAddExcel")
+    public ResponseEntity download(HttpServletResponse response){
+        return bookService.downloadBookAddExcel(response);
     }
 
 

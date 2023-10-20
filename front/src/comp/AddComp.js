@@ -153,7 +153,7 @@ function AddComp() {
                                                 <label htmlFor="bookName">책 제목</label>
                                             </div>
                                             <div className="d-grid">
-                                                <button className="btn btn-primary btn-lg" type="submit">책 추가</button>
+                                                <button className="btn btn-success btn-lg" type="submit">책 추가</button>
                                             </div>
                                         </form>
                                     </div>
@@ -167,11 +167,14 @@ function AddComp() {
                                 <div className="mb-3">
                                     <span className="display-6 fw-bold">엑셀로 추가하기</span>
                                 </div>
-                                <div className="margin-top78">
+                                <div className="margin-top60">
                                     <input className="form-control" type="file" onChange={fileChangedHandler}/>
                                 </div>
-                                <div className="d-grid margin-top78">
-                                    <button className="btn btn-primary btn-lg" onClick={FileUpload}>등록</button>
+                                <div className="mt-3">
+                                    <a className="btn btn-outline-primary btn-sm" href="http://localhost:8888/api/admin/download/bookAddExcel">책 추가 엑셀 양식 다운로드</a>
+                                </div>
+                                <div className="d-grid margin-top50">
+                                    <button className="btn btn-success btn-lg" onClick={FileUpload}>등록</button>
                                 </div>
                             </div>
                         </div>
