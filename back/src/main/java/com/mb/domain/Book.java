@@ -24,6 +24,13 @@ public class Book {
 
     private String bookImageUrl;
 
+    private String bookAuthor;
+
+    private String bookPublisher;
+
+    @Column(length = 3000)
+    private String bookDescription;
+
     private Integer recommend;
 
     private String regDate;

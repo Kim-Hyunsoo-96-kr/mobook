@@ -17,6 +17,7 @@ public class Notice {
     private String regDate;
     private String editDate;
     private String title;
+    @Column(length = 3000)
     private String contents;
     private Long memberId;
     private String memberName;

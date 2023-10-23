@@ -201,8 +201,9 @@ const Search = () => {
                                 <option value="1">제목</option>
                                 <option value="2">책 번호</option>
                                 <option value="3">저자</option>
-                                <option value="4">설명</option>
-                                <option value="5">All</option>
+                                <option value="4">출판사</option>
+                                <option value="5">설명</option>
+                                <option value="6">All</option>
                             </select>
                         </div>
                         <input className="form-control me-2" name="searchText" type="search" placeholder="책 제목 검색" aria-label="Search"/>
@@ -232,6 +233,8 @@ const Search = () => {
                                                         }
                                                         <p>번호: {book.bookNumber}</p>
                                                         <p>제목: {book.bookName}</p>
+                                                        <p>저자: {book.bookAuthor ? book.bookAuthor.replaceAll("^", ", ") : '저자 정보 없음'}</p>
+                                                        <p>출판사: {book.bookPublisher}</p>
                                                         <p>입고일: {book.regDate}</p>
                                                         <p>대여 가능 여부: {book.isAble ? "가능" : "불가능"}</p>
                                                         <p>찜 수: {book.recommend}</p>
@@ -253,6 +256,15 @@ const Search = () => {
                                                         </div>
                                                         <p><a href={book.bookLink} target="_blank" rel="noopener noreferrer">자세히 보기</a></p>
                                                     </div>
+                                                </td>
+                                                <td class="col-md-5" style={{lineHeight: "25px"}}>
+                                                    {book.bookDescription
+                                                        ? (book.bookDescription.trim().length > 500
+                                                                ? `${book.bookDescription.slice(0, 300)}...`
+                                                                : book.bookDescription
+                                                        )
+                                                        : '설명이 없습니다.'
+                                                    }
                                                 </td>
                                             </tr>
                                         ))}

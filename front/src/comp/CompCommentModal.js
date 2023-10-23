@@ -13,15 +13,6 @@ function CompCommentModal({book}) {
     const handleInputChange = (event) => {
         setComment(event.target.value);
     };
-    useEffect(() => {
-        const inputElement = document.getElementById(`commentInput${book.bookNumber}`);
-        console.log(inputElement)
-        if (inputElement && !inputElement.hasFocus) {
-            console.log("focus")
-            inputElement.focus();
-            inputElement.hasFocus = true;
-        }
-    }, [book]);
     const addComment = async (event, bookNumber) => {
 
         event.preventDefault();
@@ -54,7 +45,20 @@ function CompCommentModal({book}) {
         }
 
     }
-    // {`#modal${book.id}`}
+    useEffect(() => {
+        const modalElement = document.getElementById(`exampleModal${book.bookNumber}`);
+        const commentInputElement = document.getElementById(`commentInput${book.bookNumber}`);
+
+        modalElement.addEventListener('shown.bs.modal', function () {
+            commentInputElement.focus();
+        });
+
+        return () => {
+            modalElement.removeEventListener('shown.bs.modal', function () {
+                commentInputElement.focus();
+            });
+        }
+    }, [book.bookNumber]);
     return (
         <p>
             <div style={{marginLeft : '8px', display : 'flex', alignItems : 'center'}} type="button" className="bi bi-chat-dots btn btn-outline-secondary btn-sm" data-bs-toggle="modal"

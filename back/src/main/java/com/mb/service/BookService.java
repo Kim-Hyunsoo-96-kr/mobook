@@ -147,6 +147,9 @@ public class BookService {
                 if(!naverResponseDto.getItems().isEmpty()){
                     newBook.setBookLink(naverResponseDto.getItems().get(0).getLink());
                     newBook.setBookImageUrl(naverResponseDto.getItems().get(0).getImage());
+                    newBook.setBookAuthor(naverResponseDto.getItems().get(0).getAuthor());
+                    newBook.setBookPublisher(naverResponseDto.getItems().get(0).getPublisher());
+                    newBook.setBookDescription(naverResponseDto.getItems().get(0).getDescription());
                 } else {
                     newBook.setBookImageUrl("https://raw.githubusercontent.com/jootang2/MyS3/7c8c92a8b513f32b17864bf6a0779457895d0392/MOBOOK1.1/MOBOOK1.1_404.png");
                 }
@@ -239,11 +242,13 @@ public class BookService {
                                 if(!naverResponseDto.getItems().isEmpty()){
                                     newBook.setBookLink(naverResponseDto.getItems().get(0).getLink());
                                     newBook.setBookImageUrl(naverResponseDto.getItems().get(0).getImage());
+                                    newBook.setBookAuthor(naverResponseDto.getItems().get(0).getAuthor());
+                                    newBook.setBookPublisher(naverResponseDto.getItems().get(0).getPublisher());
+                                    newBook.setBookDescription(naverResponseDto.getItems().get(0).getDescription());
                                 } else {
                                     newBook.setBookImageUrl("https://raw.githubusercontent.com/jootang2/MyS3/7c8c92a8b513f32b17864bf6a0779457895d0392/MOBOOK1.1/MOBOOK1.1_404.png");
                                 }
                             } catch (Exception e){
-                                System.out.println(e);
                                 throw new IllegalArgumentException("Json parser 관련 오류");
                             }
                         }
