@@ -15,6 +15,7 @@ import CompCommentModal from "../comp/CompCommentModal";
 
 const Search = () => {
     const [comment, setComment] = useState('');
+    const [selectedOption, setSelectedOption] = useState("title");
     const handleInputChange = (event) => {
         setComment(event.target.value);
     };
@@ -196,14 +197,19 @@ const Search = () => {
                 <div className="search">
                     <form className="d-flex" onSubmit={submitSearch}>
                         <div className="input-group">
-                            <label className="input-group-text" htmlFor="inputGroupSelect01">Option</label>
-                            <select className="form-select me-2" id="inputGroupSelect01">
-                                <option value="1">제목</option>
-                                <option value="2">책 번호</option>
-                                <option value="3">저자</option>
-                                <option value="4">출판사</option>
-                                <option value="5">설명</option>
-                                <option value="6">All</option>
+                            <label className="input-group-text" htmlFor="searchOption">Option</label>
+                            <select
+                                className="form-select me-2"
+                                id="searchOption"
+                                value={selectedOption}
+                                onChange={(e) => setSelectedOption(e.target.value)}
+                            >
+                                <option value="title">제목</option>
+                                <option value="number">책 번호</option>
+                                <option value="author">저자</option>
+                                <option value="publisher">출판사</option>
+                                <option value="description">설명</option>
+                                <option value="all">All</option>
                             </select>
                         </div>
                         <input className="form-control me-2" name="searchText" type="search" placeholder="책 제목 검색" aria-label="Search"/>
@@ -218,6 +224,7 @@ const Search = () => {
                                     <tr>
                                         <th className="text-align-center">책 정보</th>
                                         <th></th>
+                                        <th></th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -226,7 +233,7 @@ const Search = () => {
                                                 <td className="text-align-center">
                                                     <img src={book.bookImageUrl} alt="Book Cover" style={{maxWidth : '180px'}} />
                                                 </td>
-                                                <td>
+                                                <td className="col-md-4">
                                                     <div>
                                                         {book.isDeleted &&
                                                             <p>****삭제된 책 입니다****</p>
