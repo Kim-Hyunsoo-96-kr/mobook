@@ -25,7 +25,7 @@ const Search = () => {
     const page = parseInt(queryParams.get("page") || "1") - 1;
     const navigate = useNavigate();
     const { isLoading, error, data } = useQuery(["bookList", page, searchText], async () => {
-        const response = await axiosInstance.get(`${CONFIG.API_BOOK_SEARCH}?page=${page}&searchText=${searchText}`);
+        const response = await axiosInstance.get(`${CONFIG.API_BOOK_SEARCH}?option=${selectedOption}&page=${page}&searchText=${searchText}`);
         return response.data;
     });
     const isLogined = useRecoilValue(isLoginedSelector); // 로그인 했는지 여부
@@ -34,17 +34,17 @@ const Search = () => {
     let isAdmin = null
     if(isLogined) isAdmin = loginedUserInfo.isAdmin
     const handlePageChange = (page) => {
-        navigate(`/search?searchText=${searchText}&page=${page}`);
+        navigate(`/search?option=${selectedOption}&searchText=${searchText}&page=${page}`);
     };
     const submitSearch = (event) => {
         event.preventDefault();
         const form = event.target;
         form.searchText.value = form.searchText.value.trim();
         if (form.searchText.value.length === 0) {
-            navigate(`/search?searchText=&page=1`);
+            navigate(`/search?option=title&searchText=&page=1`);
         } else {
             const searchText = form.searchText.value;
-            navigate(`/search?searchText=${searchText}&page=1`);
+            navigate(`/search?option=${selectedOption}&searchText=${searchText}&page=1`);
         }
     };
     const rentBook = async (bookNumber) => {

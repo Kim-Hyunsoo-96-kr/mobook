@@ -82,8 +82,32 @@ public class BookService {
         return findBook;
     }
 
-    public List<Book> getBookListByKeyword(String keyword, Pageable pageable) {
-        List<Book> bookList = bookRepository.findByBookNameContaining(keyword, pageable);
+    public List<Book> getBookListByOptionAndKeyword(String option, String keyword, Pageable pageable) {
+        List<Book> bookList = new ArrayList<>();
+        switch (option){
+            case "title":
+                bookList = bookRepository.findByBookNameContaining(keyword, pageable);
+                break;
+            case "number":
+                bookList = bookRepository.findByBookNumberContaining(keyword, pageable);
+                break;
+            case "author":
+                bookList = bookRepository.findByBookAuthorContaining(keyword, pageable);
+                break;
+            case "publisher":
+                bookList = bookRepository.findByBookPublisherContaining(keyword, pageable);
+                break;
+            case "description":
+                bookList = bookRepository.findByBookDescriptionContaining(keyword, pageable);
+                break;
+            case "all":
+                bookList = bookRepository.findAllContainingKeyword(keyword, pageable);
+                break;
+            default:
+                bookList = bookRepository.findByBookNameContaining(keyword, pageable);
+                break;
+        }
+
         return bookList;
     }
 
@@ -549,9 +573,9 @@ public class BookService {
         }
     }
 
-    public ResponseEntity bookSearch(String searchText, Integer page) {
+    public ResponseEntity bookSearch(String option, String searchText, Integer page) {
         Pageable pageable = PageRequest.of(page, 10, Sort.by("bookId").descending());
-        List<Book> bookList = getBookListByKeyword(searchText, pageable.withPage(page));
+        List<Book> bookList = getBookListByOptionAndKeyword(option, searchText, pageable.withPage(page));
         Integer totalCnt = getTotalCntBySearchText(searchText);
 
         BookListResponseDto bookListResponseDto = new BookListResponseDto();
