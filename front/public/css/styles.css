@@ -10954,3 +10954,7 @@ html {
 .width80per{
   width: 80%;
 }
+
+.flex{
+  display: flex;
+}

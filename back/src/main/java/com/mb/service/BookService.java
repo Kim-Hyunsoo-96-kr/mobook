@@ -798,16 +798,60 @@ public class BookService {
         }
     }
 
-    public ResponseEntity editBook(Long bookId, BookAddDto bookAddDto, Member loginMember) {
+    public ResponseEntity editBook(BookAddDto bookAddDto, Member loginMember) {
         MessageDto messageDto = new MessageDto();
         try{
             if(loginMember.getIsAdmin()){
-                Book book = findById(bookId);
+                Book book = findByBookNumber(bookAddDto.getBookNumber());
                 book.setBookNumber(bookAddDto.getBookNumber());
                 book.setBookName(bookAddDto.getBookName());
                 LocalDate today = LocalDate.now();
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                 book.setEditDate(today.format(formatter));
+
+                URI uri = UriComponentsBuilder
+                        .fromUriString("https://openapi.naver.com")
+                        .path("/v1/search/book.json")
+                        .queryParam("query", bookAddDto.getBookName())
+                        .queryParam("display", 10)
+                        .queryParam("start", 1)
+                        .queryParam("sort", "sim")
+                        .encode()
+                        .build()
+                        .toUri();
+
+                RequestEntity<Void> req = RequestEntity
+                        .get(uri)
+                        .header("X-Naver-Client-Id", naverClientId)
+                        .header("X-Naver-Client-Secret", naverClientSecret)
+                        .build();
+
+                RestTemplate restTemplate = new RestTemplate();
+                ResponseEntity<String> resp = restTemplate.exchange(req, String.class);
+
+                ObjectMapper om = new ObjectMapper();
+                NaverResponseDto naverResponseDto = null;
+
+                try{
+                    naverResponseDto = om.readValue(resp.getBody(), NaverResponseDto.class);
+                    if(!naverResponseDto.getItems().isEmpty()){
+                        book.setBookLink(naverResponseDto.getItems().get(0).getLink());
+                        book.setBookImageUrl(naverResponseDto.getItems().get(0).getImage());
+                        book.setBookAuthor(naverResponseDto.getItems().get(0).getAuthor());
+                        book.setBookPublisher(naverResponseDto.getItems().get(0).getPublisher());
+                        book.setBookDescription(naverResponseDto.getItems().get(0).getDescription());
+                    } else {
+                        book.setBookLink("");
+                        book.setBookImageUrl("https://raw.githubusercontent.com/jootang2/MyS3/7c8c92a8b513f32b17864bf6a0779457895d0392/MOBOOK1.1/MOBOOK1.1_404.png");
+                        book.setBookAuthor("저자 정보 없음");
+                        book.setBookPublisher("출판사 정보 없음");
+                        book.setBookDescription("책 정보 없음");
+                    }
+                } catch (Exception e){
+                    throw new IllegalArgumentException("Json parser 관련 오류");
+                }
+
+
                 saveBook(book);
 
                 messageDto.setMessage("성공적으로 책을 수정했습니다.");
@@ -887,4 +931,5 @@ public class BookService {
                 return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
             }
     }
+
 }

@@ -86,10 +86,10 @@ public class AdminController {
      * 412 : 관리자가 아닌 경우 에러 : 메세지 O
      */
     @Operation(summary = "책 수정", description = "책의 제목과 번호를 수정합니다.")
-    @PostMapping("/edit/book/{bookId}")
-    public ResponseEntity editBook(@PathVariable Long bookId, @RequestBody BookAddDto bookAddDto ,Authentication authentication){
+    @PostMapping("/edit/book")
+    public ResponseEntity editBook(@RequestBody BookAddDto bookAddDto ,Authentication authentication){
         Member loginMember = getLoginMember(authentication);
-        return bookService.editBook(bookId, bookAddDto, loginMember);
+        return bookService.editBook(bookAddDto, loginMember);
     }
 
     /**

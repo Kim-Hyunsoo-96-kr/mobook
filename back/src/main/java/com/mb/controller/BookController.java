@@ -1,5 +1,8 @@
 package com.mb.controller;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mb.domain.*;
@@ -17,30 +20,44 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
+import java.util.UUID;
 
 @Tag(name="BookController", description = "책 컨트롤러")
 @Controller
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
 public class BookController {
-
+    private final AmazonS3 amazonS3;
     private final BookService bookService;
     private final MemberService memberService;
     @Value("${naver.clientId}")
     public String naverClientId;
     @Value("${naver.clientSecret}")
     public String naverClientSecret;
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
 
     @PostMapping("/test")
-    public ResponseEntity test() {
-        MessageDto messageDto = new MessageDto();
-        messageDto.setMessage("test");
+    public ResponseEntity test(@RequestParam("images") MultipartFile multipartFile){
+        try {
+            String s3FileName = UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
 
+            ObjectMetadata objMeta = new ObjectMetadata();
+            objMeta.setContentLength(multipartFile.getInputStream().available());
 
-        return new ResponseEntity(messageDto, HttpStatus.OK);
+            amazonS3.putObject(bucket, s3FileName, multipartFile.getInputStream(), objMeta);
+
+            String url = amazonS3.getUrl(bucket, s3FileName).toString();
+            return ResponseEntity.ok(url);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     /**
