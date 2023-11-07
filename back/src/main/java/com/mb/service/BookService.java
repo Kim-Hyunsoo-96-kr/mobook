@@ -6,6 +6,7 @@ import com.mb.dto.Admin.resp.AdminBookLogResponseDto;
 import com.mb.dto.Admin.resp.AdminRentBookLogResponseDto;
 import com.mb.dto.Admin.resp.AdminRequestBookLogResponseDto;
 import com.mb.dto.Book.req.BookAddDto;
+import com.mb.dto.Book.req.BookEditDto;
 import com.mb.dto.Book.req.BookRequestDto;
 import com.mb.dto.Book.req.BookCommentRequestDto;
 import com.mb.dto.Book.resp.BookListResponseDto;
@@ -798,7 +799,7 @@ public class BookService {
         }
     }
 
-    public ResponseEntity editBook(BookAddDto bookAddDto, Member loginMember) {
+    public ResponseEntity editSearchBook(BookAddDto bookAddDto, Member loginMember) {
         MessageDto messageDto = new MessageDto();
         try{
             if(loginMember.getIsAdmin()){
@@ -865,7 +866,27 @@ public class BookService {
             return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         }
     }
+    public ResponseEntity editBook(BookEditDto bookEditDto, Member loginMember) {
+        MessageDto messageDto = new MessageDto();
+        if(loginMember.getIsAdmin()){
+            Book book = findByBookNumber(bookEditDto.getBookNumber());
+            book.setBookName(bookEditDto.getBookName());
+            book.setBookAuthor(bookEditDto.getBookAuthor());
+            book.setBookPublisher(bookEditDto.getBookPublisher());
+            book.setBookDescription(bookEditDto.getBookDescription());
+            LocalDate today = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            book.setEditDate(today.format(formatter));
 
+            saveBook(book);
+
+            messageDto.setMessage("성공적으로 책을 수정했습니다.");
+            return new ResponseEntity(messageDto, HttpStatus.OK);
+        } else {
+            messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
+            return new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);
+        }
+    }
     public ResponseEntity getRecentBookList() {
         RecentBookListTop5Dto recentBookListTop5Dto = new RecentBookListTop5Dto();
         try{
@@ -931,5 +952,4 @@ public class BookService {
                 return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
             }
     }
-
 }

@@ -2,11 +2,11 @@ package com.mb.controller;
 
 import com.mb.domain.Member;
 import com.mb.dto.Book.req.BookAddDto;
+import com.mb.dto.Book.req.BookEditDto;
 import com.mb.dto.Member.req.MemberSignUpDto;
 import com.mb.dto.Util.SecretRequestDto;
 import com.mb.service.BookService;
 import com.mb.service.MemberService;
-import com.mb.service.WebHookService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -86,10 +86,17 @@ public class AdminController {
      * 412 : 관리자가 아닌 경우 에러 : 메세지 O
      */
     @Operation(summary = "책 수정", description = "책의 제목과 번호를 수정합니다.")
-    @PostMapping("/edit/book")
-    public ResponseEntity editBook(@RequestBody BookAddDto bookAddDto ,Authentication authentication){
+    @PostMapping("/edit/search/book")
+    public ResponseEntity editSearchBook(@RequestBody BookAddDto bookAddDto ,Authentication authentication){
         Member loginMember = getLoginMember(authentication);
-        return bookService.editBook(bookAddDto, loginMember);
+        return bookService.editSearchBook(bookAddDto, loginMember);
+    }
+
+    @Operation(summary = "책 수정", description = "책 정보를 직접 입력한 값으로 수정합니다.")
+    @PostMapping("/edit/book")
+    public ResponseEntity editBook(@RequestBody BookEditDto bookEditDto , Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+        return bookService.editBook(bookEditDto, loginMember);
     }
 
     /**
