@@ -12,92 +12,10 @@ import Swal from "sweetalert2";
 import {useState} from "react";
 import CompComment from "../comp/CompComment";
 import CompCommentModal from "../comp/CompCommentModal";
+import CompEditModal from "../comp/CompEditModal";
 
 const Search = () => {
-    const [comment, setComment] = useState('');
-    const [bookName, setBookName] = useState('');
-    const [bookAuthor, setBookAuthor] = useState('');
-    const [bookPublisher, setBookPublisher] = useState('');
-    const [bookDescription, setBookDescription] = useState('');
     const [selectedOption, setSelectedOption] = useState("title");
-    const [isEditing, setIsEditing] = useState(false);
-    const [editedBook, setEditedBook] = useState(null);
-    const [editMode, setEditMode] = useState({});
-    const [directEditMode, setDirectEditMode] = useState({});
-    const [editedBooks, setEditedBooks] = useState({});
-
-    const handleEdit = (book) => {
-        setBookName(book.bookName)
-        setBookAuthor(book.bookAuthor)
-        setBookPublisher(book.bookPublisher)
-        setEditMode({ ...editMode, [book.bookId]: true });
-        setEditedBooks({ ...editedBooks, [book.bookId]: { ...data.bookList.find(b => b.bookId === book.bookId) } });
-    }
-    const handleDirectEdit = (book) => {
-        setBookName(book.bookName)
-        setBookAuthor(book.bookAuthor)
-        setBookPublisher(book.bookPublisher)
-        setDirectEditMode({ ...directEditMode, [book.bookId]: true });
-        setEditedBooks({ ...editedBooks, [book.bookId]: { ...data.bookList.find(b => b.bookId === book.bookId) } });
-    }
-
-    const handleInputChange = (bookId, key, value) => {
-        setEditedBooks({
-            ...editedBooks,
-            [bookId]: {
-                ...editedBooks[bookId],
-                [key]: value
-            }
-        });
-    }
-    const handleSave = async (book) => {
-        console.log(bookName)
-        console.log(bookAuthor)
-        console.log(bookPublisher)
-        // 수정된 도서 데이터를 저장하는 로직을 작성합니다 (예: 서버에 전송)
-        try{
-            Toast2.fire({
-                icon: 'info',
-                title: '작업 중...'
-            });
-            const response = await axiosInstance.post(CONFIG.API_EDIT_BOOK,{"bookNumber": book.bookNumber,"bookName": bookName})
-            Swal.fire(
-                response.data.message,
-                '책 정보를 찾지 못하는 경우에는 직접수정으로 수정해주세요.',
-                'success'
-            ).then(() => {
-                queryClient.invalidateQueries(["bookList", page, searchText]);
-            })
-        } catch (e) {
-            if(e.response.status == 400)
-                Swal.fire(
-                    e.response.data.message,
-                    '한번 더 확인해주세요.',
-                    'warning'
-                )
-            else if(e.response.status == 500){
-                Swal.fire(
-                    '웹훅 오류',
-                    '송주환 사원에게 문의해주세요.',
-                    'warning'
-                )
-            }
-            else
-                Swal.fire(
-                    '예상치 못한 오류',
-                    error.message,
-                    'warning'
-                )
-        }
-        //
-        setEditMode({ ...editMode, [book.bookId]: false });
-        setDirectEditMode({ ...editMode, [book.bookId]: false });
-    }
-
-    const handleCancel = (bookId) => {
-        setEditMode({ ...editMode, [bookId]: false });
-        setDirectEditMode({ ...editMode, [bookId]: false });
-    }
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const searchText = queryParams.get("searchText") || "";
@@ -125,6 +43,9 @@ const Search = () => {
             const searchText = form.searchText.value;
             navigate(`/search?option=${selectedOption}&searchText=${searchText}&page=1`);
         }
+    };
+    const handleEdit = (book) => {
+        console.log(book.bookNumber)
     };
     const rentBook = async (bookNumber) => {
         try{
@@ -225,39 +146,6 @@ const Search = () => {
                 )
         }
     }
-    const addComment = async (event, bookNumber) => {
-
-        event.preventDefault();
-
-        const form = event.target;
-
-        form.comment.value = form.comment.value.trim();
-
-        if (form.comment.value.length === 0) {
-            Swal.fire(
-                '댓글을 입력해주세요.',
-                '빈 값 입니다.',
-                'warning'
-            )
-            form.comment.focus();
-            return;
-        }
-        const comment = form.comment.value;
-
-        try{
-            const response = await axiosInstance.post(`${CONFIG.API_BOOK_COMMENT}${bookNumber}`, {comment});
-            Toast.fire({
-                icon: 'success',
-                title: response.data.message
-            })
-            setComment('');
-            queryClient.invalidateQueries(["bookList", page, searchText]);
-        } catch (e) {
-            console.log(e)
-        }
-
-    }
-
     if (isLoading) {
         return <div class="loading-1">로딩중</div>;
     }
@@ -314,7 +202,6 @@ const Search = () => {
                                                 </td>
                                                 <td className="col-md-4">
                                                     <div>
-                                                        {!(editMode[book.bookId] || directEditMode[book.bookId]) &&
                                                             <div>
                                                                 {book.isDeleted &&
                                                                     <p>****삭제된 책 입니다****</p>
@@ -325,88 +212,11 @@ const Search = () => {
                                                                 <p>출판사: {book.bookPublisher}</p>
                                                                 <p>입고일: {book.regDate}</p>
                                                             </div>
-                                                        }
-                                                        {(editMode[book.bookId]) && (
-                                                            <div>
-                                                                {book.isDeleted &&
-                                                                    <p>****삭제된 책 입니다****</p>
-                                                                }
-                                                                <p>번호: {book.bookNumber}</p>
-                                                                <p>제목:
-                                                                    <input className="form-control"
-                                                                           type="text"
-                                                                           value={editedBooks[book.bookId].bookName}
-                                                                           onChange={(e) => {
-                                                                               handleInputChange(book.bookId, 'bookName', e.target.value);
-                                                                               setBookName(e.target.value);
-                                                                           }}
-                                                                    />
-                                                                </p>
-                                                                <p>저자: {book.bookAuthor ? book.bookAuthor.replaceAll("^", ", ") : '저자 정보 없음'}</p>
-                                                                <p>출판사: {book.bookPublisher}</p>
-                                                                <p>입고일: {book.regDate}</p>
-                                                            </div>
-                                                        )}
-                                                        {(directEditMode[book.bookId]) && (
-                                                            <div>
-                                                                {book.isDeleted &&
-                                                                    <p>****삭제된 책 입니다****</p>
-                                                                }
-                                                                <p>번호: {book.bookNumber}</p>
-                                                                <p>제목:
-                                                                    <input className="form-control"
-                                                                    type="text"
-                                                                    value={editedBooks[book.bookId].bookName}
-                                                                    onChange={(e) => {
-                                                                       handleInputChange(book.bookId, 'bookName', e.target.value);
-                                                                       setBookName(e.target.value);
-                                                                    }}
-                                                                    />
-                                                                </p>
-                                                                <p>저자:
-                                                                    <input className="form-control"
-                                                                        type="text"
-                                                                        value={editedBooks[book.bookId].bookAuthor}
-                                                                        onChange={(e) =>{
-                                                                            handleInputChange(book.bookId, 'bookAuthor', e.target.value)
-                                                                            setBookAuthor(e.target.value);
-                                                                    }}
-                                                                    />
-                                                                </p>
-                                                                <p>출판사:
-                                                                    <input className="form-control"
-                                                                        type="text"
-                                                                        value={editedBooks[book.bookId].bookPublisher}
-                                                                        onChange={(e) => {
-                                                                            handleInputChange(book.bookId, 'bookPublisher', e.target.value)
-                                                                            setBookPublisher(e.target.value);
-                                                                        }}
-                                                                    />
-                                                                </p>
-                                                                <p>입고일: {book.regDate}</p>
-                                                            </div>
-                                                        )}
                                                         <p>대여 가능 여부: {book.isAble ? "가능" : "불가능"}</p>
                                                         <p>찜 수: {book.recommend}</p>
                                                         {isAdmin &&
                                                             <div className="flex">
-                                                                {!(editMode[book.bookId] || directEditMode[book.bookId]) &&
-                                                                    <p>
-                                                                        <button className="btn btn-outline-info btn-sm" onClick={() => handleEdit(book)}>
-                                                                            책 수정
-                                                                        </button>
-                                                                        <button style={{marginLeft: "8px"}} className="btn btn-outline-info btn-sm" onClick={() => handleDirectEdit(book)}>
-                                                                            직접 수정
-                                                                        </button>
-                                                                    </p>
-
-                                                                }
-                                                                {(editMode[book.bookId] || directEditMode[book.bookId]) &&
-                                                                    <div className="flex">
-                                                                    <p><button className="btn btn-outline-info btn-sm" onClick={() => handleSave(book)}>저장</button></p>
-                                                                    <p style={{marginLeft: "8px"}}><button className="btn btn-outline-info btn-sm" onClick={() => handleCancel(book.bookId)}>취소</button></p>
-                                                                    </div>
-                                                                }
+                                                                <CompEditModal book={book} key={book.id} />
                                                                 <p style={{marginLeft: "8px"}}><button className="btn btn-outline-danger btn-sm" onClick={() => deleteBook(book.bookNumber)}>
                                                                     책 삭제
                                                                 </button></p>

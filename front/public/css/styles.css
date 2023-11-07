@@ -5400,10 +5400,18 @@ textarea.form-control-lg {
   .modal-xl {
     --bs-modal-width: 800px;
   }
+  .modal-textarea {
+    width: 300px;
+    height: 300px;
+  }
 }
 @media (min-width: 1200px) {
   .modal-xl {
     --bs-modal-width: 1140px;
+  }
+  .modal-textarea {
+    width: 500px;
+    height: 500px;
   }
 }
 .modal-fullscreen {
@@ -5412,6 +5420,14 @@ textarea.form-control-lg {
   height: 100%;
   margin: 0;
 }
+
+.modal-80per {
+  width: 80%;
+  max-width: none;
+  height: 80%;
+  margin: 0;
+}
+
 .modal-fullscreen .modal-content {
   height: 100%;
   border: 0;
@@ -10957,4 +10973,14 @@ html {
 
 .flex{
   display: flex;
+}
+
+.flex-between{
+  display: flex;
+  justify-content: space-between;
+}
+
+.flex-center{
+  display: flex;
+  justify-content: center;
 }
