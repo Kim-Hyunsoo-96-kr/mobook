@@ -1,5 +1,7 @@
 package com.mb.service;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mb.domain.*;
 import com.mb.dto.Admin.resp.AdminBookLogResponseDto;
@@ -64,6 +66,9 @@ public class BookService {
     private final BookLogService bookLogService;
     private final BookCommentService bookCommentService;
     private final WebHookService webHookService;
+    private final AmazonS3 amazonS3;
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
     @Value("${naver.clientId}")
     public String naverClientId;
     @Value("${naver.clientSecret}")
@@ -877,6 +882,7 @@ public class BookService {
             LocalDate today = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             book.setEditDate(today.format(formatter));
+            book.setBookImageUrl(getUploadImg(bookEditDto.getBookImg()));
 
             saveBook(book);
 
@@ -887,6 +893,23 @@ public class BookService {
             return new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);
         }
     }
+
+    private String getUploadImg(MultipartFile multipartFile) {
+        try {
+            String s3FileName = UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
+
+            ObjectMetadata objMeta = new ObjectMetadata();
+            objMeta.setContentLength(multipartFile.getInputStream().available());
+
+            amazonS3.putObject(bucket, s3FileName, multipartFile.getInputStream(), objMeta);
+
+            return amazonS3.getUrl(bucket, s3FileName).toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+    }
+
     public ResponseEntity getRecentBookList() {
         RecentBookListTop5Dto recentBookListTop5Dto = new RecentBookListTop5Dto();
         try{

@@ -1,5 +1,6 @@
 package com.mb.dto.Book.req;
 import lombok.Getter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 public class BookEditDto {
@@ -15,5 +16,7 @@ public class BookEditDto {
     private String bookPublisher;
 
     private String bookDescription;
+
+    private MultipartFile bookImg;
 
 }

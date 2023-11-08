@@ -32,9 +32,9 @@ import java.util.UUID;
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
 public class BookController {
-    private final AmazonS3 amazonS3;
     private final BookService bookService;
     private final MemberService memberService;
+    private final AmazonS3 amazonS3;
     @Value("${naver.clientId}")
     public String naverClientId;
     @Value("${naver.clientSecret}")
