@@ -94,10 +94,11 @@ public class AdminController {
 
     @Operation(summary = "책 수정", description = "책 정보를 직접 입력한 값으로 수정합니다.")
     @PostMapping("/edit/book")
-    public ResponseEntity editBook(@RequestBody BookEditDto bookEditDto , Authentication authentication){
+    public ResponseEntity editBook(@RequestPart(name = "bookImg", required = false) MultipartFile bookImg ,@RequestPart("bookEditDto") BookEditDto bookEditDto , Authentication authentication) {
         Member loginMember = getLoginMember(authentication);
-        return bookService.editBook(bookEditDto, loginMember);
+        return bookService.editBook(bookImg,bookEditDto, loginMember);
     }
+
 
     /**
      * 500 : DB 에러

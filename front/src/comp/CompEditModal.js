@@ -15,7 +15,18 @@ function CompCommentModal({book}) {
     const [bookPublisher, setBookPublisher] = useState(book.bookPublisher);
     const [bookDescription, setBookDescription] = useState(book.bookDescription);
     const [bookImg, setBookImg] = useState(book.bookImageUrl);
+    const [previewBookImg, setPreviewBookImg] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
+    const encodeFileToBase64 = (fileBlob) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(fileBlob);
+        return new Promise((resolve) => {
+            reader.onload = () => {
+                setPreviewBookImg(reader.result);
+                resolve();
+            };
+        });
+    };
     const bookNameInputChange = (event) => {
         setBookName(event.target.value);
     };
@@ -31,73 +42,43 @@ function CompCommentModal({book}) {
 
     const handleFileInputChange = (event) => {
         const file = event.target.files[0];
+        encodeFileToBase64(event.target.files[0]);
+        setBookImg('')
         setSelectedFile(file);
     }
     const edit = async (event, bookNumber) => {
-
         event.preventDefault();
 
-        const form = event.target;
+        // FormData 객체 생성
+        const formData = new FormData();
+        formData.append('bookEditDto', new Blob([JSON.stringify({
+            bookNumber: bookNumber,
+            bookName: bookName,
+            bookAuthor: bookAuthor,
+            bookPublisher: bookPublisher,
+            bookDescription: bookDescription,
+        })], { type: 'application/json' }));
+        formData.append('bookImg', selectedFile);
+        const config = {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        };
+        try {
+            const response = await axiosInstance.post(CONFIG.API_EDIT_BOOK, formData);
 
-        form.bookName.value = form.bookName.value.trim();
-        form.bookAuthor.value = form.bookAuthor.value.trim();
-        form.bookPublisher.value = form.bookPublisher.value.trim();
-        form.bookDescription.value = form.bookDescription.value.trim();
-
-        if (form.bookName.value.length === 0) {
-            Swal.fire(
-                '책 제목을 입력해주세요.',
-                '책 제목은 필수입니다.',
-                'warning'
-            )
-            return;
-        }
-
-        if (form.bookAuthor.value.length === 0) {
-            Swal.fire(
-                '책 저자는 입력해주세요.',
-                '책 저자는 필수입니다.',
-                'warning'
-            )
-            return;
-        }
-
-        if (form.bookPublisher.value.length === 0) {
-            Swal.fire(
-                '책 출판사는 입력해주세요.',
-                '책 출판사는 필수입니다.',
-                'warning'
-            )
-            return;
-        }
-
-        if (form.bookDescription.value.length === 0) {
-            Swal.fire(
-                '책 설명은 입력해주세요.',
-                '책 설명은 필수입니다.',
-                'warning'
-            )
-            return;
-        }
-
-        try{
-            const response = await axiosInstance.post(CONFIG.API_EDIT_BOOK,
-                {
-                    "bookNumber" : bookNumber,
-                    "bookName" : bookName,
-                    "bookAuthor" : bookAuthor,
-                    "bookPublisher" : bookPublisher,
-                    "bookDescription" : bookDescription
-                }
-            );
             Toast.fire({
                 icon: 'success',
                 title: response.data.message
-            })
+            });
+
             setBookName('');
             setBookAuthor('');
             setBookPublisher('');
             setBookDescription('');
+            setPreviewBookImg('');
+            setSelectedFile(null);
+
             queryClient.invalidateQueries(["bookList"]);
             closeButtonRef.current.click();
         } catch (e) {
@@ -145,7 +126,8 @@ function CompCommentModal({book}) {
                             <div class="card bg-light">
                                 <div class="card-body flex-center">
                                     <div style={{padding: "5% 0 5% 0"}}>
-                                        <img src={book.bookImageUrl} alt="Book Cover" style={{maxWidth : '80%'}} />
+                                        {bookImg && <img src={bookImg} alt="Book Cover" style={{maxWidth : '80%'}} />}
+                                        {previewBookImg && <img src={previewBookImg} alt="preview-img" style={{maxWidth : '80%'}}/>}
                                         <div className="margin-top30">
                                             <label className="form-label">책 표지</label>
                                             <input className="form-control" type="file" name="bookImg" onChange={handleFileInputChange} style={{maxWidth : '80%'}}/>

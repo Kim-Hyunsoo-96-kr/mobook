@@ -17,6 +17,4 @@ public class BookEditDto {
 
     private String bookDescription;
 
-    private MultipartFile bookImg;
-
 }

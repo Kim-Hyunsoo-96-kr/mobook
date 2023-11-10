@@ -45,7 +45,7 @@ const  DashboardSection1 = () => {
                                             <div className="card-body">
                                                 <ul className="list-unstyled mt-3 mb-4 text-left">
                                                     {dashboard.recentBookList.map((recentBook, index)=>(
-                                                        <li className="ellipsis mb-2">{index+1}.  {recentBook.bookName}</li>
+                                                        <li className="ellipsis mb-2" title={recentBook.bookName}>{index+1}.  {recentBook.bookName}</li>
                                                     ))}
                                                 </ul>
                                             </div>
@@ -71,7 +71,7 @@ const  DashboardSection1 = () => {
                                                 <div className="card-body">
                                                     <ul className="list-unstyled mt-3 mb-4 text-left">
                                                         {dashboard.popularBookList.map((popularBook, index)=>(
-                                                            <li className="ellipsis mb-2">{index+1}.  {popularBook.bookName}</li>
+                                                            <li className="ellipsis mb-2" title={popularBook.bookName}>{index+1}.  {popularBook.bookName}</li>
                                                         ))}
                                                     </ul>
                                                 </div>
@@ -98,8 +98,11 @@ const  DashboardSection1 = () => {
                                                 <div className="card-body">
                                                     <ul className="list-unstyled mt-3 mb-4 text-left">
                                                         {dashboard.rentBookList.map((rentBook, index)=>(
-                                                            <li className="ellipsis mb-2">{index+1}.  {rentBook.userName} - {rentBook.bookName}</li>
+                                                            <li className="ellipsis mb-2" title={rentBook.bookName}>{index+1}.  {rentBook.userName} - {rentBook.bookName}</li>
                                                         ))}
+                                                        {dashboard.rentBookList.size > 0 ||
+                                                            <div>대여중인 책이 없습니다.</div>
+                                                        }
                                                     </ul>
                                                 </div>
                                             </div>

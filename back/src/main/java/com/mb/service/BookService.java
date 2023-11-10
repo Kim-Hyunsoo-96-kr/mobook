@@ -871,7 +871,7 @@ public class BookService {
             return new ResponseEntity(messageDto, HttpStatus.BAD_REQUEST);
         }
     }
-    public ResponseEntity editBook(BookEditDto bookEditDto, Member loginMember) {
+    public ResponseEntity editBook(MultipartFile bookImg ,BookEditDto bookEditDto, Member loginMember) {
         MessageDto messageDto = new MessageDto();
         if(loginMember.getIsAdmin()){
             Book book = findByBookNumber(bookEditDto.getBookNumber());
@@ -882,8 +882,10 @@ public class BookService {
             LocalDate today = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             book.setEditDate(today.format(formatter));
-            book.setBookImageUrl(getUploadImg(bookEditDto.getBookImg()));
-
+            Optional<MultipartFile> optionalBookImg = Optional.ofNullable(bookImg);
+            if(optionalBookImg.isPresent()){
+                book.setBookImageUrl(getUploadImg(optionalBookImg.get()));
+            }
             saveBook(book);
 
             messageDto.setMessage("성공적으로 책을 수정했습니다.");
