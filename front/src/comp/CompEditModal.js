@@ -86,6 +86,7 @@ function CompEditModal({book}) {
             if (inputRef.current) {
                 inputRef.current.value = null;
             }
+            setSelectedFile(null)
             setPreviewBookImg('');
             setBookImg(response.data.bookImg)
 
@@ -107,6 +108,15 @@ function CompEditModal({book}) {
             console.log(e)
         }
     }
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+    }
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+        }
+    };
 
     useEffect(() => {
         const modalElement = document.getElementById(`editModal${book.bookNumber}`);
@@ -145,7 +155,7 @@ function CompEditModal({book}) {
                 </div>
                 <div className="modal-body">
                     <section>
-                        <form onSubmit={(event) => edit(event, book.bookNumber)}>
+                        <form onSubmit={handleSubmit}  onKeyDown={handleKeyDown}>
                             <div class="card bg-light">
                                 <div class="card-body flex-center">
                                     <div style={{padding: "5% 0 5% 0"}}>
@@ -174,7 +184,8 @@ function CompEditModal({book}) {
                             <div className="modal-footer">
                                 <button type="button"
                                         className="btn btn-success"
-                                        type='submit'>수정
+                                        type='submit'
+                                        onClick={(event) => edit(event, book.bookNumber)}>수정
                                 </button>
                             </div>
                         </form>

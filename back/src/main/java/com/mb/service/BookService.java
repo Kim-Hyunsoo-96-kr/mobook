@@ -117,6 +117,35 @@ public class BookService {
         return bookList;
     }
 
+    private Integer getTotalCntByOptionAndKeyword(String option, String keyword) {
+        Integer totalCnt = 0;
+        switch (option){
+            case "title":
+                totalCnt = bookRepository.findByBookNameContaining(keyword).size();
+                break;
+            case "number":
+                totalCnt = bookRepository.findByBookNumberContaining(keyword).size();
+                break;
+            case "author":
+                totalCnt = bookRepository.findByBookAuthorContaining(keyword).size();
+                break;
+            case "publisher":
+                totalCnt = bookRepository.findByBookPublisherContaining(keyword).size();
+                break;
+            case "description":
+                totalCnt = bookRepository.findByBookDescriptionContaining(keyword).size();
+                break;
+            case "all":
+                totalCnt = bookRepository.findAllContainingKeyword(keyword).size();
+                break;
+            default:
+                totalCnt = bookRepository.findByBookNameContaining(keyword).size();
+                break;
+        }
+
+        return totalCnt;
+    }
+
     public List<Book> findByRentalMemberId(Long memberId) {
         List<Book> bookList = bookRepository.findByRentalMemberId(memberId);
         return bookList;
@@ -636,7 +665,7 @@ public class BookService {
     public ResponseEntity bookSearch(String option, String searchText, Integer page) {
         Pageable pageable = PageRequest.of(page, 10, Sort.by("bookId").descending());
         List<Book> bookList = getBookListByOptionAndKeyword(option, searchText, pageable.withPage(page));
-        Integer totalCnt = getTotalCntBySearchText(searchText);
+        Integer totalCnt = getTotalCntByOptionAndKeyword(option, searchText);
 
         BookListResponseDto bookListResponseDto = new BookListResponseDto();
         bookListResponseDto.setBookList(bookList);
