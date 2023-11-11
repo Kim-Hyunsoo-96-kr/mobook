@@ -99,6 +99,13 @@ public class AdminController {
         return bookService.editBook(bookImg,bookEditDto, loginMember);
     }
 
+    @Operation(summary = "책 제목으로 검색", description = "책 수정을 위한 책 제목으로 검색")
+    @GetMapping("/edit/search/book")
+    public ResponseEntity searchByBookName(@RequestParam String bookName , Authentication authentication) {
+        Member loginMember = getLoginMember(authentication);
+        return bookService.searchByBookName(bookName, loginMember);
+    }
+
 
     /**
      * 500 : DB 에러

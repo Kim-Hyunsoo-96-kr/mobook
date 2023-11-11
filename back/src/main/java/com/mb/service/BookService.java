@@ -207,6 +207,60 @@ public class BookService {
 
     }
 
+    public ResponseEntity searchByBookName(String bookName, Member loginMember) {
+        if(loginMember.getIsAdmin()){
+            Book newBook = new Book();
+            URI uri = UriComponentsBuilder
+                    .fromUriString("https://openapi.naver.com")
+                    .path("/v1/search/book.json")
+                    .queryParam("query", bookName)
+                    .queryParam("display", 10)
+                    .queryParam("start", 1)
+                    .queryParam("sort", "sim")
+                    .encode()
+                    .build()
+                    .toUri();
+
+            RequestEntity<Void> req = RequestEntity
+                    .get(uri)
+                    .header("X-Naver-Client-Id", naverClientId)
+                    .header("X-Naver-Client-Secret", naverClientSecret)
+                    .build();
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> resp = restTemplate.exchange(req, String.class);
+
+            ObjectMapper om = new ObjectMapper();
+            NaverResponseDto naverResponseDto = null;
+
+            try{
+                naverResponseDto = om.readValue(resp.getBody(), NaverResponseDto.class);
+                if(!naverResponseDto.getItems().isEmpty()){
+                    newBook.setBookName(naverResponseDto.getItems().get(0).getTitle());
+                    newBook.setBookImageUrl(naverResponseDto.getItems().get(0).getImage());
+                    newBook.setBookAuthor(naverResponseDto.getItems().get(0).getAuthor());
+                    newBook.setBookPublisher(naverResponseDto.getItems().get(0).getPublisher());
+                    newBook.setBookDescription(naverResponseDto.getItems().get(0).getDescription());
+                } else {
+                    newBook.setBookName(bookName);
+                    newBook.setBookImageUrl("https://raw.githubusercontent.com/jootang2/MyS3/7c8c92a8b513f32b17864bf6a0779457895d0392/MOBOOK1.1/MOBOOK1.1_404.png");
+                    newBook.setBookAuthor("정보 없음");
+                    newBook.setBookPublisher("정보 없음");
+                    newBook.setBookDescription("정보 없음");
+                }
+            } catch (Exception e){
+                throw new IllegalArgumentException("Json parser 관련 오류");
+            }
+            return new ResponseEntity(newBook, HttpStatus.OK);
+        } else {
+            MessageDto messageDto = new MessageDto();
+            messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
+            return  new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);
+        }
+
+    }
+
+
     @Transactional
     public ResponseEntity addBookByExcel(MultipartFile mf, Member loginMember) {
 
@@ -885,11 +939,15 @@ public class BookService {
             Optional<MultipartFile> optionalBookImg = Optional.ofNullable(bookImg);
             if(optionalBookImg.isPresent()){
                 book.setBookImageUrl(getUploadImg(optionalBookImg.get()));
+            } else {
+                book.setBookImageUrl(bookEditDto.getBookImageUrl());
             }
             saveBook(book);
 
-            messageDto.setMessage("성공적으로 책을 수정했습니다.");
-            return new ResponseEntity(messageDto, HttpStatus.OK);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "성공적으로 책을 수정했습니다.");
+            response.put("bookImg", book.getBookImageUrl());
+            return new ResponseEntity(response, HttpStatus.OK);
         } else {
             messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
             return new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);

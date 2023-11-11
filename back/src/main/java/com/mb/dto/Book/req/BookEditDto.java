@@ -17,4 +17,6 @@ public class BookEditDto {
 
     private String bookDescription;
 
+    private String bookImageUrl;
+
 }

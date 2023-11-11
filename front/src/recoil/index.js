@@ -91,6 +91,7 @@ CONFIG.BASE_URL = "http://localhost:8888"; //로컬
 CONFIG.API_CREATE_ACCOUNT = `${CONFIG.BASE_URL}/api/admin/signUp`;
 CONFIG.API_ADD_BOOK = `${CONFIG.BASE_URL}/api/admin/add`;
 CONFIG.API_EDIT_BOOK = `${CONFIG.BASE_URL}/api/admin/edit/book`;
+CONFIG.API_EDIT_SEARCH_BOOK = `${CONFIG.BASE_URL}/api/admin/edit/search/book?bookName=`;
 CONFIG.API_UPLOAD_EXCEL = `${CONFIG.BASE_URL}/api/admin/add/excel`;
 CONFIG.API_LOGIN = `${CONFIG.BASE_URL}/api/members/login`;
 CONFIG.API_REFRESH_TOKEN = `${CONFIG.BASE_URL}/api/members/refreshToken`;

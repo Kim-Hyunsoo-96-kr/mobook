@@ -7,8 +7,13 @@ import {useRecoilValue, useSetRecoilState} from "recoil";
 import CompComment from "./CompComment";
 import Swal from "sweetalert2";
 import {useEffect, useRef, useState} from "react";
+import {useLocation} from "react-router-dom";
 
-function CompCommentModal({book}) {
+function CompEditModal({book}) {
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const searchText = queryParams.get("searchText") || "";
+    const page = parseInt(queryParams.get("page") || "1") - 1;
     const closeButtonRef = useRef(null);
     const [bookName, setBookName] = useState(book.bookName);
     const [bookAuthor, setBookAuthor] = useState(book.bookAuthor);
@@ -17,6 +22,7 @@ function CompCommentModal({book}) {
     const [bookImg, setBookImg] = useState(book.bookImageUrl);
     const [previewBookImg, setPreviewBookImg] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
+    const inputRef = useRef(null);
     const encodeFileToBase64 = (fileBlob) => {
         const reader = new FileReader();
         reader.readAsDataURL(fileBlob);
@@ -57,6 +63,7 @@ function CompCommentModal({book}) {
             bookAuthor: bookAuthor,
             bookPublisher: bookPublisher,
             bookDescription: bookDescription,
+            bookImageUrl : bookImg
         })], { type: 'application/json' }));
         formData.append('bookImg', selectedFile);
         const config = {
@@ -72,19 +79,35 @@ function CompCommentModal({book}) {
                 title: response.data.message
             });
 
-            setBookName('');
-            setBookAuthor('');
-            setBookPublisher('');
-            setBookDescription('');
+            setBookName(bookName);
+            setBookAuthor(bookAuthor);
+            setBookPublisher(bookPublisher);
+            setBookDescription(bookDescription);
+            if (inputRef.current) {
+                inputRef.current.value = null;
+            }
             setPreviewBookImg('');
-            setSelectedFile(null);
+            setBookImg(response.data.bookImg)
 
-            queryClient.invalidateQueries(["bookList"]);
+            queryClient.invalidateQueries(["bookList", page, searchText]);
             closeButtonRef.current.click();
         } catch (e) {
             console.log(e)
         }
     }
+    const searchBook = async (bookName) => {
+        try{
+            const response = await axiosInstance.get(`${CONFIG.API_EDIT_SEARCH_BOOK}${bookName}`);
+            setBookName(response.data.bookName)
+            setBookAuthor(response.data.bookAuthor);
+            setBookPublisher(response.data.bookPublisher);
+            setBookDescription(response.data.bookDescription);
+            setBookImg(response.data.bookImageUrl)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     useEffect(() => {
         const modalElement = document.getElementById(`editModal${book.bookNumber}`);
         const bookNameInputElement = document.getElementById(`bookNameInput${book.bookNumber}`);
@@ -130,14 +153,14 @@ function CompCommentModal({book}) {
                                         {previewBookImg && <img src={previewBookImg} alt="preview-img" style={{maxWidth : '80%'}}/>}
                                         <div className="margin-top30">
                                             <label className="form-label">책 표지</label>
-                                            <input className="form-control" type="file" name="bookImg" onChange={handleFileInputChange} style={{maxWidth : '80%'}}/>
+                                            <input className="form-control" type="file" name="bookImg" ref={inputRef} onChange={handleFileInputChange} style={{maxWidth : '80%'}}/>
                                         </div>
                                     </div>
                                     <div className="margin-left8">
                                         <label className="form-label">제목</label>
                                         <input className="form-control me-2 mb-3" name="bookName" id={`bookNameInput${book.bookNumber}`} value={bookName} onChange={bookNameInputChange}/>
                                         <div>
-                                            <button type="button" className="btn btn-sm btn-outline-secondary mb-3" type='submit'>제목으로 검색</button>
+                                            <button className="btn btn-outline-danger btn-sm mb-3" type="button" onClick={() => searchBook(bookName)}>제목으로 검색</button>
                                         </div>
                                         <label className="form-label">저자</label>
                                         <input className="form-control me-2 mb-3" name="bookAuthor" value={bookAuthor} onChange={bookAuthorInputChange}/>
@@ -164,4 +187,4 @@ function CompCommentModal({book}) {
     );
 }
 
-export default CompCommentModal;
+export default CompEditModal;
