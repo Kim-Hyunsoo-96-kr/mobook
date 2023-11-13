@@ -73,6 +73,9 @@ public class BookService {
     public String naverClientId;
     @Value("${naver.clientSecret}")
     public String naverClientSecret;
+    @Value("${mobook.404Img}")
+    public String mobook404Img;
+
     public Book saveBook(Book newBook) {
         Book saveBook = bookRepository.save(newBook);
         return saveBook;
@@ -210,7 +213,7 @@ public class BookService {
                     newBook.setBookPublisher(naverResponseDto.getItems().get(0).getPublisher());
                     newBook.setBookDescription(naverResponseDto.getItems().get(0).getDescription());
                 } else {
-                    newBook.setBookImageUrl("https://raw.githubusercontent.com/jootang2/MyS3/7c8c92a8b513f32b17864bf6a0779457895d0392/MOBOOK1.1/MOBOOK1.1_404.png");
+                    newBook.setBookImageUrl(mobook404Img);
                 }
             } catch (Exception e){
                 throw new IllegalArgumentException("Json parser 관련 오류");
@@ -272,7 +275,7 @@ public class BookService {
                     newBook.setBookDescription(naverResponseDto.getItems().get(0).getDescription());
                 } else {
                     newBook.setBookName(bookName);
-                    newBook.setBookImageUrl("https://raw.githubusercontent.com/jootang2/MyS3/7c8c92a8b513f32b17864bf6a0779457895d0392/MOBOOK1.1/MOBOOK1.1_404.png");
+                    newBook.setBookImageUrl(mobook404Img);
                     newBook.setBookAuthor("정보 없음");
                     newBook.setBookPublisher("정보 없음");
                     newBook.setBookDescription("정보 없음");
@@ -359,7 +362,7 @@ public class BookService {
                                     newBook.setBookPublisher(naverResponseDto.getItems().get(0).getPublisher());
                                     newBook.setBookDescription(naverResponseDto.getItems().get(0).getDescription());
                                 } else {
-                                    newBook.setBookImageUrl("https://raw.githubusercontent.com/jootang2/MyS3/7c8c92a8b513f32b17864bf6a0779457895d0392/MOBOOK1.1/MOBOOK1.1_404.png");
+                                    newBook.setBookImageUrl(mobook404Img);
                                 }
                             } catch (Exception e){
                                 throw new IllegalArgumentException("Json parser 관련 오류");
@@ -931,7 +934,7 @@ public class BookService {
                         book.setBookDescription(naverResponseDto.getItems().get(0).getDescription());
                     } else {
                         book.setBookLink("");
-                        book.setBookImageUrl("https://raw.githubusercontent.com/jootang2/MyS3/7c8c92a8b513f32b17864bf6a0779457895d0392/MOBOOK1.1/MOBOOK1.1_404.png");
+                        book.setBookImageUrl(mobook404Img);
                         book.setBookAuthor("저자 정보 없음");
                         book.setBookPublisher("출판사 정보 없음");
                         book.setBookDescription("책 정보 없음");

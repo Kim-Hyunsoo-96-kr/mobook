@@ -142,7 +142,7 @@ public class MemberService {
                     Map<String, Object> model = new HashMap<>();
                     model.put("newPassword", newPassword);
                     try {
-                        mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.0]새로운 비밀번호 안내", "findPassword.html", model);
+                        mailService.sendHtmlEmail(receiveArray, "[MOBOOK1.2]새로운 비밀번호 안내", "findPassword.html", model);
                     } catch (Exception e) {
                         messageDto.setMessage("메일 발송 관련 오류");
                     }

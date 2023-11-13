@@ -16,7 +16,7 @@ function NavBar(props) {
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container px-5">
                 <Link to="/" className="navbar-brand">
-                    <img src="https://raw.githubusercontent.com/jootang2/MyS3/7c8c92a8b513f32b17864bf6a0779457895d0392/MOBOOK1.1/MOBOOK1.1.png" alt="Logo" />
+                    <img src="https://raw.githubusercontent.com/jootang2/MyS3/8ecc030e23d953296f92545f8f9e4dbb61fb7ad7/MOBOOK1.2/MOBOOK%201.2%20logo.png" alt="Logo" />
                 </Link>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
