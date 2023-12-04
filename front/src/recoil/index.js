@@ -86,8 +86,8 @@ export const nav = {
     ]
 }
 export const CONFIG = {};
-CONFIG.BASE_URL = "http://localhost:8888"; //로컬
-// CONFIG.BASE_URL = "http://mobook.mobility42.io:9607"; //실서버
+// CONFIG.BASE_URL = "http://localhost:8888"; //로컬
+CONFIG.BASE_URL = "http://mobook.mobility42.io:9607"; //실서버
 CONFIG.API_CREATE_ACCOUNT = `${CONFIG.BASE_URL}/api/admin/signUp`;
 CONFIG.API_ADD_BOOK = `${CONFIG.BASE_URL}/api/admin/add`;
 CONFIG.API_EDIT_BOOK = `${CONFIG.BASE_URL}/api/admin/edit/book`;

@@ -100,7 +100,7 @@ const  DashboardSection1 = () => {
                                                         {dashboard.rentBookList.map((rentBook, index)=>(
                                                             <li className="ellipsis mb-2" title={rentBook.bookName}>{index+1}.  {rentBook.userName} - {rentBook.bookName}</li>
                                                         ))}
-                                                        {dashboard.rentBookList.size > 0 ||
+                                                        {dashboard.rentBookList.length > 0 ||
                                                             <div>대여중인 책이 없습니다.</div>
                                                         }
                                                     </ul>
