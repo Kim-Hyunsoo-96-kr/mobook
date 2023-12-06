@@ -7,10 +7,7 @@ import com.mb.domain.*;
 import com.mb.dto.Admin.resp.AdminBookLogResponseDto;
 import com.mb.dto.Admin.resp.AdminRentBookLogResponseDto;
 import com.mb.dto.Admin.resp.AdminRequestBookLogResponseDto;
-import com.mb.dto.Book.req.BookAddDto;
-import com.mb.dto.Book.req.BookEditDto;
-import com.mb.dto.Book.req.BookRequestDto;
-import com.mb.dto.Book.req.BookCommentRequestDto;
+import com.mb.dto.Book.req.*;
 import com.mb.dto.Book.resp.BookListResponseDto;
 import com.mb.dto.Book.resp.DashboardResponseDto;
 import com.mb.dto.Book.resp.RecentBookListTop5Dto;
@@ -237,6 +234,87 @@ public class BookService {
             return  new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);
         }
 
+    }
+
+    @Transactional
+    public ResponseEntity addBookByISBN(BookAddByBarcodeDto bookAddByBarcodeDto, Member loginMember) {
+        MessageDto messageDto = new MessageDto();
+        if(loginMember.getIsAdmin()){
+            for (String ISBN : bookAddByBarcodeDto.getISBNList()) {
+
+                Book newBook = new Book();
+                Book lastBook = findLastBook();
+                newBook.setBookNumber(lastBook.getBookNumber());
+                newBook.setIsAble(true);
+                LocalDate today = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                newBook.setRegDate(today.format(formatter));
+                newBook.setEditDate(today.format(formatter));
+                newBook.setRecommend(0);
+                newBook.setPopularity(0);
+                newBook.setRentalMemberId(0L);
+                newBook.setIsDeleted(false);
+
+                URI uri = UriComponentsBuilder
+                        .fromUriString("https://openapi.naver.com")
+                        .path("/v1/search/book_adv")
+                        .queryParam("d_isbn", ISBN)
+                        .encode()
+                        .build()
+                        .toUri();
+
+                RequestEntity<Void> req = RequestEntity
+                        .get(uri)
+                        .header("X-Naver-Client-Id", naverClientId)
+                        .header("X-Naver-Client-Secret", naverClientSecret)
+                        .build();
+
+                RestTemplate restTemplate = new RestTemplate();
+                ResponseEntity<String> resp = restTemplate.exchange(req, String.class);
+
+                ObjectMapper om = new ObjectMapper();
+                NaverResponseDto naverResponseDto = null;
+
+                try {
+                    naverResponseDto = om.readValue(resp.getBody(), NaverResponseDto.class);
+                    if (!naverResponseDto.getItems().isEmpty()) {
+                        newBook.setBookName(naverResponseDto.getItems().get(0).getTitle());
+                        newBook.setBookLink(naverResponseDto.getItems().get(0).getLink());
+                        newBook.setBookImageUrl(naverResponseDto.getItems().get(0).getImage());
+                        newBook.setBookAuthor(naverResponseDto.getItems().get(0).getAuthor());
+                        newBook.setBookPublisher(naverResponseDto.getItems().get(0).getPublisher());
+                        newBook.setBookDescription(naverResponseDto.getItems().get(0).getDescription());
+                    } else {
+                        newBook.setBookImageUrl(mobook404Img);
+                    }
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("Json parser 관련 오류");
+                }
+
+
+                bookRepository.save(newBook);
+            }
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                @Override
+                public void afterCommit() {
+                    WebHook webHook = webHookService.findById(1L);
+                    String body = WebHookUtil.bookAddHook(1);
+                    webHookService.sendWebHook(webHook, body);
+                }
+            });
+            messageDto.setMessage("책 추가 성공!");
+            return new ResponseEntity(messageDto, HttpStatus.OK);
+        } else {
+            messageDto.setMessage("관리자만 해당 기능을 사용할 수 있습니다.");
+            return  new ResponseEntity(messageDto, HttpStatus.PRECONDITION_FAILED);
+        }
+
+    }
+
+    public Book findLastBook() {
+        Book lastBook = bookRepository.findLastBook();
+        System.out.println("+++++++++++++++" + lastBook.getBookNumber() + "++++++++++++++++++++++++");
+        return bookRepository.findLastBook();
     }
 
     public ResponseEntity searchByBookName(String bookName, Member loginMember) {

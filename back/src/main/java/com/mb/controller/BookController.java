@@ -43,21 +43,25 @@ public class BookController {
     private String bucket;
 
     @PostMapping("/test")
-    public ResponseEntity test(@RequestParam("images") MultipartFile multipartFile){
-        try {
-            String s3FileName = UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
-
-            ObjectMetadata objMeta = new ObjectMetadata();
-            objMeta.setContentLength(multipartFile.getInputStream().available());
-
-            amazonS3.putObject(bucket, s3FileName, multipartFile.getInputStream(), objMeta);
-
-            String url = amazonS3.getUrl(bucket, s3FileName).toString();
-            return ResponseEntity.ok(url);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public ResponseEntity test(){
+//        try {
+//            String s3FileName = UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
+//
+//            ObjectMetadata objMeta = new ObjectMetadata();
+//            objMeta.setContentLength(multipartFile.getInputStream().available());
+//
+//            amazonS3.putObject(bucket, s3FileName, multipartFile.getInputStream(), objMeta);
+//
+//            String url = amazonS3.getUrl(bucket, s3FileName).toString();
+//            return ResponseEntity.ok(url);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+        Book book = bookService.findLastBook();
+        MessageDto messageDto = new MessageDto();
+        messageDto.setMessage(book.getBookNumber());
+        return new ResponseEntity(messageDto, HttpStatus.OK);
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.mb.controller;
 
 import com.mb.domain.Member;
+import com.mb.dto.Book.req.BookAddByBarcodeDto;
 import com.mb.dto.Book.req.BookAddDto;
 import com.mb.dto.Book.req.BookEditDto;
 import com.mb.dto.Member.req.MemberSignUpDto;
@@ -66,6 +67,19 @@ public class AdminController {
     public ResponseEntity addExcel(@RequestParam("excelFile") MultipartFile mf, Authentication authentication){
         Member loginMember = getLoginMember(authentication);
         return bookService.addBookByExcel(mf, loginMember);
+    }
+
+    /**
+     * 500 : 메일 관련 오류 : 메세지 X
+     * 400 : 서비스 오류 : 메세지 O
+     * 200 : 성공 : 메세지 O
+     * 412 : 관리자가 아닌 경우 에러 : 메세지 O
+     */
+    @Operation(summary = "바코드(ISBN)로 책 추가", description = "ISBN을 통해서 책을 추가합니다.")
+    @PostMapping("/add/ISBN")
+    public ResponseEntity addByBarcode(@RequestBody BookAddByBarcodeDto bookAddByBarcodeDto, Authentication authentication){
+        Member loginMember = getLoginMember(authentication);
+        return bookService.addBookByISBN(bookAddByBarcodeDto, loginMember);
     }
 
     /**

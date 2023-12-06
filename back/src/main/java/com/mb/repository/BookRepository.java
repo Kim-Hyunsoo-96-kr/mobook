@@ -46,4 +46,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "b.bookDescription LIKE %:keyword%")
     List<Book> findAllContainingKeyword(@Param("keyword") String keyword);
 
+    @Query("SELECT b FROM Book b ORDER BY CAST(b.bookNumber AS int)  desc LIMIT 1")
+    Book findLastBook();
 }
